@@ -44,7 +44,6 @@ namespace AntShell
 		{
 			tem.Calibrate();
 			tem.Write(Text, false, Color);
-			tem.Calibrate();
 		}
 	}
 

@@ -402,7 +402,6 @@ namespace AntShell
 
 				NormalPrompt.Write(terminal);
 				history.Reset();
-				terminal.Calibrate();
                 
 				break;
 
