@@ -32,6 +32,7 @@ namespace AntShellDemo
 			var pty = new Pty("/proc/self/fd/1");
 			var calc = new AntCalc(pty.Stream);
 			calc.Start();
+			pty.ResetTerminal();
 		}
 	}
 }

@@ -33,15 +33,27 @@ namespace AntShellDemo
 {
 	public class Pty
 	{
+		private IntPtr original;
+		private int master;
+
 		public Pty(string name)
 		{
-			var master = Syscall.open(name, OpenFlags.O_RDWR);
+			master = Syscall.open(name, OpenFlags.O_RDWR);
 			stream = new UnixStream(master, true);
 			IntPtr termios = Marshal.AllocHGlobal(128); // termios struct is 60-bytes, but we allocate more just to make sure
+			original = Marshal.AllocHGlobal(128);
 			Tcgetattr(0, termios);
+			Tcgetattr(0, original);
+
 			Cfmakeraw(termios);
 			Tcsetattr(master, 1, termios);  // 1 == TCSAFLUSH
 			Marshal.FreeHGlobal(termios);
+		}
+
+		public void ResetTerminal()
+		{
+			Tcsetattr(master, 1, original);  // 1 == TCSAFLUSH
+			Marshal.FreeHGlobal(original);
 		}
 
 		private UnixStream stream;

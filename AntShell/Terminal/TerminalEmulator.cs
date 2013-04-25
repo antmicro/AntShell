@@ -121,6 +121,8 @@ namespace AntShell.Terminal
             CursorToColumn(1);
             CursorUp(int.MaxValue);
             onceAgain = false;
+			Reset();
+			stream.Flush();
         }
 
 		public void Run()
@@ -526,6 +528,12 @@ namespace AntShell.Terminal
 		#endregion
 
 		#region Display
+
+		public void Reset()
+		{
+			SendCSI((byte)'c'); // reset device
+			SendCSI((byte)'0', (byte)'m'); // reset colors
+		}
 
 		public void Calibrate()
 		{
