@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AntShellDemo", "AntShellDem
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AntShell", "AntShell\AntShell.csproj", "{0A473566-F4C6-455E-A56E-B3963FBABDFF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShellSpeedTest", "ShellSpeedTest\ShellSpeedTest.csproj", "{B7193EB4-58A9-44E9-878D-30E6EA9AB697}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -15,6 +17,10 @@ Global
 		{0A473566-F4C6-455E-A56E-B3963FBABDFF}.Debug|x86.Build.0 = Debug|Any CPU
 		{0A473566-F4C6-455E-A56E-B3963FBABDFF}.Release|x86.ActiveCfg = Release|Any CPU
 		{0A473566-F4C6-455E-A56E-B3963FBABDFF}.Release|x86.Build.0 = Release|Any CPU
+		{B7193EB4-58A9-44E9-878D-30E6EA9AB697}.Debug|x86.ActiveCfg = Debug|x86
+		{B7193EB4-58A9-44E9-878D-30E6EA9AB697}.Debug|x86.Build.0 = Debug|x86
+		{B7193EB4-58A9-44E9-878D-30E6EA9AB697}.Release|x86.ActiveCfg = Release|x86
+		{B7193EB4-58A9-44E9-878D-30E6EA9AB697}.Release|x86.Build.0 = Release|x86
 		{D4F75C6D-04F5-4584-9FFD-2BC2EE3152D5}.Debug|x86.ActiveCfg = Debug|x86
 		{D4F75C6D-04F5-4584-9FFD-2BC2EE3152D5}.Debug|x86.Build.0 = Debug|x86
 		{D4F75C6D-04F5-4584-9FFD-2BC2EE3152D5}.Release|x86.ActiveCfg = Release|x86

@@ -28,6 +28,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using AntShell.Helpers;
+using System.Diagnostics;
 
 namespace AntShell.Terminal
 {
@@ -644,12 +645,15 @@ namespace AntShell.Terminal
 				ControlSequence cs;
 				var localBuffer = new List<byte>();
 
+				DEBUGTOFILE("Sending sequence");
 				SendCSI();
 				SendControlSequence("6n");
+				DEBUGTOFILE("Sequence send");
 
 				while (true)
 				{
 					var b = stream.ReadByte(); // can be optimized
+					DEBUGTOFILE("Byte received");
 
 					localBuffer.Add((byte)b);
 
@@ -662,6 +666,7 @@ namespace AntShell.Terminal
 						case SequenceValidationResult.SequenceFound:
 						if (cs.Type == ControlSequenceType.CursorPosition)
 						{
+							DEBUGTOFILE("Sequence finished");
 							return cs.Argument as Position;
 						}
 						Buffer.AddRange(localBuffer);
@@ -719,6 +724,15 @@ namespace AntShell.Terminal
 			SEM = 0x3B, // ';'
 			INTEGER = 0xFF
 		}
+
+		private void DEBUGTOFILE(string txt)
+		{
+			buffer[pos++] = string.Format("{0}: {1}", stpw.ElapsedMilliseconds, txt);
+		}
+
+		private Stopwatch stpw = Stopwatch.StartNew();
+		private int pos = 0;
+		private string[] buffer = new string[100000];
 	}
 }
 
