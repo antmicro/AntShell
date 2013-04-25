@@ -32,10 +32,12 @@ namespace AntShell
 		public SearchPrompt SearchPrompt { get; set; }
 		public string Banner;
 		public bool UseBuiltinQuit { get; set; }
+		public bool UseBuiltinHelp { get; set; }
 
 		public ShellSettings()
 		{
 			UseBuiltinQuit = true;
+			UseBuiltinHelp = true;
 		}
 	}
 }

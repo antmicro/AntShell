@@ -106,11 +106,15 @@ namespace AntShell
 		{
 			RegisterCommand(new HistoryCommand(history));
 			RegisterCommand(new SaveCommand(history));
-			RegisterCommand(new HelpCommand(commands));
 
 			if (settings.UseBuiltinQuit)
 			{
 				RegisterCommand(new QuitCommand());
+			}
+
+			if (settings.UseBuiltinHelp)
+			{
+				RegisterCommand(new HelpCommand(commands));
 			}
 		}
 
