@@ -28,6 +28,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using AntShell.Helpers;
+using System.Diagnostics;
 
 namespace AntShell.Terminal
 {
@@ -68,6 +69,8 @@ namespace AntShell.Terminal
 		{
 			ClearScreen();
 			SetColor(DefaultColor);
+			CursorUp(int.MaxValue, false);
+			CursorToColumn(0, false);
 
 			Calibrate();
 		}
@@ -115,19 +118,18 @@ namespace AntShell.Terminal
 
 		#region Input handling
 
-        public void Stop()
-        {
-            ClearScreen();
-            CursorToColumn(1);
-            CursorUp(int.MaxValue);
-            onceAgain = false;
-			Reset();
-			stream.Flush();
-        }
+    public void Stop()
+    {
+      ClearScreen();
+      CursorToColumn(1);
+      CursorUp(int.MaxValue);
+      onceAgain = false;
+      ResetColors();
+    }
 
 		public void Run()
 		{
-            onceAgain = true;
+      onceAgain = true;
 			while(onceAgain)
 			{
 				byte value;
@@ -347,7 +349,7 @@ namespace AntShell.Terminal
 
 		#region Cursor movement
 
-		public void CursorUp(int n = 1)
+		public void CursorUp(int n = 1, bool recalculateEstimatedPosition = true)
 		{
 			if (n > 0)
 			{
@@ -359,7 +361,10 @@ namespace AntShell.Terminal
 
 				SendControlSequence((byte)'A');
 
-				vcursor.MoveUp(n);
+				if (recalculateEstimatedPosition)
+				{
+					vcursor.MoveUp(n);
+				}
 			}
 		}
 
@@ -529,9 +534,8 @@ namespace AntShell.Terminal
 
 		#region Display
 
-		public void Reset()
+		public void ResetColors()
 		{
-			SendCSI((byte)'c'); // reset device
 			SendCSI((byte)'0', (byte)'m'); // reset colors
 		}
 
@@ -643,7 +647,7 @@ namespace AntShell.Terminal
 			{
 				ControlSequence cs;
 				var localBuffer = new List<byte>();
-
+				
 				SendCSI();
 				SendControlSequence("6n");
 
