@@ -123,7 +123,8 @@ namespace AntShell.Terminal
             CursorUp(int.MaxValue);
             onceAgain = false;
 			Reset();
-			stream.Flush();
+
+			System.IO.File.WriteAllLines(@"log.txt", buffer);
         }
 
 		public void Run()
@@ -341,6 +342,7 @@ namespace AntShell.Terminal
 
 		private void WriteCharRaw(char c)
 		{
+			DEBUGTOFILE(string.Format("WCR Writing to stream: {0} ({0:X})", c));
 			stream.WriteByte((byte)c);
 		}
 
@@ -653,7 +655,7 @@ namespace AntShell.Terminal
 				while (true)
 				{
 					var b = stream.ReadByte(); // can be optimized
-					DEBUGTOFILE("Byte received");
+					DEBUGTOFILE(string.Format("Byte received: {0:X}", b));
 
 					localBuffer.Add((byte)b);
 
@@ -696,6 +698,7 @@ namespace AntShell.Terminal
 			{
 				foreach(var c in s.ToCharArray())
 				{
+					DEBUGTOFILE(string.Format("CS1 Writing to stream: {0} ({1})", (char)c, (int)c));
 					stream.WriteByte((byte)c);
 				}
 			}
@@ -705,6 +708,7 @@ namespace AntShell.Terminal
 		{
 			foreach(var b in seq)
 			{
+				DEBUGTOFILE(string.Format("CS2 Writing to stream: {0} ({1})", (char)b, (int)b));
 				stream.WriteByte(b);
 			}
 		}
