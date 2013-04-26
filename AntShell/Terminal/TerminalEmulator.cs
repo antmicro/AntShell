@@ -120,7 +120,7 @@ namespace AntShell.Terminal
         {
             ClearScreen();
             CursorToColumn(1);
-            CursorUp(int.MaxValue);
+            CursorUp(30);
             onceAgain = false;
 			Reset();
 
@@ -630,8 +630,8 @@ namespace AntShell.Terminal
 		{
 			HideCursor();
 			SaveCursor();
-			CursorToColumn(int.MaxValue, false);
-			CursorDown(int.MaxValue, false);
+			CursorToColumn(30, false);
+			CursorDown(30, false);
 
 			var result = GetCursorPosition(true);
 
