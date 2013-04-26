@@ -28,12 +28,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using AntShell.Helpers;
-using System.Diagnostics;
 
 namespace AntShell.Terminal
 {
 	public class TerminalEmulator
 	{
+		private const int MAX_HEIGHT = 9999;
+		private const int MAX_WIDTH = 9999;
+
 		private ConsoleColor DefaultColor;
 		private SequenceValidator validator;
 		private Queue<byte> queue;
@@ -69,7 +71,7 @@ namespace AntShell.Terminal
 		{
 			ClearScreen();
 			SetColor(DefaultColor);
-			CursorUp(int.MaxValue, false);
+			CursorUp(MAX_HEIGHT, false);
 			CursorToColumn(0, false);
 
 			Calibrate();
@@ -122,7 +124,7 @@ namespace AntShell.Terminal
     {
       ClearScreen();
       CursorToColumn(1);
-      CursorUp(int.MaxValue);
+      CursorUp(MAX_HEIGHT);
       onceAgain = false;
       ResetColors();
     }
@@ -631,8 +633,8 @@ namespace AntShell.Terminal
 		{
 			HideCursor();
 			SaveCursor();
-			CursorToColumn(int.MaxValue, false);
-			CursorDown(int.MaxValue, false);
+			CursorToColumn(MAX_WIDTH, false);
+			CursorDown(MAX_HEIGHT, false);
 
 			var result = GetCursorPosition(true);
 
