@@ -20,11 +20,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <ConsolePause>false</ConsolePause>
     <Externalconsole>true</Externalconsole>
-    <CustomCommands>
-      <CustomCommands>
-        <Command type="Execute" command="xterm" />
-      </CustomCommands>
-    </CustomCommands>
+    <DebugType>full</DebugType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <Optimize>true</Optimize>
@@ -33,6 +29,7 @@
     <WarningLevel>4</WarningLevel>
     <Externalconsole>true</Externalconsole>
     <PlatformTarget>x86</PlatformTarget>
+    <DebugType>none</DebugType>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
