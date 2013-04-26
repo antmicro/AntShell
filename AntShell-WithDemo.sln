@@ -27,6 +27,6 @@ Global
 		{D4F75C6D-04F5-4584-9FFD-2BC2EE3152D5}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = AntShellDemo\AntShellDemo.csproj
+		StartupItem = ShellSpeedTest\ShellSpeedTest.csproj
 	EndGlobalSection
 EndGlobal
