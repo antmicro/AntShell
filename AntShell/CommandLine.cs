@@ -339,7 +339,6 @@ namespace AntShell
 								terminal.WriteRaw(string.Format(" {0}\r\n", sug), ConsoleColor.Blue);
 							}
 
-							terminal.CursorBackward(CurrentEditor.Length);
 							CurrentEditor.SetValue(Helper.CommonPrefix(sugs));
 							NormalPrompt.Write(terminal);
 							terminal.Write(CurrentEditor.Value);

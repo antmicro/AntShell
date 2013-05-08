@@ -300,23 +300,24 @@ namespace AntShell.Terminal
 		{
 			WriteCharRaw(c);
 
-			if (c == (byte)SequenceElement.ESC)
+			if (checkIfWrapped)
 			{
-				InEscapeMode = true;
-			}
 
-			if (!InEscapeMode) // if the char changed cursor position by one; check for color steering codes
-			{
-				var result = vcursor.MoveForward();
-
-				if (vcursor.IsCursorOutOfLine && !vcursor.IsCursorOutOfScreen)
+				if (c == (byte)SequenceElement.ESC) // to eliminate control sequences, mostly color change
 				{
-					CursorDown();
-					CursorToColumn(1);
+					InEscapeMode = true;
 				}
 
-				if (checkIfWrapped)
+				if (!InEscapeMode) // if the char changed cursor position by one; check for color steering codes
 				{
+					var result = vcursor.MoveForward();
+
+					if (vcursor.IsCursorOutOfLine && !vcursor.IsCursorOutOfScreen)
+					{
+						CursorDown();
+						CursorToColumn(1);
+					}
+
 					if (result == VirtualCursorMoveResult.LineWrapped)
 					{
 						OnLineWrapped();
@@ -327,16 +328,17 @@ namespace AntShell.Terminal
 						OnLineWrapped();
 						OnScreenScroll();
 					}
+
+					return true;
+				}
+				else
+				{
+					if (c == 'm')
+					{
+						InEscapeMode = false;
+					}
 				}
 
-				return true;
-			}
-			else
-			{
-				if (c == 'm')
-				{
-					InEscapeMode = false;
-				}
 			}
 
 			return false;
