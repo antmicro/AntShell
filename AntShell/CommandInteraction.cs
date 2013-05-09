@@ -42,20 +42,20 @@ namespace AntShell
 
 		public bool QuitEnvironment { get; set; }
 
-		public void Write(char c)
+		public void Write(char c, ConsoleColor? color = null)
 		{
-			terminal.WriteRaw(c);
+			terminal.WriteRaw(c, color);
 		}
 
 		public void WriteError(string error)
 		{
 			if (!error.EndsWith("\r\n"))
 			{
-				terminal.WriteRaw(error + "\r\n", ConsoleColor.White);
+				terminal.WriteRaw(error + "\r\n", ConsoleColor.DarkRed);
 			}
 			else
 			{
-				terminal.WriteRaw(error, ConsoleColor.White);
+				terminal.WriteRaw(error, ConsoleColor.DarkRed);
 			}
 		}
 

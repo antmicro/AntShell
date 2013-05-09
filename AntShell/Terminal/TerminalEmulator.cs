@@ -54,7 +54,7 @@ namespace AntShell.Terminal
 
 		public TerminalEmulator(Stream stream)
 		{
-			DefaultColor = ConsoleColor.Green;
+			DefaultColor = ConsoleColor.Gray;
 
 			validator = new SequenceValidator();
 			queue = new Queue<byte>();
@@ -120,18 +120,18 @@ namespace AntShell.Terminal
 
 		#region Input handling
 
-    public void Stop()
-    {
-      ClearScreen();
-      CursorToColumn(1);
-      CursorUp(MAX_HEIGHT);
-      onceAgain = false;
-      ResetColors();
-    }
+	    public void Stop()
+	    {
+	      ClearScreen();
+	      CursorToColumn(1);
+	      CursorUp(MAX_HEIGHT);
+	      onceAgain = false;
+	      ResetColors();
+	    }
 
 		public void Run()
 		{
-      onceAgain = true;
+      		onceAgain = true;
 			while(onceAgain)
 			{
 				byte value;
@@ -213,7 +213,7 @@ namespace AntShell.Terminal
 
 			if (text != null)
 			{
-				if (color.HasValue && color != DefaultColor)
+				if (color.HasValue)
 				{
 					SetColor(color.Value);
 				}
@@ -223,7 +223,7 @@ namespace AntShell.Terminal
 					result += WriteChar(c, checkWrap) ? 1 : 0;
 				}
 
-				if (color.HasValue && color != DefaultColor)
+				if (color.HasValue)
 				{
 					SetColor(DefaultColor);
 				}
@@ -234,14 +234,14 @@ namespace AntShell.Terminal
 
 		public void Write(char c, bool checkWrap = true, ConsoleColor? color = null)
 		{
-			if (color.HasValue && color != DefaultColor)
+			if (color.HasValue)
 			{
 				SetColor(color.Value);
 			}
 			
 			WriteChar(c, checkWrap);
 			
-			if (color.HasValue && color != DefaultColor)
+			if (color.HasValue)
 			{
 				SetColor(DefaultColor);
 			}
@@ -269,16 +269,26 @@ namespace AntShell.Terminal
 			}
 		}
 
-		public void WriteRaw(char c)
+		public void WriteRaw(char c, ConsoleColor? color = null)
 		{
+			if (color.HasValue)
+			{
+				SetColor(color.Value);
+			}
+
 			WriteCharRaw(c);
+
+			if (color.HasValue)
+			{
+				SetColor(DefaultColor);
+			}
 		}
 
 		public void WriteRaw(string text, ConsoleColor? color = null)
 		{
 			if (text != null)
 			{
-				if (color.HasValue && color != DefaultColor)
+				if (color.HasValue)
 				{
 					SetColor(color.Value);
 				}
@@ -288,7 +298,7 @@ namespace AntShell.Terminal
 					WriteCharRaw(c);
 				}
 				
-				if (color.HasValue && color != DefaultColor)
+				if (color.HasValue)
 				{
 					SetColor(DefaultColor);
 				}
@@ -580,49 +590,49 @@ namespace AntShell.Terminal
 			switch(color)
 			{
 			case ConsoleColor.Black:
-				SendCSI((byte)'3', (byte)'0', (byte)'m');
+				SendCSI((byte)SequenceElement.SEM, (byte)'0', (byte)'3', (byte)'0', (byte)'m');
 				break;
-			case ConsoleColor.DarkRed:
-				SendCSI((byte)'3', (byte)'1', (byte)'m');
+			case ConsoleColor.Red:
+				SendCSI((byte)SequenceElement.SEM, (byte)'0', (byte)'3', (byte)'1', (byte)'m');
 				break;
-			case ConsoleColor.DarkGreen:
-				SendCSI((byte)'3', (byte)'2', (byte)'m');
+			case ConsoleColor.Green:
+				SendCSI((byte)SequenceElement.SEM, (byte)'0', (byte)'3', (byte)'2', (byte)'m');
 				break;
-			case ConsoleColor.DarkYellow:
-				SendCSI((byte)'3', (byte)'3', (byte)'m');
+			case ConsoleColor.Yellow:
+				SendCSI((byte)SequenceElement.SEM, (byte)'0', (byte)'3', (byte)'3', (byte)'m');
 				break;
-			case ConsoleColor.DarkBlue:
-				SendCSI((byte)'3', (byte)'4', (byte)'m');
+			case ConsoleColor.Blue:
+				SendCSI((byte)SequenceElement.SEM, (byte)'0', (byte)'3', (byte)'4', (byte)'m');
 				break;
-			case ConsoleColor.DarkMagenta:
-				SendCSI((byte)'3', (byte)'5', (byte)'m');
+			case ConsoleColor.Magenta:
+				SendCSI((byte)SequenceElement.SEM, (byte)'0', (byte)'3', (byte)'5', (byte)'m');
 				break;
-			case ConsoleColor.DarkCyan:
-				SendCSI((byte)'3', (byte)'6', (byte)'m');
+			case ConsoleColor.Cyan:
+				SendCSI((byte)SequenceElement.SEM, (byte)'0', (byte)'3', (byte)'6', (byte)'m');
 				break;
 			case ConsoleColor.Gray:
-				SendCSI((byte)'3', (byte)'7', (byte)'m');
+				SendCSI((byte)SequenceElement.SEM, (byte)'0', (byte)'3', (byte)'7', (byte)'m');
 				break;
 
 			case ConsoleColor.DarkGray:
 				SendCSI((byte)'3', (byte)'0', (byte)SequenceElement.SEM, (byte)'1', (byte)'m');
 				break;
-			case ConsoleColor.Red:
+			case ConsoleColor.DarkRed:
 				SendCSI((byte)'3', (byte)'1', (byte)SequenceElement.SEM, (byte)'1', (byte)'m');
 				break;
-			case ConsoleColor.Green:
+			case ConsoleColor.DarkGreen:
 				SendCSI((byte)'3', (byte)'2', (byte)SequenceElement.SEM, (byte)'1', (byte)'m');
 				break;
-			case ConsoleColor.Yellow:
+			case ConsoleColor.DarkYellow:
 				SendCSI((byte)'3', (byte)'3', (byte)SequenceElement.SEM, (byte)'1', (byte)'m');
 				break;
-			case ConsoleColor.Blue:
+			case ConsoleColor.DarkBlue:
 				SendCSI((byte)'3', (byte)'4', (byte)SequenceElement.SEM, (byte)'1', (byte)'m');
 				break;
-			case ConsoleColor.Magenta:
+			case ConsoleColor.DarkMagenta:
 				SendCSI((byte)'3', (byte)'5', (byte)SequenceElement.SEM, (byte)'1', (byte)'m');
 				break;
-			case ConsoleColor.Cyan:
+			case ConsoleColor.DarkCyan:
 				SendCSI((byte)'3', (byte)'6', (byte)SequenceElement.SEM, (byte)'1', (byte)'m');
 				break;
 			case ConsoleColor.White:

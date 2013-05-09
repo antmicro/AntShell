@@ -106,6 +106,7 @@ namespace AntShell
 		{
 			RegisterCommand(new HistoryCommand(history));
 			RegisterCommand(new SaveCommand(history));
+			RegisterCommand(new ColorsCommand());
 
 			if (settings.UseBuiltinQuit)
 			{

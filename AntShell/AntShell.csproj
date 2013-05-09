@@ -54,6 +54,7 @@
     <Compile Include="Commands\BuiltIn\QuitCommand.cs" />
     <Compile Include="Commands\ICommandWithShortcut.cs" />
     <Compile Include="Commands\BuiltIn\HelpCommand.cs" />
+    <Compile Include="Commands\BuiltIn\ColorsCommand.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

@@ -25,34 +25,29 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 using System;
 
-namespace AntShell.Commands
+namespace AntShell.Commands.BuiltIn
 {
-	public interface ICommandInteraction
+	public class ColorsCommand : ICommand
 	{
-		void Write(char c, ConsoleColor? color = null);
-		void WriteError(string error);
+		#region ICommand implementation
 
-		bool QuitEnvironment { get; set; }
-	}
-
-	public static class ICommandInteractionExtensions
-	{
-		public static void Write(this ICommandInteraction ici, string str, ConsoleColor? color = null)
+		public int Execute(string[] args, ICommandInteraction writer)
 		{
-			foreach (var c in str.ToCharArray())
+			foreach (var name in Enum.GetNames(typeof(ConsoleColor)))
 			{
-				ici.Write(c, color);
+				writer.WriteLine(name, (ConsoleColor)Enum.Parse(typeof(ConsoleColor), name));
 			}
+
+			return 0;
 		}
 
-		public static void WriteLine(this ICommandInteraction ici, string str, ConsoleColor? color = null)
-		{
-			ici.Write(string.Format("{0}\n\r", str), color);
-		}
+		public string Name { get { return "colors"; }	}
+		public string Description { get { return "Show table with available text colors"; }	}
 
-		public static void WriteRaw(this ICommandInteraction ici, string str)
+		#endregion
+
+		public ColorsCommand()
 		{
-			ici.Write(str);
 		}
 	}
 }
