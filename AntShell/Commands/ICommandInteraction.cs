@@ -32,6 +32,7 @@ namespace AntShell.Commands
 		void Write(char c, ConsoleColor? color = null);
 		void WriteError(string error);
 
+		string CommandToExecute { get; set; }
 		bool QuitEnvironment { get; set; }
 	}
 

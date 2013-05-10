@@ -397,9 +397,18 @@ namespace AntShell
 					}
 
 					CurrentEditor.Clear();
+					if (interaction != null && interaction.CommandToExecute != null)
+					{
+						CurrentEditor.SetValue(interaction.CommandToExecute);
+						(interaction as CommandInteraction).Clear();
+					}
 				}
 
 				NormalPrompt.Write(terminal);
+				if (CurrentEditor.Length > 0)
+				{
+					terminal.Write(CurrentEditor.Value);
+				}
 				history.Reset();
                 
 				break;

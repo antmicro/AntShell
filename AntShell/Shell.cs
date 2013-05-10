@@ -104,9 +104,9 @@ namespace AntShell
 
 		private void Commands()
 		{
+			RegisterCommand(new CommandFromHistoryCommand(history));
 			RegisterCommand(new HistoryCommand(history));
 			RegisterCommand(new SaveCommand(history));
-			RegisterCommand(new ColorsCommand());
 
 			if (settings.UseBuiltinQuit)
 			{
@@ -159,7 +159,11 @@ namespace AntShell
 			var result = commands.Where(x => x.Name.StartsWith(str)).Select(x => x.Name).ToList();
 			if (externalHandler != null)
 			{
-				result.Add(externalHandler.BestSuggestionNeeded(str));
+				var bestsug = externalHandler.BestSuggestionNeeded(str);
+				if (bestsug != null)
+				{
+					result.Add(bestsug);
+				}
 			}
 			return Helper.CommonPrefix(result) ?? str;
 		}
@@ -171,12 +175,17 @@ namespace AntShell
 				history.Add(cmd);
 			}
 
-			var param = Regex.Matches(cmd, @"(?<match>[\w\.\-\?]+)|\""(?<match>[\w\s\.\-\?]*)""")
+			var param = Regex.Matches(cmd, string.Format(@"(?<match>[{0}]+)|\""(?<match>[{0}]*)""", @"\w\.\-\?\!"))
 					.Cast<Match>()
 					.Select(m => m.Groups["match"].Value)
 					.ToArray();
 
-			var command = param.Length > 0 ? commands.SingleOrDefault(x => x.Name == param[0] || ((x is ICommandWithShortcut) ? ((ICommandWithShortcut)x).Shortcut == param[0] : false)) : null;
+			var command = param.Length > 0 ? commands.SingleOrDefault(x => 
+			    (x.Name == param[0]) || 
+				((x is ICommandWithShortcut) ? ((ICommandWithShortcut)x).Shortcut == param[0] : false) ||
+			 	((x is IOperator) ? ((IOperator)x).Operator == param[0][0] : false)
+			) : null;
+
 			if (command == null)
 			{
 				if (externalHandler != null)
@@ -188,6 +197,13 @@ namespace AntShell
 			}
 			else
 			{
+				if (command is IOperator)
+				{
+					var list = new List<string> { param[0][0].ToString(), param[0].Substring(1) };
+					list.AddRange(param.Skip(1));
+					param = list.ToArray();
+				}
+
 				command.Execute(param, Writer);
 			}
 

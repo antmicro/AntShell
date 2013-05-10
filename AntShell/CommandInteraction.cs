@@ -38,9 +38,17 @@ namespace AntShell
 			terminal = term;
 		}
 
+		public void Clear()
+		{
+			QuitEnvironment = false;
+			CommandToExecute = null;
+		}
+
 		#region ICommandInteraction implementation
 
 		public bool QuitEnvironment { get; set; }
+
+		public string CommandToExecute { get; set; }
 
 		public void Write(char c, ConsoleColor? color = null)
 		{
@@ -51,11 +59,11 @@ namespace AntShell
 		{
 			if (!error.EndsWith("\r\n"))
 			{
-				terminal.WriteRaw(error + "\r\n", ConsoleColor.DarkRed);
+				terminal.WriteRaw(error + "\r\n", ConsoleColor.Red);
 			}
 			else
 			{
-				terminal.WriteRaw(error, ConsoleColor.DarkRed);
+				terminal.WriteRaw(error, ConsoleColor.Red);
 			}
 		}
 

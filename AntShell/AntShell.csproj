@@ -55,6 +55,8 @@
     <Compile Include="Commands\ICommandWithShortcut.cs" />
     <Compile Include="Commands\BuiltIn\HelpCommand.cs" />
     <Compile Include="Commands\BuiltIn\ColorsCommand.cs" />
+    <Compile Include="Commands\BuiltIn\CommandFromHistoryCommand.cs" />
+    <Compile Include="Commands\IOperator.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
