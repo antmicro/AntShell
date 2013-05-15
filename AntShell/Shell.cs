@@ -96,6 +96,11 @@ namespace AntShell
 			term.Run();
 		}
 
+		public void Stop()
+		{
+			term.Stop();
+		}
+
 		public void Reset()
 		{
 			term.ClearScreen();

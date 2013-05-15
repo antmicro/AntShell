@@ -134,19 +134,25 @@ namespace AntShell.Terminal
       		onceAgain = true;
 			while(onceAgain)
 			{
-				byte value;
+				try {
+					byte value;
 
-				if (Buffer.Count > 0)
-				{
-					value = Buffer.ElementAt(0);
-					Buffer.RemoveAt(0);
-				}
-				else
-				{
-					value = (byte)stream.ReadByte();
-				}
+					if (Buffer.Count > 0)
+					{
+						value = Buffer.ElementAt(0);
+						Buffer.RemoveAt(0);
+					}
+					else
+					{
+						value = (byte)stream.ReadByte();
+					}
 
-				HandleByte(value);
+					HandleByte(value);
+				}
+				catch (Exception)
+				{
+					onceAgain = false;
+				}
 			}
 		}
 
