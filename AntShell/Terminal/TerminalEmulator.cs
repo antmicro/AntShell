@@ -36,7 +36,6 @@ namespace AntShell.Terminal
 		private const int MAX_HEIGHT = 9999;
 		private const int MAX_WIDTH = 9999;
 
-		private ConsoleColor DefaultColor;
 		private SequenceValidator validator;
 		private Queue<byte> queue;
 
@@ -54,8 +53,6 @@ namespace AntShell.Terminal
 
 		public TerminalEmulator(Stream stream)
 		{
-			DefaultColor = ConsoleColor.Gray;
-
 			validator = new SequenceValidator();
 			queue = new Queue<byte>();
 
@@ -70,7 +67,7 @@ namespace AntShell.Terminal
 		public void Start()
 		{
 			ClearScreen();
-			SetColor(DefaultColor);
+			ResetColors();
 			CursorUp(MAX_HEIGHT, false);
 			CursorToColumn(0, false);
 
@@ -231,7 +228,7 @@ namespace AntShell.Terminal
 
 				if (color.HasValue)
 				{
-					SetColor(DefaultColor);
+					ResetColors();
 				}
 			}
 
@@ -249,7 +246,7 @@ namespace AntShell.Terminal
 			
 			if (color.HasValue)
 			{
-				SetColor(DefaultColor);
+				ResetColors();
 			}
 		}
 
@@ -286,7 +283,7 @@ namespace AntShell.Terminal
 
 			if (color.HasValue)
 			{
-				SetColor(DefaultColor);
+				ResetColors();
 			}
 		}
 
@@ -306,7 +303,7 @@ namespace AntShell.Terminal
 				
 				if (color.HasValue)
 				{
-					SetColor(DefaultColor);
+					ResetColors();
 				}
 			}
 		}
