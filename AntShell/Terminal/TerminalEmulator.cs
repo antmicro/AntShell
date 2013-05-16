@@ -28,6 +28,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using AntShell.Helpers;
+using System.Threading;
 
 namespace AntShell.Terminal
 {
@@ -146,7 +147,7 @@ namespace AntShell.Terminal
 
 					HandleByte(value);
 				}
-				catch (Exception)
+				catch (ThreadAbortException)
 				{
 					onceAgain = false;
 				}
