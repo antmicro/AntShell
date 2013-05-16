@@ -120,11 +120,13 @@ namespace AntShell.Terminal
 
 	    public void Stop()
 	    {
-	      ClearScreen();
-	      CursorToColumn(1);
-	      CursorUp(MAX_HEIGHT);
-	      onceAgain = false;
-	      ResetColors();
+			ClearScreen();
+	      	CursorToColumn(1);
+	      	CursorUp(MAX_HEIGHT);
+	      	ResetColors();
+
+			onceAgain = false;
+			stream.Close();
 	    }
 
 		public void Run()
@@ -132,25 +134,29 @@ namespace AntShell.Terminal
       		onceAgain = true;
 			while(onceAgain)
 			{
-				try {
-					byte value;
+				byte value;
 
-					if (Buffer.Count > 0)
-					{
-						value = Buffer.ElementAt(0);
-						Buffer.RemoveAt(0);
-					}
-					else
-					{
-						value = (byte)stream.ReadByte();
-					}
-
-					HandleByte(value);
-				}
-				catch (ThreadAbortException)
+				if (Buffer.Count > 0)
 				{
-					onceAgain = false;
+					value = Buffer.ElementAt(0);
+					Buffer.RemoveAt(0);
 				}
+				else
+				{
+					try {
+						value = (byte)stream.ReadByte();
+					} 
+					catch (ArgumentException)
+					{
+						if (onceAgain)
+						{
+							throw;
+						}
+						break;
+					}
+				}
+
+				HandleByte(value);	
 			}
 		}
 
