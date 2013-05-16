@@ -336,7 +336,7 @@ namespace AntShell
 							terminal.NewLine();
 							foreach(var sug in sugs)
 							{
-								terminal.WriteRaw(string.Format(" {0}\r\n", sug), ConsoleColor.Blue);
+								terminal.WriteRaw(string.Format(" {0}\r\n", sug));
 							}
 
 							CurrentEditor.SetValue(Helper.CommonPrefix(sugs));
