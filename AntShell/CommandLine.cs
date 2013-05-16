@@ -236,7 +236,7 @@ namespace AntShell
 						mode = Mode.Search;
 						terminal.CursorBackward(command.MoveHome());
 						terminal.ClearLine();
-						search.SetValue(command.Value);
+						search.SetValue(string.Empty);
 						command.Clear();
 
 						CurrentPrompt.Write(terminal);

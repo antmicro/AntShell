@@ -43,7 +43,7 @@ namespace AntShell
 		public virtual void Write(TerminalEmulator tem)
 		{
 			tem.Calibrate();
-			tem.Write(Text, false, Color);
+			tem.Write(Text, true, Color);
 		}
 	}
 
@@ -78,9 +78,9 @@ namespace AntShell
 		public override void Write(TerminalEmulator tem)
 		{
 			tem.Calibrate();
-			tem.Write(Head, false, Color);
+			tem.Write(Head, true, Color);
 			tem.Write(Search.Value, true, SearchColor);
-			tem.Write(Tail, false, Color);
+			tem.Write(Tail, true, Color);
 			tem.CursorBackward(Tail.Length);
 		}
 
@@ -91,7 +91,7 @@ namespace AntShell
 			tem.HideCursor();
 			tem.ClearToTheEndOfLine();
 			tem.Write(st, true, SearchColor);
-			tem.Write(Tail, false, Color);
+			tem.Write(Tail, true, Color);
 			tem.CursorBackward(Tail.Length + st.Length + shift);
 			tem.ShowCursor();
 		}
