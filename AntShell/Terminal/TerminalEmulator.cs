@@ -82,14 +82,18 @@ namespace AntShell.Terminal
 			validator.Add(ControlSequenceType.UpArrow,    	(byte)SequenceElement.ESC, (byte)SequenceElement.CSI, (byte)'A');
 			validator.Add(ControlSequenceType.DownArrow,  	(byte)SequenceElement.ESC, (byte)SequenceElement.CSI, (byte)'B');
 
-			validator.Add(ControlSequenceType.CtrlLeftArrow, 	(byte)SequenceElement.ESC, (byte)SequenceElement.CSI, (byte)'1', (byte)';', (byte)'5', (byte)'D');
-			validator.Add(ControlSequenceType.CtrlRightArrow, 	(byte)SequenceElement.ESC, (byte)SequenceElement.CSI, (byte)'1', (byte)';', (byte)'5', (byte)'C');
+			validator.Add(ControlSequenceType.CtrlLeftArrow,    (byte)SequenceElement.ESC, (byte)'O', (byte)'D');
+			validator.Add(ControlSequenceType.CtrlLeftArrow,    (byte)SequenceElement.ESC, (byte)SequenceElement.CSI, (byte)'1', (byte)';', (byte)'5', (byte)'D');
+			validator.Add(ControlSequenceType.CtrlRightArrow,   (byte)SequenceElement.ESC, (byte)'O', (byte)'C');
+			validator.Add(ControlSequenceType.CtrlRightArrow,   (byte)SequenceElement.ESC, (byte)SequenceElement.CSI, (byte)'1', (byte)';', (byte)'5', (byte)'C');
 
 			validator.Add(ControlSequenceType.Delete,		(byte)SequenceElement.ESC, (byte)SequenceElement.CSI, (byte)'3', (byte)'~');
 
+			validator.Add(ControlSequenceType.Home, 		(byte)SequenceElement.ESC, (byte)SequenceElement.CSI, (byte)'1', (byte)'~');
 			validator.Add(ControlSequenceType.Home,			(byte)SequenceElement.ESC, (byte)'O', (byte)'H');
 			validator.Add(ControlSequenceType.Home,			(byte)SequenceElement.ESC, (byte)SequenceElement.CSI, (byte)'H');
 
+			validator.Add(ControlSequenceType.End, 			(byte)SequenceElement.ESC, (byte)SequenceElement.CSI, (byte)'4', (byte)'~');
 			validator.Add(ControlSequenceType.End,			(byte)SequenceElement.ESC, (byte)'O', (byte)'F');
 			validator.Add(ControlSequenceType.End,			(byte)SequenceElement.ESC, (byte)SequenceElement.CSI, (byte)'F');
 
