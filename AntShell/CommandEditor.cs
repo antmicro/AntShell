@@ -164,7 +164,6 @@ namespace AntShell
 		public int MoveWordForward()
 		{
 			var diff = DiffNextWord();
-			var previousPosition = Position;
 			Position += diff;
 
 			return diff;
@@ -173,7 +172,6 @@ namespace AntShell
 		public int MoveWordBackward()
 		{
 			var diff = DiffPrevWord();
-			var previousPosition = Position;
 			Position -= diff;
 
 			return diff;
