@@ -61,8 +61,9 @@ namespace AntShell.Commands.BuiltIn
 				}
 			}
 
+			history.RemoveLast();
 			var count = history.Items.Count();
-			if ((num > 0 && num >= count - 1) || (num < 0 && -num >= count))
+			if ((num > 0 && num > count) || (num < 0 && -num > count))
 			{
 				writer.WriteError(string.Format("Command #{0} not found in history", num));
 				return 3;
@@ -70,7 +71,7 @@ namespace AntShell.Commands.BuiltIn
 
 			if (num != 0)
 			{
-				writer.CommandToExecute = history.Items.ElementAt(num - 1 + (num < 0 ? count : 0));
+				writer.CommandToExecute = history.Items.ElementAt(num + (num < 0 ? count : -1));
 			}
 			else
 			{

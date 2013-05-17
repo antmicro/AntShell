@@ -39,6 +39,16 @@ namespace AntShell
 
 		#endregion
 
+		#region Remove
+
+		public void RemoveLast()
+		{
+			items.RemoveAt(items.Count - 1);
+			Reset();
+		}
+
+		#endregion
+
 		#region Search
 
 		public string ReverseSearch(string command)
@@ -99,12 +109,6 @@ namespace AntShell
 		{
 			position = items.Count;
 			_currentCommand = null;
-		}
-
-		public void RemoveLast()
-		{
-			items.RemoveAt(items.Count - 1);
-			Reset();
 		}
 
 		public void SetCurrentCommand(string value)
