@@ -138,7 +138,7 @@ namespace AntShell.Terminal
       		onceAgain = true;
 			while(onceAgain)
 			{
-				byte value;
+				int value;
 
 				if (Buffer.Count > 0)
 				{
@@ -147,20 +147,14 @@ namespace AntShell.Terminal
 				}
 				else
 				{
-					try {
-						value = (byte)stream.ReadByte();
-					} 
-					catch (ArgumentException)
+					value = stream.ReadByte();
+					if (value == -1)
 					{
-						if (onceAgain)
-						{
-							throw;
-						}
-						break;
+						continue;
 					}
 				}
 
-				HandleByte(value);	
+				HandleByte((byte)value);	
 			}
 		}
 
