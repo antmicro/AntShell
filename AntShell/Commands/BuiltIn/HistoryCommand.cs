@@ -44,10 +44,10 @@ namespace AntShell.Commands.BuiltIn
 			writer.WriteLine(string.Empty);
 			writer.WriteLine("Commands history:");
 
-			var arr = history.Items.ToArray();
-			for (int i = 0; i < arr.Length - 1; i++)
+			var counter = 1;
+			foreach (var item in history.Items) 
 			{
-				writer.WriteLine(string.Format(" {0}: {1}", i + 1, arr[i]));
+				writer.WriteLine(string.Format(" {0}: {1}", counter++, item));
 			}
 
 			writer.WriteLine(string.Empty);
