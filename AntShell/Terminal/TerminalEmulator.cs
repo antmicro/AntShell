@@ -133,7 +133,7 @@ namespace AntShell.Terminal
 			stream.Close();
 	    }
 
-		public void Run()
+		public void Run(bool stopOnError = false)
 		{
       		onceAgain = true;
 			while(onceAgain)
@@ -150,6 +150,11 @@ namespace AntShell.Terminal
 					value = stream.ReadByte();
 					if (value == -1)
 					{
+						if (stopOnError)
+						{
+							break;
+						}
+
 						continue;
 					}
 				}

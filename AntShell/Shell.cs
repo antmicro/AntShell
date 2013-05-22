@@ -73,7 +73,7 @@ namespace AntShell
 			externalHandler = handler;
 		}
 
-		public void Start()
+		public void Start(bool stopOnError = false)
 		{
 			term.Start();
 
@@ -93,7 +93,7 @@ namespace AntShell
 
 			line.Start();
 
-			term.Run();
+			term.Run(stopOnError);
 		}
 
 		public void Stop()
