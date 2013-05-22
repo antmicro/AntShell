@@ -373,8 +373,7 @@ namespace AntShell
 					terminal.ClearLine();
 					wasInSearchMode = true;
 				}
-
-				if (!wasInSearchMode)
+				else
 				{
 					terminal.CursorForward(CurrentEditor.MoveEnd());
 					terminal.NewLine();
@@ -382,18 +381,18 @@ namespace AntShell
 				
                 if (CurrentEditor.Value != string.Empty)
 				{
-                    var interaction = handler.HandleCommand(CurrentEditor.Value, null);
-					if (interaction != null && interaction.QuitEnvironment)
-					{
-						terminal.Stop();
-						return;
-					}
-
 					if (wasInSearchMode)
 					{
 						NormalPrompt.Write(terminal);
 						terminal.Write(command.Value);
 						terminal.NewLine();
+					}
+
+                    var interaction = handler.HandleCommand(CurrentEditor.Value, null);
+					if (interaction != null && interaction.QuitEnvironment)
+					{
+						terminal.Stop();
+						return;
 					}
 
 					CurrentEditor.Clear();
