@@ -388,18 +388,28 @@ namespace AntShell
 						terminal.NewLine();
 					}
 
-                    var interaction = handler.HandleCommand(CurrentEditor.Value, null);
-					if (interaction != null && interaction.QuitEnvironment)
+					var cmd = CurrentEditor.Value;
+					while (true)
 					{
-						terminal.Stop();
-						return;
-					}
+						var interaction = handler.HandleCommand(cmd, null);
+						if (interaction != null && interaction.QuitEnvironment)
+						{
+							terminal.Stop();
+							return;
+						}
 
-					CurrentEditor.Clear();
-					if (interaction != null && interaction.CommandToExecute != null)
-					{
-						CurrentEditor.SetValue(interaction.CommandToExecute);
-						(interaction as CommandInteraction).Clear();
+						CurrentEditor.Clear();
+						if (interaction != null && interaction.CommandToExecute != null)
+						{
+							cmd = interaction.CommandToExecute;
+							terminal.Write(cmd, false);
+							terminal.NewLine();
+							(interaction as CommandInteraction).Clear();
+						}
+						else
+						{
+							break;
+						}
 					}
 				}
 
