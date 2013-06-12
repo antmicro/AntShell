@@ -188,7 +188,7 @@ namespace AntShell
 			var command = param.Length > 0 ? commands.SingleOrDefault(x => 
 			    (x.Name == param[0]) || 
 				((x is ICommandWithShortcut) ? ((ICommandWithShortcut)x).Shortcut == param[0] : false) ||
-			 	((x is IOperator) ? ((IOperator)x).Operator == param[0][0] : false)
+			 	((x is IOperator) ? (param[0].Length > 0 && ((IOperator)x).Operator == param[0][0]) : false)
 			) : null;
 
 			if (command == null)
