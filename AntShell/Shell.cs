@@ -37,6 +37,8 @@ namespace AntShell
 {
 	public class Shell : ICommandHandler
 	{
+        public event Action Quitted;
+
 		private TerminalEmulator term;
 		private CommandHistory history;
 		private CommandLine line;
@@ -94,6 +96,12 @@ namespace AntShell
 			line.Start();
 
 			term.Run(stopOnError);
+
+            var q = Quitted;
+            if (q != null)
+            {
+                q();
+            }
 		}
 
 		public void Stop()

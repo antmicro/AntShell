@@ -130,7 +130,7 @@ namespace AntShell.Terminal
 	      	ResetColors();
 
 			onceAgain = false;
-			stream.Close();
+			//stream.Close();
 	    }
 
 		public void Run(bool stopOnError = false)
