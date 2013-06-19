@@ -30,9 +30,9 @@ namespace AntShell.Helpers
 {
 	public class SequenceValidator
 	{
-		private Dictionary<byte, Tuple<SequenceValidator, ControlSequenceGenerator>> seqs = new Dictionary<byte, Tuple<SequenceValidator, ControlSequenceGenerator>>();
+		private Dictionary<char, Tuple<SequenceValidator, ControlSequenceGenerator>> seqs = new Dictionary<char, Tuple<SequenceValidator, ControlSequenceGenerator>>();
 
-		public SequenceValidationResult Check(byte[] input, out ControlSequence seq)
+		public SequenceValidationResult Check(char[] input, out ControlSequence seq)
 		{
 			Tuple<ControlSequenceGenerator, int> result;
 			var seqFound = TryCheck(input, 0, out result);
@@ -58,7 +58,7 @@ namespace AntShell.Helpers
 
 		}
 
-		private bool TryCheck(byte[] input, int offset, out Tuple<ControlSequenceGenerator, int> seq)
+		private bool TryCheck(char[] input, int offset, out Tuple<ControlSequenceGenerator, int> seq)
 		{
 			if (offset == input.Length)
 			{
@@ -66,7 +66,7 @@ namespace AntShell.Helpers
 				return true;
 			}
 
-			if (seqs.ContainsKey(255))
+			if (seqs.ContainsKey((char)255))
 			{
 				var loffset = offset;
 
@@ -84,7 +84,7 @@ namespace AntShell.Helpers
 						}
 					}
 
-					var result = seqs[255].Item1.TryCheck(input, loffset, out seq); // might not work when '255' byte is the last one in a sequence
+					var result = seqs[(char)255].Item1.TryCheck(input, loffset, out seq); // might not work when '255' byte is the last one in a sequence
 					if (result)
 					{
 						return result;
@@ -117,22 +117,22 @@ namespace AntShell.Helpers
 			}
 		}
 
-		public void Add(ControlSequenceGenerator seq, params byte[] input)
+		public void Add(ControlSequenceGenerator seq, params char[] input)
 		{
 			Add(input, 0, seq);
 		}
 
-		public void Add(ControlSequence seq, params byte[] input)
+		public void Add(ControlSequence seq, params char[] input)
 		{
 			Add(input, 0, (a, b) => seq);
 		}
 
-		public void Add(ControlSequenceType seqT, params byte[] input)
+		public void Add(ControlSequenceType seqT, params char[] input)
 		{
 			Add(input, 0, (a, b) => new ControlSequence(seqT));
 		}
 
-		private void Add(byte[] input, int offset, ControlSequenceGenerator seq)
+		private void Add(char[] input, int offset, ControlSequenceGenerator seq)
 		{
 			if (input.Length - offset == 0)
 			{
@@ -162,6 +162,6 @@ namespace AntShell.Helpers
 		PrefixFound
 	}
 
-	public delegate ControlSequence ControlSequenceGenerator(byte[] seq, int length);
+	public delegate ControlSequence ControlSequenceGenerator(char[] seq, int length);
 }
 

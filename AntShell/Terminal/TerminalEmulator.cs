@@ -28,7 +28,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using AntShell.Helpers;
-using System.Threading;
+using AntShell.Encoding;
 
 namespace AntShell.Terminal
 {
@@ -38,29 +38,32 @@ namespace AntShell.Terminal
 		private const int MAX_WIDTH = 9999;
 
 		private SequenceValidator validator;
-		private Queue<byte> queue;
+		private Queue<char> queue;
 
 		public ITerminalHandler Handler { get; set; }
 
 		private VirtualCursor vcursor;
 
-		private List<byte> Buffer;
+		private List<char> Buffer;
 		private List<int> WrappedLines;
 		private int CurrentLine;
 		private int LinesScrolled;
 
 		private Stream stream;
         private bool onceAgain;
+        private System.Text.Encoding encoding;
 
 		public TerminalEmulator(Stream stream)
 		{
 			validator = new SequenceValidator();
-			queue = new Queue<byte>();
+			queue = new Queue<char>();
 
 			this.stream = stream;
 			WrappedLines = new List<int>();
-			Buffer = new List<byte>();
+			Buffer = new List<char>();
 			vcursor = new VirtualCursor();
+
+            encoding = System.Text.Encoding.GetEncoding("UTF-8", System.Text.EncoderFallback.ReplacementFallback, new CustomDecoderFallback());
 
 			ControlSequences();
 		}
@@ -77,47 +80,47 @@ namespace AntShell.Terminal
 
 		private void ControlSequences()
 		{
-			validator.Add(ControlSequenceType.LeftArrow,  	(byte)SequenceElement.ESC, (byte)SequenceElement.CSI, (byte)'D');
-			validator.Add(ControlSequenceType.RightArrow, 	(byte)SequenceElement.ESC, (byte)SequenceElement.CSI, (byte)'C');
-			validator.Add(ControlSequenceType.UpArrow,    	(byte)SequenceElement.ESC, (byte)SequenceElement.CSI, (byte)'A');
-			validator.Add(ControlSequenceType.DownArrow,  	(byte)SequenceElement.ESC, (byte)SequenceElement.CSI, (byte)'B');
+			validator.Add(ControlSequenceType.LeftArrow,  	(char)SequenceElement.ESC, (char)SequenceElement.CSI, 'D');
+			validator.Add(ControlSequenceType.RightArrow, 	(char)SequenceElement.ESC, (char)SequenceElement.CSI, 'C');
+			validator.Add(ControlSequenceType.UpArrow,    	(char)SequenceElement.ESC, (char)SequenceElement.CSI, 'A');
+			validator.Add(ControlSequenceType.DownArrow,  	(char)SequenceElement.ESC, (char)SequenceElement.CSI, 'B');
 
-			validator.Add(ControlSequenceType.CtrlLeftArrow,    (byte)SequenceElement.ESC, (byte)'O', (byte)'D');
-			validator.Add(ControlSequenceType.CtrlLeftArrow,    (byte)SequenceElement.ESC, (byte)SequenceElement.CSI, (byte)'1', (byte)';', (byte)'5', (byte)'D');
-			validator.Add(ControlSequenceType.CtrlRightArrow,   (byte)SequenceElement.ESC, (byte)'O', (byte)'C');
-			validator.Add(ControlSequenceType.CtrlRightArrow,   (byte)SequenceElement.ESC, (byte)SequenceElement.CSI, (byte)'1', (byte)';', (byte)'5', (byte)'C');
+			validator.Add(ControlSequenceType.CtrlLeftArrow,    (char)SequenceElement.ESC, 'O', 'D');
+			validator.Add(ControlSequenceType.CtrlLeftArrow,    (char)SequenceElement.ESC, (char)SequenceElement.CSI, '1', ';', '5', 'D');
+			validator.Add(ControlSequenceType.CtrlRightArrow,   (char)SequenceElement.ESC, 'O', 'C');
+			validator.Add(ControlSequenceType.CtrlRightArrow,   (char)SequenceElement.ESC, (char)SequenceElement.CSI, '1', ';', '5', 'C');
 
-			validator.Add(ControlSequenceType.Delete,		(byte)SequenceElement.ESC, (byte)SequenceElement.CSI, (byte)'3', (byte)'~');
+			validator.Add(ControlSequenceType.Delete,		(char)SequenceElement.ESC, (char)SequenceElement.CSI, '3', '~');
 
-			validator.Add(ControlSequenceType.Home, 		(byte)SequenceElement.ESC, (byte)SequenceElement.CSI, (byte)'1', (byte)'~');
-			validator.Add(ControlSequenceType.Home,			(byte)SequenceElement.ESC, (byte)'O', (byte)'H');
-			validator.Add(ControlSequenceType.Home,			(byte)SequenceElement.ESC, (byte)SequenceElement.CSI, (byte)'H');
+			validator.Add(ControlSequenceType.Home, 		(char)SequenceElement.ESC, (char)SequenceElement.CSI, '1', '~');
+			validator.Add(ControlSequenceType.Home,			(char)SequenceElement.ESC, 'O', 'H');
+			validator.Add(ControlSequenceType.Home,			(char)SequenceElement.ESC, (char)SequenceElement.CSI, 'H');
 
-			validator.Add(ControlSequenceType.End, 			(byte)SequenceElement.ESC, (byte)SequenceElement.CSI, (byte)'4', (byte)'~');
-			validator.Add(ControlSequenceType.End,			(byte)SequenceElement.ESC, (byte)'O', (byte)'F');
-			validator.Add(ControlSequenceType.End,			(byte)SequenceElement.ESC, (byte)SequenceElement.CSI, (byte)'F');
+			validator.Add(ControlSequenceType.End, 			(char)SequenceElement.ESC, (char)SequenceElement.CSI, '4', '~');
+			validator.Add(ControlSequenceType.End,			(char)SequenceElement.ESC, 'O', 'F');
+			validator.Add(ControlSequenceType.End,			(char)SequenceElement.ESC, (char)SequenceElement.CSI, 'F');
 
-			validator.Add(ControlSequenceType.Esc,			(byte)SequenceElement.ESC, (byte)SequenceElement.ESC);
+			validator.Add(ControlSequenceType.Esc,			(char)SequenceElement.ESC, (char)SequenceElement.ESC);
 
-			validator.Add(new ControlSequence(ControlSequenceType.Ctrl, 'k'), 	(byte)11);
-			validator.Add(new ControlSequence(ControlSequenceType.Ctrl, 'r'), 	(byte)18);
-			validator.Add(new ControlSequence(ControlSequenceType.Ctrl, 'w'), 	(byte)23);
-			validator.Add(new ControlSequence(ControlSequenceType.Ctrl, 'c'), 	(byte)3);
+			validator.Add(new ControlSequence(ControlSequenceType.Ctrl, 'k'), 	(char)11);
+			validator.Add(new ControlSequence(ControlSequenceType.Ctrl, 'r'), 	(char)18);
+			validator.Add(new ControlSequence(ControlSequenceType.Ctrl, 'w'), 	(char)23);
+			validator.Add(new ControlSequence(ControlSequenceType.Ctrl, 'c'), 	(char)3);
 
-			validator.Add(ControlSequenceType.Tab, 			(byte)'\t');
-			validator.Add(ControlSequenceType.Backspace, 	(byte)127);
-			validator.Add(ControlSequenceType.Enter,		(byte)'\r');
+			validator.Add(ControlSequenceType.Tab, 			'\t');
+			validator.Add(ControlSequenceType.Backspace, 	(char)127);
+			validator.Add(ControlSequenceType.Enter,		'\r');
 
-			validator.Add(ControlSequenceType.Ignore,		(byte)12);
+			validator.Add(ControlSequenceType.Ignore,		(char)12);
 
 			validator.Add((ControlSequenceGenerator)((s, l) => {
-				var str = new string(s.Select(x => (char)x).ToArray());
+				var str = new string(s.ToArray());
 				var trimmed = str.Substring(2, str.Length - 3);
 				var splitted = trimmed.Split(';');
 
 				return new ControlSequence(ControlSequenceType.CursorPosition, new Position(int.Parse(splitted[1]), int.Parse(splitted[0])));
 			}),
-			(byte)SequenceElement.ESC, (byte)SequenceElement.CSI, (byte)SequenceElement.INTEGER, (byte)';', (byte)SequenceElement.INTEGER, (byte)'R');
+			(char)SequenceElement.ESC, (char)SequenceElement.CSI, (char)SequenceElement.INTEGER, ';', (char)SequenceElement.INTEGER, 'R');
 		}
 
 		#region Input handling
@@ -130,25 +133,25 @@ namespace AntShell.Terminal
 	      	ResetColors();
 
 			onceAgain = false;
-			//stream.Close();
 	    }
 
-		public void Run(bool stopOnError = false)
+        public void Run(bool stopOnError = false)
 		{
       		onceAgain = true;
 			while(onceAgain)
 			{
-				int value;
+				char? character;
 
 				if (Buffer.Count > 0)
 				{
-					value = Buffer.ElementAt(0);
+					character = Buffer.ElementAt(0);
 					Buffer.RemoveAt(0);
 				}
 				else
 				{
-					value = stream.ReadByte();
-					if (value == -1)
+                    character = EncodingHelper.ReadChar(stream, encoding);
+
+					if (character == null)
 					{
 						if (stopOnError)
 						{
@@ -159,15 +162,15 @@ namespace AntShell.Terminal
 					}
 				}
 
-				HandleByte((byte)value);	
+				HandleChar(character.Value);	
 			}
 		}
 
-		private void HandleByte(byte b)
+		private void HandleChar(char b)
 		{
 			if (queue.Count == 0)
 			{
-				if (b == (byte)SequenceElement.ESC)
+				if (b == (char)SequenceElement.ESC)
 				{
 					queue.Enqueue(b);
 					return;
@@ -369,7 +372,10 @@ namespace AntShell.Terminal
 
 		private void WriteCharRaw(char c)
 		{
-			stream.WriteByte((byte)c);
+            foreach (var b in encoding.GetBytes(new [] { c }))
+            {
+			    stream.WriteByte(b);
+            }
 		}
 
 		#endregion
@@ -673,16 +679,15 @@ namespace AntShell.Terminal
 			if (useExactValue)
 			{
 				ControlSequence cs;
-				var localBuffer = new List<byte>();
+				var localBuffer = new List<char>();
 				
 				SendCSI();
 				SendControlSequence("6n");
 
 				while (true)
 				{
-					var b = stream.ReadByte(); // can be optimized
-
-					localBuffer.Add((byte)b);
+					var b = EncodingHelper.ReadChar(stream, encoding);
+                    localBuffer.Add(b.Value);
 
 					var validationResult = validator.Check(localBuffer.ToArray(), out cs);
 					switch(validationResult)

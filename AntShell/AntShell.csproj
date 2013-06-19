@@ -57,6 +57,9 @@
     <Compile Include="Commands\BuiltIn\ColorsCommand.cs" />
     <Compile Include="Commands\BuiltIn\CommandFromHistoryCommand.cs" />
     <Compile Include="Commands\IOperator.cs" />
+    <Compile Include="Encoding\CustomDecoderFallback.cs" />
+    <Compile Include="Encoding\CustomDecoderFallbackBuffer.cs" />
+    <Compile Include="Encoding\EncodingHelper.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -64,5 +67,6 @@
     <Folder Include="Commands\BuiltIn\" />
     <Folder Include="Terminal\" />
     <Folder Include="Helpers\" />
+    <Folder Include="Encoding\" />
   </ItemGroup>
 </Project>
