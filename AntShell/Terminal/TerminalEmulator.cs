@@ -49,16 +49,18 @@ namespace AntShell.Terminal
 		private int CurrentLine;
 		private int LinesScrolled;
 
-		private Stream stream;
+		private Stream inputStream;
+        private Stream outputStream;
         private bool onceAgain;
         private System.Text.Encoding encoding;
 
-		public TerminalEmulator(Stream stream)
+		public TerminalEmulator(Stream input, Stream output)
 		{
 			validator = new SequenceValidator();
 			queue = new Queue<char>();
 
-			this.stream = stream;
+			this.inputStream = input;
+            this.outputStream = output;
 			WrappedLines = new List<int>();
 			Buffer = new List<char>();
 			vcursor = new VirtualCursor();
@@ -149,7 +151,7 @@ namespace AntShell.Terminal
 				}
 				else
 				{
-                    character = EncodingHelper.ReadChar(stream, encoding);
+                    character = EncodingHelper.ReadChar(inputStream, encoding);
 
 					if (character == null)
 					{
@@ -374,7 +376,7 @@ namespace AntShell.Terminal
 		{
             foreach (var b in encoding.GetBytes(new [] { c }))
             {
-			    stream.WriteByte(b);
+			    outputStream.WriteByte(b);
             }
 		}
 
@@ -686,7 +688,7 @@ namespace AntShell.Terminal
 
 				while (true)
 				{
-					var b = EncodingHelper.ReadChar(stream, encoding);
+					var b = EncodingHelper.ReadChar(inputStream, encoding);
                     localBuffer.Add(b.Value);
 
 					var validationResult = validator.Check(localBuffer.ToArray(), out cs);
@@ -727,7 +729,7 @@ namespace AntShell.Terminal
 			{
 				foreach(var c in s.ToCharArray())
 				{
-					stream.WriteByte((byte)c);
+					outputStream.WriteByte((byte)c);
 				}
 			}
 		}
@@ -736,7 +738,7 @@ namespace AntShell.Terminal
 		{
 			foreach(var b in seq)
 			{
-				stream.WriteByte(b);
+				outputStream.WriteByte(b);
 			}
 		}
 

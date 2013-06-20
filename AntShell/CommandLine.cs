@@ -423,7 +423,7 @@ namespace AntShell
 				break;
 
 			default:
-				Console.WriteLine("WARNING: Unknown control sequence!");
+				//Console.WriteLine("WARNING: Unknown control sequence!");
 			break;
 			}
 

@@ -52,9 +52,11 @@ namespace AntShell
 
 		private ShellSettings settings;
 
-		public Shell(Stream s, ShellSettings settings)
+        public Shell(Stream s, ShellSettings settings) : this(s, s, settings) { }
+
+		public Shell(Stream input, Stream output, ShellSettings settings)
 		{
-			term = new TerminalEmulator(s);
+			term = new TerminalEmulator(input, output);
 			history = new CommandHistory();
 			commands = new List<ICommand>();
 
@@ -70,10 +72,12 @@ namespace AntShell
 			Commands();
 		}
 
-		public Shell(Stream s, ICommandHandler handler, ShellSettings settings) : this(s, settings)
-		{
-			externalHandler = handler;
-		}
+		public Shell(Stream s, ICommandHandler handler, ShellSettings settings) : this(s, s, handler, settings) { }
+
+        public Shell(Stream input, Stream output, ICommandHandler handler, ShellSettings settings) : this(input, output, settings)
+        {
+            externalHandler = handler;
+        }
 
 		public void Start(bool stopOnError = false)
 		{
