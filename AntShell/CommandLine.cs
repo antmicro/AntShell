@@ -351,8 +351,9 @@ namespace AntShell
 						var sug = handler.BestSuggestionNeeded(CurrentEditor.Value);
 						if (sug != null)
 						{
-							terminal.CursorBackward(CurrentEditor.Length);
+                            terminal.CursorBackward(CurrentEditor.Position);
 							CurrentEditor.SetValue(sug);
+                            CurrentEditor.MoveEnd();
 							terminal.Write(CurrentEditor.ToString());
 						}
 
