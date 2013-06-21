@@ -29,6 +29,8 @@ using System.Linq;
 using System.IO;
 using AntShell.Helpers;
 using AntShell.Encoding;
+using System.Threading;
+using System.Text;
 
 namespace AntShell.Terminal
 {
@@ -44,7 +46,7 @@ namespace AntShell.Terminal
 
 		private VirtualCursor vcursor;
 
-		private List<char> Buffer;
+		private List<char> buffer;
 		private List<int> WrappedLines;
 		private int CurrentLine;
 		private int LinesScrolled;
@@ -62,7 +64,7 @@ namespace AntShell.Terminal
 			this.inputStream = input;
             this.outputStream = output;
 			WrappedLines = new List<int>();
-			Buffer = new List<char>();
+			buffer = new List<char>();
 			vcursor = new VirtualCursor();
 
             encoding = System.Text.Encoding.GetEncoding("UTF-8", System.Text.EncoderFallback.ReplacementFallback, new CustomDecoderFallback());
@@ -144,10 +146,10 @@ namespace AntShell.Terminal
 			{
 				char? character;
 
-				if (Buffer.Count > 0)
+				if (buffer.Count > 0)
 				{
-					character = Buffer.ElementAt(0);
-					Buffer.RemoveAt(0);
+					character = buffer.ElementAt(0);
+					buffer.RemoveAt(0);
 				}
 				else
 				{
@@ -163,10 +165,24 @@ namespace AntShell.Terminal
 						continue;
 					}
 				}
-
-				HandleChar(character.Value);	
+				HandleChar(character.Value);
 			}
 		}
+
+        public string ReadLine()
+        {
+            var b = EncodingHelper.ReadChar(inputStream, encoding);
+            WriteCharRaw(b.Value);
+            var lineBuffer = new StringBuilder();
+            while(b != '\r')
+            {   
+                lineBuffer.Append(b.Value);
+                b = EncodingHelper.ReadChar(inputStream, encoding);
+                WriteCharRaw(b.Value);
+            }
+
+            return lineBuffer.ToString();
+        }
 
 		private void HandleChar(char b)
 		{
@@ -702,12 +718,12 @@ namespace AntShell.Terminal
 						{
 							return cs.Argument as Position;
 						}
-						Buffer.AddRange(localBuffer);
+						buffer.AddRange(localBuffer);
 						localBuffer.Clear();
 						continue;
 
 						case SequenceValidationResult.SequenceNotFound:
-						Buffer.AddRange(localBuffer);
+						buffer.AddRange(localBuffer);
 						localBuffer.Clear();
 						continue;
 					}

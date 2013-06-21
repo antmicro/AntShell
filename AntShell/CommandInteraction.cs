@@ -67,6 +67,11 @@ namespace AntShell
 			}
 		}
 
+        public string ReadLine()
+        {
+            return terminal.ReadLine();
+        }
+
 		#endregion
 	}
 }
