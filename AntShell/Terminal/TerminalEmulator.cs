@@ -142,29 +142,87 @@ namespace AntShell.Terminal
       		onceAgain = true;
 			while(onceAgain)
 			{
-				char? character;
+				char? character = GetNextChar();
 
-				if (Buffer.Count > 0)
+				if (character == null)
 				{
-					character = Buffer.ElementAt(0);
-					Buffer.RemoveAt(0);
-				}
-				else
-				{
-                    character = EncodingHelper.ReadChar(inputStream, encoding);
-
-					if (character == null)
+					if (stopOnError)
 					{
-						if (stopOnError)
-						{
-							break;
-						}
-
-						continue;
+						break;
 					}
+
+					continue;
 				}
 
 				HandleChar(character.Value);	
+			}
+		}
+
+		private char? GetNextChar()
+		{
+			char? character;
+
+			if (Buffer.Count > 0)
+			{
+				character = Buffer.ElementAt(0);
+				Buffer.RemoveAt(0);
+			}
+			else
+			{
+				character = EncodingHelper.ReadChar(inputStream, encoding);
+			}
+
+			return character;
+		}
+
+		// TODO: integr8 with HandleChar
+		public object GetNextInput()
+		{
+			while (true)
+			{
+				var b = GetNextChar();
+				if (b == null)
+				{
+					return null;
+				}
+
+				if (queue.Count == 0)
+				{
+					if (b == (char)SequenceElement.ESC)
+					{
+						queue.Enqueue(b.Value);
+						continue;
+					}
+
+					// try special control sequence
+					ControlSequence cs;
+					var result = validator.Check(new [] {b.Value}, out cs);
+					if (result == SequenceValidationResult.SequenceFound)
+					{
+						return cs;
+					}
+
+					// so it must be normal character
+					return b.Value;
+				}
+				else
+				{
+					queue.Enqueue(b.Value);
+					ControlSequence cs;
+					var validationResult = validator.Check(queue.ToArray(), out cs);
+					if (cs == null)
+					{
+						if (validationResult == SequenceValidationResult.SequenceNotFound)
+						{
+							queue.Clear();
+						}
+					}
+					else
+					{
+						queue.Clear();
+						return cs;
+					}
+				}
 			}
 		}
 

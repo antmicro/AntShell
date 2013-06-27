@@ -41,6 +41,7 @@
     <Compile Include="Pty.cs" />
     <Compile Include="Calculator.cs" />
     <Compile Include="Command\PrintCommand.cs" />
+    <Compile Include="Command\AskCommand.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

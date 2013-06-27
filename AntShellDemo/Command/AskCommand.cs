@@ -24,32 +24,37 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 using System;
-using AntShell;
-using System.IO;
+using AntShell.Commands;
 
 namespace AntShellDemo
 {
-	public class AntCalc
+	public class AskCommand : ICommand
 	{
-		private Shell shell;
+		#region ICommand implementation
 
-		public AntCalc(Stream stream)
+		public int Execute(string[] args, ICommandInteraction writer)
 		{
-			var sett = new ShellSettings {
-				NormalPrompt = new Prompt("ant-calc ", ConsoleColor.DarkBlue),
-				Banner = "Welcome to AntCalc - AntShell Demo!"
-			};
+			if (args.Length != 1)
+			{
+				writer.WriteError("Command usage: Ask");
+				return 1;
+			}
 
-			shell = new Shell(stream, sett);
-			shell.RegisterCommand(new AddCommand());
-			shell.RegisterCommand(new AskCommand());
-			shell.RegisterCommand(new PrintCommand());
+			writer.Write("What should I add? ");
+			var v = writer.ReadLine();
+			if (v != null)
+			{
+				var val = int.Parse(v);
+				Calculator.Add(val);
+			}
+
+			return 0;
 		}
 
-		public void Start()
-		{
-			shell.Start();
-		}
+		public string Name { get { return "Ask";	} }
+		public string Description { get { return "Asks for a value to add";	} }
+
+		#endregion
 	}
 }
 

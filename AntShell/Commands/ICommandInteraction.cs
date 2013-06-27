@@ -29,6 +29,8 @@ namespace AntShell.Commands
 {
 	public interface ICommandInteraction
 	{
+		string ReadLine();
+
 		void Write(char c, ConsoleColor? color = null);
 		void WriteError(string error);
 

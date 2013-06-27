@@ -461,6 +461,39 @@ namespace AntShell
 
 		#endregion
 
+		public string ReadLine()
+		{
+			CurrentEditor.Clear();
+			while (true)
+			{
+				var input = terminal.GetNextInput();
+				if (input is char) {
+					HandleCharacter((char)input);
+				} 
+				else if (input is ControlSequence)
+				{
+					if (((ControlSequence)input).Type == ControlSequenceType.Enter)
+					{
+						var value = CurrentEditor.Value;
+						CurrentEditor.Clear();
+						terminal.NewLine();
+						return value;
+					}
+					else if (((ControlSequence)input).Type == ControlSequenceType.Ctrl && (char)((ControlSequence)input).Argument == 'c')
+					{
+						terminal.Write("^C");
+						terminal.NewLine();
+						CurrentEditor.Clear();
+						return null;
+					}
+					else
+					{
+						HandleControlSequence((ControlSequence)input);
+					}
+				}
+			}
+		}
+
 		private enum Mode
 		{
 			Command,

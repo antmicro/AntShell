@@ -60,12 +60,11 @@ namespace AntShell
 			history = new CommandHistory();
 			commands = new List<ICommand>();
 
-			Writer = new CommandInteraction(term);
-
 			line = new CommandLine(term, history, this);
-
 			line.NormalPrompt = settings.NormalPrompt;
 			line.SearchPrompt = settings.SearchPrompt ?? new SearchPrompt("search `{0}`> ", ConsoleColor.Yellow);
+
+			Writer = new CommandInteraction(term, line);
 
 			this.settings = settings;
 

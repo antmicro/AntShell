@@ -32,10 +32,15 @@ namespace AntShell
 	public class CommandInteraction : ICommandInteraction
 	{
 		private TerminalEmulator terminal;
+		private CommandLine cmdLine;
 
 		public CommandInteraction(TerminalEmulator term)
 		{
 			terminal = term;
+		}
+		public CommandInteraction(TerminalEmulator term, CommandLine cmd) : this(term)
+		{
+			cmdLine = cmd;
 		}
 
 		public void Clear()
@@ -49,6 +54,11 @@ namespace AntShell
 		public bool QuitEnvironment { get; set; }
 
 		public string CommandToExecute { get; set; }
+
+		public string ReadLine()
+		{
+			return cmdLine.ReadLine();
+		}
 
 		public void Write(char c, ConsoleColor? color = null)
 		{
