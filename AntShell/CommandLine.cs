@@ -36,6 +36,7 @@ namespace AntShell
 		private Mode mode;
 		private CommandEditor command;
 		private CommandEditor search;
+		private CommandEditor userInput;
 		private TerminalEmulator terminal;
 
 		public Prompt NormalPrompt { get; set; }
@@ -61,6 +62,7 @@ namespace AntShell
 			this.history = history;
 			command = new CommandEditor();
 			search = new CommandEditor();
+			userInput = new CommandEditor();
 
 			term.Handler = this;
 		}
@@ -74,7 +76,16 @@ namespace AntShell
 		{
 			get
 			{
-				return mode == Mode.Command ? command : search;
+				switch (mode) {
+				case Mode.Command:
+					return command;
+				case Mode.Search:
+					return search;
+				case Mode.UserInput:
+					return userInput;
+				default:
+					return null;
+				}
 			}
 		}
 
@@ -82,7 +93,14 @@ namespace AntShell
 		{
 			get
 			{
-				return mode == Mode.Command ? NormalPrompt : SearchPrompt;
+				switch(mode) {
+				case Mode.Command:
+					return NormalPrompt;
+				case Mode.Search:
+					return SearchPrompt;
+				default:
+					return null;
+				}
 			}
 		}
 
@@ -121,6 +139,11 @@ namespace AntShell
 
 			case ControlSequenceType.UpArrow:
 			{
+				if (mode == Mode.UserInput)
+				{
+					break;
+				}
+
 				if (!history.HasMoved)
 				{
 					history.SetCurrentCommand(CurrentEditor.Value);
@@ -140,6 +163,11 @@ namespace AntShell
 
 			case ControlSequenceType.DownArrow:
 			{
+				if (mode == Mode.UserInput)
+				{
+					break;
+				}
+
 				var cmd = history.NextCommand();
 				if (cmd != null)
 				{
@@ -157,12 +185,12 @@ namespace AntShell
 				{
 					terminal.CursorBackward();
 
-					if (mode == Mode.Command)
+					if (mode == Mode.Command || mode == Mode.UserInput)
 					{
 						terminal.ClearToTheEndOfLine();
 						terminal.WriteNoMove(CurrentEditor.ToString(CurrentEditor.Position));
 					}
-					else
+					else if (mode == Mode.Search)
 					{
 						SearchPrompt.Recreate(terminal);
 
@@ -176,12 +204,12 @@ namespace AntShell
 			case ControlSequenceType.Delete:
 				if (CurrentEditor.RemoveNextCharacter())
 				{
-					if (mode == Mode.Command)
+					if (mode == Mode.Command || mode == Mode.UserInput)
 					{
 						terminal.ClearToTheEndOfLine();
 						terminal.WriteNoMove(CurrentEditor.ToString(CurrentEditor.Position));
 					}
-					else
+					else if (mode == Mode.Search)
 					{
 						SearchPrompt.Recreate(terminal);
 
@@ -211,8 +239,7 @@ namespace AntShell
 				case 'c':
 					if (mode == Mode.Command)
 					{
-						var diff = CurrentEditor.MoveEnd();
-						terminal.CursorForward(diff);
+						terminal.CursorForward(CurrentEditor.MoveEnd());
 						terminal.Write("^C");
 						terminal.NewLine();
 					}
@@ -231,7 +258,11 @@ namespace AntShell
 					break;
 
 				case 'r':
-					if (mode == Mode.Command)
+					if (mode == Mode.UserInput)
+					{
+						break;
+					}
+					else if (mode == Mode.Command)
 					{
 						mode = Mode.Search;
 						terminal.CursorBackward(command.MoveHome());
@@ -241,7 +272,7 @@ namespace AntShell
 
 						CurrentPrompt.Write(terminal);
 					}
-					else
+					else if (mode == Mode.Search)
 					{
 						if (search.Value != string.Empty)
 						{
@@ -261,12 +292,12 @@ namespace AntShell
 					if (diff > 0)
 					{
 						terminal.CursorBackward(diff);
-						if (mode == Mode.Command)
+						if (mode == Mode.Command || mode == Mode.UserInput)
 						{
 							terminal.ClearToTheEndOfLine();
 							terminal.WriteNoMove(CurrentEditor.ToString(CurrentEditor.Position));
 						}
-						else
+						else if (mode == Mode.Search)
 						{
 							SearchPrompt.Recreate(terminal);
 							history.Reset();
@@ -280,11 +311,11 @@ namespace AntShell
 				case 'k':
 					CurrentEditor.RemoveToTheEnd();
 
-					if (mode == Mode.Command)
+					if (mode == Mode.Command || mode == Mode.UserInput)
 					{
 						terminal.ClearToTheEndOfLine();
 					}
-					else
+					else if (mode == Mode.Search)
 					{
 						SearchPrompt.Recreate(terminal);
 						history.Reset();
@@ -312,7 +343,11 @@ namespace AntShell
 				break;
 
 			case ControlSequenceType.Tab:
-				if (mode == Mode.Search)
+				if (mode == Mode.UserInput)
+				{
+					break;
+				}
+				else if (mode == Mode.Search)
 				{
 					mode = Mode.Command;
 					CurrentEditor.SetValue(history.CurrentCommand);
@@ -320,7 +355,7 @@ namespace AntShell
 					CurrentPrompt.Write(terminal);
 					terminal.Write(CurrentEditor.Value);
 				}
-				else
+				else if (mode == Mode.Command)
 				{
 					if (tabTabMode)
 					{
@@ -437,7 +472,7 @@ namespace AntShell
 			{
 				var appended = CurrentEditor.InsertCharacter(character);
 
-				if (mode == Mode.Command)
+				if (mode != Mode.Search)
 				{
 					terminal.Write(character);
 
@@ -463,7 +498,10 @@ namespace AntShell
 
 		public string ReadLine()
 		{
-			CurrentEditor.Clear();
+			var currentMode = mode;
+			mode = Mode.UserInput;
+			string result = null;
+
 			while (true)
 			{
 				var input = terminal.GetNextInput();
@@ -474,17 +512,14 @@ namespace AntShell
 				{
 					if (((ControlSequence)input).Type == ControlSequenceType.Enter)
 					{
-						var value = CurrentEditor.Value;
-						CurrentEditor.Clear();
-						terminal.NewLine();
-						return value;
+						result = CurrentEditor.Value;
+						break;
 					}
 					else if (((ControlSequence)input).Type == ControlSequenceType.Ctrl && (char)((ControlSequence)input).Argument == 'c')
 					{
+						terminal.CursorForward(CurrentEditor.MoveEnd());
 						terminal.Write("^C");
-						terminal.NewLine();
-						CurrentEditor.Clear();
-						return null;
+						break;
 					}
 					else
 					{
@@ -492,12 +527,19 @@ namespace AntShell
 					}
 				}
 			}
+
+			CurrentEditor.Clear();
+			terminal.NewLine();
+
+			mode = currentMode;
+			return result;
 		}
 
 		private enum Mode
 		{
 			Command,
-			Search
+			Search,
+			UserInput
 		}
 	}
 }

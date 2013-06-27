@@ -142,9 +142,9 @@ namespace AntShell.Terminal
       		onceAgain = true;
 			while(onceAgain)
 			{
-				char? character = GetNextChar();
+				var input = GetNextInput();
 
-				if (character == null)
+				if (input == null)
 				{
 					if (stopOnError)
 					{
@@ -154,7 +154,7 @@ namespace AntShell.Terminal
 					continue;
 				}
 
-				HandleChar(character.Value);	
+				HandleInput(input);	
 			}
 		}
 
@@ -175,7 +175,6 @@ namespace AntShell.Terminal
 			return character;
 		}
 
-		// TODO: integr8 with HandleChar
 		public object GetNextInput()
 		{
 			while (true)
@@ -226,45 +225,19 @@ namespace AntShell.Terminal
 			}
 		}
 
-		private void HandleChar(char b)
+		private void HandleInput(object input)
 		{
-			if (queue.Count == 0)
+			if (input == null)
 			{
-				if (b == (char)SequenceElement.ESC)
-				{
-					queue.Enqueue(b);
-					return;
-				}
-				
-				// try special control sequence
-				ControlSequence cs;
-				var result = validator.Check(new [] {b}, out cs);
-				if (result == SequenceValidationResult.SequenceFound)
-				{
-					Handler.HandleControlSequence(cs);
-					return;
-				}
-				
-				// so it must be normal character
-				Handler.HandleCharacter((char)b);
+				return;
 			}
-			else
+			else if (input is char)
 			{
-				queue.Enqueue(b);
-				ControlSequence cs;
-				var validationResult = validator.Check(queue.ToArray(), out cs);
-				if (cs == null)
-				{
-					if (validationResult == SequenceValidationResult.SequenceNotFound)
-					{
-						queue.Clear();
-					}
-				}
-				else
-				{
-					queue.Clear();
-					Handler.HandleControlSequence(cs);
-				}
+				Handler.HandleCharacter((char)input);
+			}
+			else if (input is ControlSequence)
+			{
+				Handler.HandleControlSequence((ControlSequence)input);
 			}
 		}
 
