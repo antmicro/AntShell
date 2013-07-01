@@ -87,9 +87,12 @@ namespace AntShell.Terminal
 			validator.Add(ControlSequenceType.UpArrow,    	(char)SequenceElement.ESC, (char)SequenceElement.CSI, 'A');
 			validator.Add(ControlSequenceType.DownArrow,  	(char)SequenceElement.ESC, (char)SequenceElement.CSI, 'B');
 
-			validator.Add(ControlSequenceType.CtrlLeftArrow,    (char)SequenceElement.ESC, 'O', 'D');
+            validator.Add(ControlSequenceType.LeftArrow,    (char)SequenceElement.ESC, 'O', 'D');
+            validator.Add(ControlSequenceType.RightArrow,   (char)SequenceElement.ESC, 'O', 'C');
+            validator.Add(ControlSequenceType.UpArrow,      (char)SequenceElement.ESC, 'O', 'A');
+            validator.Add(ControlSequenceType.DownArrow,    (char)SequenceElement.ESC, 'O', 'B');
+
 			validator.Add(ControlSequenceType.CtrlLeftArrow,    (char)SequenceElement.ESC, (char)SequenceElement.CSI, '1', ';', '5', 'D');
-			validator.Add(ControlSequenceType.CtrlRightArrow,   (char)SequenceElement.ESC, 'O', 'C');
 			validator.Add(ControlSequenceType.CtrlRightArrow,   (char)SequenceElement.ESC, (char)SequenceElement.CSI, '1', ';', '5', 'C');
 
 			validator.Add(ControlSequenceType.Delete,		(char)SequenceElement.ESC, (char)SequenceElement.CSI, '3', '~');
