@@ -41,16 +41,16 @@ namespace AntShell.Commands.BuiltIn
 
 		public int Execute(string[] args, ICommandInteraction writer)
 		{
-			writer.WriteLine(string.Empty);
 			writer.WriteLine("Commands history:");
-
+            
+            writer.WriteLine();
 			var counter = 1;
 			foreach (var item in history.Items) 
 			{
 				writer.WriteLine(string.Format(" {0}: {1}", counter++, item));
 			}
 
-			writer.WriteLine(string.Empty);
+			writer.WriteLine();
 
 			return 0;
 		}

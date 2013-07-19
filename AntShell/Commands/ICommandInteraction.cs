@@ -48,7 +48,7 @@ namespace AntShell.Commands
 			}
 		}
 
-		public static void WriteLine(this ICommandInteraction ici, string str, ConsoleColor? color = null)
+		public static void WriteLine(this ICommandInteraction ici, string str = "", ConsoleColor? color = null)
 		{
 			ici.Write(string.Format("{0}\n\r", str), color);
 		}
