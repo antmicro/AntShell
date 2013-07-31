@@ -54,11 +54,14 @@ namespace AntShell.Terminal
         private bool onceAgain;
         private System.Text.Encoding encoding;
 
-		public TerminalEmulator(Stream input, Stream output)
+        private bool forceVirtualCursor = false;
+
+		public TerminalEmulator(Stream input, Stream output, bool forceVCursor = false)
 		{
 			validator = new SequenceValidator();
 			queue = new Queue<char>();
 
+            this.forceVirtualCursor = forceVCursor;
 			this.inputStream = input;
             this.outputStream = output;
 			WrappedLines = new List<int>();
@@ -308,8 +311,6 @@ namespace AntShell.Terminal
 
 				HideCursor();
 
-				//LinesScrolled = 0;
-
 				CursorForward(skip);
 				var count = Write(text, true, color);
 				CursorBackward(count + skip);
@@ -328,7 +329,7 @@ namespace AntShell.Terminal
 				SetColor(color.Value);
 			}
 
-			WriteCharRaw(c);
+			WriteChar(c, false);
 
 			if (color.HasValue)
 			{
@@ -347,7 +348,7 @@ namespace AntShell.Terminal
 				
 				foreach(var c in text.ToCharArray())
 				{
-					WriteCharRaw(c);
+					WriteChar(c, false);
 				}
 				
 				if (color.HasValue)
@@ -362,7 +363,7 @@ namespace AntShell.Terminal
 		{
 			WriteCharRaw(c);
 
-			if (checkIfWrapped)
+			if (forceVirtualCursor || checkIfWrapped)
 			{
 
 				if (c == (byte)SequenceElement.ESC) // to eliminate control sequences, mostly color change
@@ -400,7 +401,6 @@ namespace AntShell.Terminal
 						InEscapeMode = false;
 					}
 				}
-
 			}
 
 			return false;
@@ -610,7 +610,14 @@ namespace AntShell.Terminal
 
 		public void Calibrate()
 		{
-			vcursor.Calibrate(GetCursorPosition(true), GetSize());
+            if (forceVirtualCursor) 
+            {
+                vcursor.Calibrate(new Position(0, 0), new Position(MAX_WIDTH, MAX_HEIGHT));
+            }
+            else
+            {
+			    vcursor.Calibrate(GetCursorPosition(true), GetSize());
+            }
 		}
 
 		public void ScrollDown()
@@ -712,7 +719,7 @@ namespace AntShell.Terminal
 
 		public Position GetCursorPosition(bool useExactValue = false)
 		{
-			if (useExactValue)
+			if (useExactValue && !forceVirtualCursor)
 			{
 				ControlSequence cs;
 				var localBuffer = new List<char>();

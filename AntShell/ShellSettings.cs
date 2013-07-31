@@ -33,6 +33,7 @@ namespace AntShell
 		public string Banner;
 		public bool UseBuiltinQuit { get; set; }
 		public bool UseBuiltinHelp { get; set; }
+        public bool ForceVirtualCursor { get; set; }
 
 		public ShellSettings()
 		{

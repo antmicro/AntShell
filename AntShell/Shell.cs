@@ -56,7 +56,7 @@ namespace AntShell
 
 		public Shell(Stream input, Stream output, ShellSettings settings)
 		{
-			term = new TerminalEmulator(input, output);
+			term = new TerminalEmulator(input, output, settings.ForceVirtualCursor);
 			history = new CommandHistory();
 			commands = new List<ICommand>();
 
