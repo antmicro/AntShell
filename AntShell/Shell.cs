@@ -80,7 +80,7 @@ namespace AntShell
 
 		public void Start(bool stopOnError = false)
 		{
-			term.Start();
+			term.Start(settings.ClearScreen);
 
 			if (settings.Banner != null)
 			{

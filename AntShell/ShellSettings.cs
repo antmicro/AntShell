@@ -34,6 +34,7 @@ namespace AntShell
 		public bool UseBuiltinQuit { get; set; }
 		public bool UseBuiltinHelp { get; set; }
         public bool ForceVirtualCursor { get; set; }
+        public bool ClearScreen { get; set; }
 
 		public ShellSettings()
 		{

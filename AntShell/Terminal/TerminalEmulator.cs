@@ -54,6 +54,7 @@ namespace AntShell.Terminal
         private bool onceAgain;
         private System.Text.Encoding encoding;
 
+        private bool clearScreen = false;
         private bool forceVirtualCursor = false;
 
 		public TerminalEmulator(Stream input, Stream output, bool forceVCursor = false)
@@ -73,12 +74,16 @@ namespace AntShell.Terminal
 			ControlSequences();
 		}
 
-		public void Start()
+		public void Start(bool clearScreen)
 		{
-			ClearScreen();
-			ResetColors();
-			CursorUp(MAX_HEIGHT, false);
-			CursorToColumn(0, false);
+            this.clearScreen = clearScreen;
+            if (clearScreen)
+            {
+    			ClearScreen();
+    			ResetColors();
+    			CursorUp(MAX_HEIGHT, false);
+    			CursorToColumn(0, false);
+            }
 
 			Calibrate();
 		}
@@ -133,12 +138,15 @@ namespace AntShell.Terminal
 
 		#region Input handling
 
-	    public void Stop()
+        public void Stop()
 	    {
-			ClearScreen();
-	      	CursorToColumn(1);
-	      	CursorUp(MAX_HEIGHT);
-	      	ResetColors();
+            if (clearScreen) 
+            {
+    			ClearScreen();
+    	      	CursorToColumn(1);
+    	      	CursorUp(MAX_HEIGHT);
+    	      	ResetColors();
+            }
 
 			onceAgain = false;
 	    }
