@@ -363,6 +363,7 @@ namespace AntShell
 						if (sugs.Length == 1)
 						{
 							terminal.CursorBackward(CurrentEditor.Length);
+                            terminal.ClearToTheEndOfLine();
 							CurrentEditor.SetValue(sugs[0]);
 							terminal.Write(CurrentEditor.ToString());
 						}
@@ -387,6 +388,7 @@ namespace AntShell
 						if (sug != null)
 						{
                             terminal.CursorBackward(CurrentEditor.Position);
+                            terminal.ClearToTheEndOfLine();
 							CurrentEditor.SetValue(sug);
                             CurrentEditor.MoveEnd();
 							terminal.Write(CurrentEditor.ToString());
