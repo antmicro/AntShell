@@ -39,18 +39,18 @@ namespace AntShell
 	{
         public event Action Quitted;
 
-		private TerminalEmulator term;
-		private CommandHistory history;
-		private CommandLine line;
+		private readonly TerminalEmulator term;
+		private readonly CommandHistory history;
+		private readonly CommandLine line;
 
         public List<ICommand> Commands { get; private set; }
 
 		public string StartupCommand { get; set; }
 		public CommandInteraction Writer { get; private set; }
 
-		private ICommandHandler externalHandler;
+		private readonly ICommandHandler externalHandler;
 
-		private ShellSettings settings;
+		private readonly ShellSettings settings;
 
         public Shell(Stream s, ShellSettings settings) : this(s, s, settings) { }
 
