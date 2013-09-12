@@ -25,11 +25,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 namespace AntShell.Commands
 {
-	public interface ICommand
+    public interface ICommand : ICommandDescription
 	{
-		string Name { get; }
-		string Description { get; }
-
 		int Execute(string[] args, ICommandInteraction writer);
 	}
 }

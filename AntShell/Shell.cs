@@ -43,7 +43,7 @@ namespace AntShell
 		private CommandHistory history;
 		private CommandLine line;
 
-		private List<ICommand> commands;
+        public List<ICommand> Commands { get; private set; }
 
 		public string StartupCommand { get; set; }
 		public CommandInteraction Writer { get; private set; }
@@ -58,7 +58,7 @@ namespace AntShell
 		{
 			term = new TerminalEmulator(input, output, settings.ForceVirtualCursor);
 			history = new CommandHistory();
-			commands = new List<ICommand>();
+            Commands = new List<ICommand>();
 
 			line = new CommandLine(term, history, this);
 			line.NormalPrompt = settings.NormalPrompt;
@@ -68,7 +68,7 @@ namespace AntShell
 
 			this.settings = settings;
 
-			Commands();
+			PrepareCommands();
 		}
 
 		public Shell(Stream s, ICommandHandler handler, ShellSettings settings) : this(s, s, handler, settings) { }
@@ -76,6 +76,7 @@ namespace AntShell
         public Shell(Stream input, Stream output, ICommandHandler handler, ShellSettings settings) : this(input, output, settings)
         {
             externalHandler = handler;
+            externalHandler.GetInternalCommands = () => Commands.Cast<ICommandDescription>();
         }
 
 		public void Start(bool stopOnError = false)
@@ -118,7 +119,7 @@ namespace AntShell
 			line.CurrentPrompt.Write(term);
 		}
 
-		private void Commands()
+		private void PrepareCommands()
 		{
 			RegisterCommand(new CommandFromHistoryCommand(history));
 			RegisterCommand(new HistoryCommand(history));
@@ -131,23 +132,23 @@ namespace AntShell
 
 			if (settings.UseBuiltinHelp)
 			{
-				RegisterCommand(new HelpCommand(commands));
+                RegisterCommand(new HelpCommand(Commands));
 			}
 		}
 
 		public void RegisterCommand(ICommand cmd)
 		{
-			if (commands.Any(x => x.Name == cmd.Name))
+            if (Commands.Any(x => x.Name == cmd.Name))
 			{
 				throw new ArgumentException("Command name is already registered");
 			}
 
-			if (cmd is ICommandWithShortcut && commands.Where(x => x is ICommandWithShortcut).Cast<ICommandWithShortcut>().Any(y => y.Shortcut == ((ICommandWithShortcut)cmd).Shortcut))
+            if (Commands.Any(x => x.AlternativeNames != null && x.AlternativeNames.Contains(cmd.Name)))
 			{
-				throw new ArgumentException("Command shortcut is already registered");
+                throw new ArgumentException("Command alternative name is already registered");
 			}
 
-			commands.Add(cmd);
+            Commands.Add(cmd);
 		}
 
 		string HandleOnHistorySearch(bool reset, string arg)
@@ -162,7 +163,7 @@ namespace AntShell
 
 		public string[] SuggestionNeeded(string arg)
 		{
-			var result = commands.Where(x => x.Name.StartsWith(arg)).Select(x => x.Name).ToList();
+            var result = Commands.Where(x => x.Name.StartsWith(arg)).Select(x => x.Name).ToList();
 			if (externalHandler != null)
 			{
 				result.AddRange(externalHandler.SuggestionNeeded(arg));
@@ -172,7 +173,7 @@ namespace AntShell
 
 		public string BestSuggestionNeeded(string str)
 		{
-			var result = commands.Where(x => x.Name.StartsWith(str)).Select(x => x.Name).ToList();
+            var result = Commands.Where(x => x.Name.StartsWith(str)).Select(x => x.Name).ToList();
 			if (externalHandler != null)
 			{
 				var bestsug = externalHandler.BestSuggestionNeeded(str);
@@ -196,9 +197,8 @@ namespace AntShell
 					.Select(m => m.Groups["match"].Value)
 					.ToArray();
 
-			var command = param.Length > 0 ? commands.SingleOrDefault(x => 
-			    (x.Name == param[0]) || 
-				((x is ICommandWithShortcut) ? ((ICommandWithShortcut)x).Shortcut == param[0] : false) ||
+            var command = param.Length > 0 ? Commands.SingleOrDefault(x => 
+                (x.Name == param[0]) || x.AlternativeNames.Contains(param[0]) ||
 			 	((x is IOperator) ? (param[0].Length > 0 && ((IOperator)x).Operator == param[0][0]) : false)
 			) : null;
 
@@ -253,6 +253,12 @@ namespace AntShell
 				line.NormalPrompt = p;
 			}
 		}
+
+        #region ICommandHandler implementation
+
+        public Func<IEnumerable<ICommandDescription>> GetInternalCommands { get; set; }
+
+        #endregion
 	}
 }
 

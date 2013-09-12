@@ -27,11 +27,11 @@ using System;
 
 namespace AntShell.Commands.BuiltIn
 {
-	public class ColorsCommand : ICommand
+    public class ColorsCommand : CommandBase
 	{
 		#region ICommand implementation
 
-		public int Execute(string[] args, ICommandInteraction writer)
+        public override int Execute(string[] args, ICommandInteraction writer)
 		{
 			foreach (var name in Enum.GetNames(typeof(ConsoleColor)))
 			{
@@ -41,12 +41,9 @@ namespace AntShell.Commands.BuiltIn
 			return 0;
 		}
 
-		public string Name { get { return "colors"; }	}
-		public string Description { get { return "Show table with available text colors"; }	}
-
 		#endregion
 
-		public ColorsCommand()
+        public ColorsCommand() : base("colors", "shows table with available text colors.")
 		{
 		}
 	}

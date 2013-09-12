@@ -28,18 +28,18 @@ using System.Linq;
 
 namespace AntShell.Commands.BuiltIn
 {
-	public class CommandFromHistoryCommand : ICommandWithShortcut, IOperator
+    public class CommandFromHistoryCommand : CommandBase, IOperator
 	{
-		private CommandHistory history;
+		private readonly CommandHistory history;
 
-		public CommandFromHistoryCommand(CommandHistory h)
+        public CommandFromHistoryCommand(CommandHistory h) : base("commandFromHistory", "executes command from history.", "!")
 		{
 			history = h;
 		}
 
 		#region ICommand implementation
 
-		public int Execute(string[] args, ICommandInteraction writer)
+        public override int Execute(string[] args, ICommandInteraction writer)
 		{
 			if (args.Length != 2 || args[1] == string.Empty)
 			{
@@ -82,14 +82,7 @@ namespace AntShell.Commands.BuiltIn
 			return 0;
 		}
 
-		public string Name { get { return "commandFromHistory";	} }
-		public string Description { get { return "Prints command history";	} }
-
-		#endregion
-
-		#region ICommandWithShortcut implementation
-
-		public string Shortcut { get { return "!"; } }
+		
 
 		#endregion
 

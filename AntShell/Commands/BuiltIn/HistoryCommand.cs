@@ -24,22 +24,21 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 using System;
-using System.Linq;
 
 namespace AntShell.Commands.BuiltIn
 {
-	public class HistoryCommand : ICommand
+    public class HistoryCommand : CommandBase
 	{
-		private CommandHistory history;
+		private readonly CommandHistory history;
 
-		public HistoryCommand(CommandHistory h)
+        public HistoryCommand(CommandHistory h) : base("history", "prints command history.")
 		{
 			history = h;
 		}
 
 		#region ICommand implementation
 
-		public int Execute(string[] args, ICommandInteraction writer)
+        public override int Execute(string[] args, ICommandInteraction writer)
 		{
 			writer.WriteLine("Commands history:");
             
@@ -54,9 +53,6 @@ namespace AntShell.Commands.BuiltIn
 
 			return 0;
 		}
-
-		public string Name { get { return "history";	} }
-		public string Description { get { return "Prints command history";	} }
 
 		#endregion
 	}

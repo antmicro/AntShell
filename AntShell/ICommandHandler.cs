@@ -24,6 +24,8 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 using AntShell.Commands;
+using System.Collections.Generic;
+using System;
 
 namespace AntShell
 {
@@ -32,6 +34,8 @@ namespace AntShell
 		ICommandInteraction HandleCommand(string cmd, ICommandInteraction ci);
 		string[] SuggestionNeeded(string cmd);
 		string BestSuggestionNeeded(string cmd);
+
+        Func<IEnumerable<ICommandDescription>> GetInternalCommands { get; set; }
 	}
 }
 

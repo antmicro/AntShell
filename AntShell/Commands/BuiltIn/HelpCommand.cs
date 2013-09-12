@@ -27,11 +27,11 @@ using System.Collections.Generic;
 
 namespace AntShell.Commands.BuiltIn
 {
-	public class HelpCommand : ICommandWithShortcut
+    public class HelpCommand : CommandBase
 	{
 		#region ICommand implementation
 
-		public int Execute(string[] args, ICommandInteraction writer)
+        public override int Execute(string[] args, ICommandInteraction writer)
 		{
 			writer.WriteLine("\nCommands:");
 			writer.WriteLine(string.Format("{0,-18}|{1}", "Name", "Description"));
@@ -44,23 +44,14 @@ namespace AntShell.Commands.BuiltIn
 			return 0;
 		}
 
-		public string Name { get { return "help"; }	}
-		public string Description { get { return "Show this table"; }	}
-
 		#endregion
 
-		#region ICommandWithShortcut implementation
-
-		public string Shortcut { get { return "?"; } }
-
-		#endregion
-
-		public HelpCommand(IEnumerable<ICommand> commands)
+        public HelpCommand(IEnumerable<ICommand> commands) : base ("help", "shows this table.", "?")
 		{
 			this.commands = commands;
 		}
 
-		private IEnumerable<ICommand> commands;
+		private readonly IEnumerable<ICommand> commands;
 	}
 }
 

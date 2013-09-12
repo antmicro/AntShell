@@ -27,26 +27,19 @@ using AntShell.Commands;
 
 namespace AntShell.Commands.BuiltIn
 {
-	public class QuitCommand : ICommandWithShortcut
+    public class QuitCommand : CommandBase
 	{
 		#region ICommand implementation
 
-		public int Execute(string[] args, ICommandInteraction writer)
+        public override int Execute(string[] args, ICommandInteraction writer)
 		{
 			writer.QuitEnvironment = true;
 			return 0;
 		}
 
-		public string Name { get { return "quit"; }	}
-		public string Description { get { return "Quits the shell"; } }
+        #endregion
 
-		#endregion
-
-		#region ICommandWithShortcut
-
-		public string Shortcut	{ get {return "q"; } }
-
-		#endregion
+        public QuitCommand() : base ("quit", "quits the shell.", "q") {}
 	}
 }
 

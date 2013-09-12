@@ -27,18 +27,18 @@ using System.Linq;
 
 namespace AntShell.Commands.BuiltIn
 {
-	public class SaveCommand : ICommand
+    public class SaveCommand : CommandBase
 	{
-		private CommandHistory history;
+		private readonly CommandHistory history;
 
-		public SaveCommand(CommandHistory h)
+        public SaveCommand(CommandHistory h) : base("save", "saves commands history to the file.")
 		{
 			history = h;
 		}
 
 		#region ICommand implementation
 
-		public int Execute(string[] args, ICommandInteraction writer)
+        public override int Execute(string[] args, ICommandInteraction writer)
 		{
 			history.RemoveLast();
 
@@ -70,9 +70,6 @@ namespace AntShell.Commands.BuiltIn
 
 			return 0;
 		}
-
-		public string Name { get { return "save"; } }
-		public string Description { get { return "Saves commands history to the file"; } }
 
 		#endregion
 	}
