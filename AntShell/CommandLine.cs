@@ -375,7 +375,7 @@ namespace AntShell
 								terminal.WriteRaw(string.Format(" {0}\r\n", sug));
 							}
 
-							CurrentEditor.SetValue(Helper.CommonPrefix(sugs));
+                            CurrentEditor.SetValue((CurrentEditor.Value.EndsWith(" ") ? CurrentEditor.Value : string.Empty) + Helper.CommonPrefix(sugs));
 							NormalPrompt.Write(terminal);
 							terminal.Write(CurrentEditor.Value);
 						}
@@ -385,14 +385,14 @@ namespace AntShell
 					{
 						tabTabMode = true;
 						var sug = handler.BestSuggestionNeeded(CurrentEditor.Value);
-						if (sug != null)
-						{
+                        if(!string.IsNullOrEmpty(sug))
+                        {
                             terminal.CursorBackward(CurrentEditor.Position);
                             terminal.ClearToTheEndOfLine();
-							CurrentEditor.SetValue(sug);
+                            CurrentEditor.SetValue(sug);
                             CurrentEditor.MoveEnd();
-							terminal.Write(CurrentEditor.ToString());
-						}
+                            terminal.Write(CurrentEditor.ToString());
+                        }
 
 						return;
 					}
