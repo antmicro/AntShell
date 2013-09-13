@@ -28,11 +28,11 @@ using AntShell.Commands;
 
 namespace AntShellDemo
 {
-	public class AskCommand : ICommand
+    public class AskCommand : CommandBase
 	{
 		#region ICommand implementation
 
-		public int Execute(string[] args, ICommandInteraction writer)
+        public override int Execute(string[] args, ICommandInteraction writer)
 		{
 			if (args.Length != 1)
 			{
@@ -51,10 +51,9 @@ namespace AntShellDemo
 			return 0;
 		}
 
-		public string Name { get { return "Ask";	} }
-		public string Description { get { return "Asks for a value to add";	} }
-
 		#endregion
+
+        public AskCommand() : base("Ask", "Asks for a value to add") {}
 	}
 }
 

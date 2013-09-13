@@ -23,16 +23,15 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-using System;
 using AntShell.Commands;
 
 namespace AntShellDemo
 {
-	public class PrintCommand : ICommand
+    public class PrintCommand : CommandBase
 	{
 		#region ICommand implementation
 
-		public int Execute(string[] args, ICommandInteraction writer)
+        public override int Execute(string[] args, ICommandInteraction writer)
 		{
 			if (args.Length != 1)
 			{
@@ -45,19 +44,9 @@ namespace AntShellDemo
 			return 0;
 		}
 
-		public string Name {
-			get {
-				return "Print";
-			}
-		}
-
-		public string Description {
-			get {
-				return "Prints the value";
-			}
-		}
-
 		#endregion
+
+        public PrintCommand() : base("Print", "Prints the value") {}
 	}
 }
 
