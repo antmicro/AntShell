@@ -192,7 +192,7 @@ namespace AntShell
 				history.Add(cmd);
 			}
 
-			var param = Regex.Matches(cmd, string.Format(@"(?<match>[{0}]+)|\""(?<match>[{0}]*)""", @"\w\.\-\?\!"))
+            var param = Regex.Matches(cmd, string.Format(@"(?<match>[{0}]+)|\""(?<match>[{0}]*)""", @"\w\.\-\?\!\~\/"))
 					.Cast<Match>()
 					.Select(m => m.Groups["match"].Value)
 					.ToArray();
