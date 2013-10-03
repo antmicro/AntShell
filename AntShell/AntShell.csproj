@@ -61,6 +61,7 @@
     <Compile Include="Encoding\EncodingHelper.cs" />
     <Compile Include="Commands\ICommandDescription.cs" />
     <Compile Include="Commands\CommandBase.cs" />
+    <Compile Include="Commands\ISuggestionProvider.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
