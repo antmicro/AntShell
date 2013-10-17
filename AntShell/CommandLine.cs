@@ -26,6 +26,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 using System;
 using AntShell.Helpers;
 using AntShell.Terminal;
+using System.IO;
 
 namespace AntShell
 {
@@ -364,18 +365,20 @@ namespace AntShell
 						{
 							terminal.CursorBackward(CurrentEditor.Length);
                             terminal.ClearToTheEndOfLine();
-							CurrentEditor.SetValue(sugs[0]);
+                            CurrentEditor.SetValue(sugs[0] + (sugs[0][sugs[0].Length - 1] == Path.DirectorySeparatorChar ? "" : " "));
 							terminal.Write(CurrentEditor.ToString());
 						}
 						else if (sugs.Length > 1)
 						{
 							terminal.NewLine();
-							foreach(var sug in sugs)
-							{
-								terminal.WriteRaw(string.Format(" {0}\r\n", sug));
-							}
-
-                            CurrentEditor.SetValue((CurrentEditor.Value.EndsWith(" ") ? CurrentEditor.Value : string.Empty) + Helper.CommonPrefix(sugs));
+                            var prefix = Helper.CommonPrefix(sugs);
+                            var lastSpace = prefix.LastIndexOf(" ", StringComparison.Ordinal);
+                            var length = lastSpace == -1 ? prefix.Length : lastSpace + 1;
+                            foreach(var sug in sugs)
+                            {
+                                terminal.WriteRaw(string.Format(" {0}\r\n", sug.Substring(length)));
+                            }
+                            CurrentEditor.SetValue(prefix);
 							NormalPrompt.Write(terminal);
 							terminal.Write(CurrentEditor.Value);
 						}
@@ -384,12 +387,13 @@ namespace AntShell
 					else
 					{
 						tabTabMode = true;
-						var sug = handler.BestSuggestionNeeded(CurrentEditor.Value);
-                        if(!string.IsNullOrEmpty(sug))
+                        var sug = handler.SuggestionNeeded(CurrentEditor.Value);
+                        var prefix = Helper.CommonPrefix(sug);
+                        if(!string.IsNullOrEmpty(prefix))
                         {
                             terminal.CursorBackward(CurrentEditor.Position);
                             terminal.ClearToTheEndOfLine();
-                            CurrentEditor.SetValue(sug);
+                            CurrentEditor.SetValue(prefix + (sug.Length == 1 && sug[0][sug[0].Length - 1] != Path.DirectorySeparatorChar ? " " : String.Empty));
                             CurrentEditor.MoveEnd();
                             terminal.Write(CurrentEditor.ToString());
                         }
