@@ -358,59 +358,53 @@ namespace AntShell
 				}
 				else if (mode == Mode.Command)
 				{
-					if (tabTabMode)
-					{
-						var sugs = handler.SuggestionNeeded(CurrentEditor.Value);
-						if (sugs.Length == 1)
-						{
-							terminal.CursorBackward(CurrentEditor.Length);
-                            terminal.ClearToTheEndOfLine();
-                            CurrentEditor.SetValue(sugs[0] + (sugs[0][sugs[0].Length - 1] == Path.DirectorySeparatorChar ? "" : " "));
-							terminal.Write(CurrentEditor.ToString());
-						}
-						else if (sugs.Length > 1)
-						{
-							terminal.NewLine();
-                            var prefix = Helper.CommonPrefix(sugs);
-                            var lastSpace = prefix.LastIndexOf(" ", StringComparison.Ordinal);
-                            var length = lastSpace == -1 ? prefix.Length : lastSpace + 1;
-                            foreach(var sug in sugs)
-                            {
-                                terminal.WriteRaw(string.Format(" {0}\r\n", sug.Substring(length)));
-                            }
-                            CurrentEditor.SetValue(prefix);
-							NormalPrompt.Write(terminal);
-							terminal.Write(CurrentEditor.Value);
-						}
-						return;
-					}
-					else
-					{
-						tabTabMode = true;
-                        var sug = handler.SuggestionNeeded(CurrentEditor.Value);
-                        var prefix = Helper.CommonPrefix(sug);
-                        if(!string.IsNullOrEmpty(prefix))
+                    var sugs = handler.SuggestionNeeded(CurrentEditor.Value);
+                    var prefix = Helper.CommonPrefix(sugs);
+
+                    if(string.IsNullOrEmpty(prefix))
+                    {
+                        break;
+                    }
+
+                    if(!tabTabMode || sugs.Length == 1)
+                    {
+                        tabTabMode = true;
+
+                        terminal.CursorBackward(CurrentEditor.Position);
+                        terminal.ClearToTheEndOfLine();
+                        CurrentEditor.SetValue(prefix);
+                    }
+                    else if(tabTabMode)
+                    {						
+                        terminal.NewLine();
+                            
+                        //var splitPoint = Math.Max(prefix.LastIndexOf(" ", StringComparison.Ordinal), prefix.LastIndexOf(";", StringComparison.Ordinal));
+                        var splitPoint = prefix.LastIndexOf(" ", StringComparison.Ordinal);
+                        foreach(var sug in sugs)
                         {
-                            terminal.CursorBackward(CurrentEditor.Position);
-                            terminal.ClearToTheEndOfLine();
-                            CurrentEditor.SetValue(prefix + (sug.Length == 1 && sug[0][sug[0].Length - 1] != Path.DirectorySeparatorChar ? " " : String.Empty));
-                            CurrentEditor.MoveEnd();
-                            terminal.Write(CurrentEditor.ToString());
+                            terminal.WriteRaw(string.Format(" {0}\r\n", sug.Substring(splitPoint + 1)));
                         }
+                        CurrentEditor.SetValue(prefix);
+                        NormalPrompt.Write(terminal);
+                    }
 
-						return;
-					}
-				}
+                    if(sugs.Length == 1 && sugs[0][sugs[0].Length - 1] != Path.DirectorySeparatorChar)
+                    {
+                        CurrentEditor.InsertCharacter(' ');
+                    }
+                    terminal.Write(CurrentEditor.Value);
+                    return;
+                }
 
-				break;
+                break;
 
-			case ControlSequenceType.Enter:
-				var wasInSearchMode = false;
-				if (mode == Mode.Search)
-				{
-					mode = Mode.Command;
-					command.SetValue(history.CurrentCommand ?? string.Empty);
-					search.Clear();
+            case ControlSequenceType.Enter:
+                var wasInSearchMode = false;
+                if(mode == Mode.Search)
+                {
+                    mode = Mode.Command;
+                    command.SetValue(history.CurrentCommand ?? string.Empty);
+                    search.Clear();
 
 					terminal.ClearLine();
 					wasInSearchMode = true;

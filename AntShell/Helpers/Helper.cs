@@ -34,6 +34,11 @@ namespace AntShell.Helpers
 	{
 		public static string CommonPrefix(IEnumerable<string> items)
 		{
+            if (items.Count() == 1)
+            {
+                return items.First();
+            }
+
 			StringBuilder commonPrefix = null;
 
 			foreach(var item in items)
