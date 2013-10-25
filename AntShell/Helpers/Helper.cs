@@ -32,15 +32,14 @@ namespace AntShell.Helpers
 {
 	public static class Helper
 	{
-		public static string CommonPrefix(IEnumerable<string> items)
+        public static string CommonPrefix(IEnumerable<string> items, string baseString = null)
 		{
             if (items.Count() == 1)
             {
                 return items.First();
             }
 
-			StringBuilder commonPrefix = null;
-
+            var commonPrefix = new StringBuilder(items.FirstOrDefault(x => x.StartsWith(baseString ?? string.Empty)) ?? string.Empty);
 			foreach(var item in items)
 			{
 				if (item == null)
@@ -48,15 +47,8 @@ namespace AntShell.Helpers
 					continue;
 				}
 
-				if (commonPrefix == null)
-				{
-					commonPrefix = new StringBuilder(item);
-				}
-				else
-				{
-					var index = commonPrefix.ToString().Zip(item, (c1, c2) => c1 == c2).TakeWhile(b => b).Count();
-					commonPrefix.Remove(index, commonPrefix.Length - index);
-				}
+				var index = commonPrefix.ToString().Zip(item, (c1, c2) => Char.ToUpper(c1) == Char.ToUpper(c2)).TakeWhile(b => b).Count();
+                commonPrefix.Remove(index, commonPrefix.Length - index);
 			}
 
 			return (commonPrefix != null) ? commonPrefix.ToString() : null;

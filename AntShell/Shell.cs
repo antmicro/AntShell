@@ -182,7 +182,7 @@ namespace AntShell
 					result.Add(bestsug);
 				}
 			}
-			return Helper.CommonPrefix(result) ?? str;
+            return Helper.CommonPrefix(result, str) ?? str;
 		}
 
 		public ICommandInteraction HandleCommand(string cmd, ICommandInteraction ic)

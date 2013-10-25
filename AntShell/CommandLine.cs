@@ -359,7 +359,7 @@ namespace AntShell
 				else if (mode == Mode.Command)
 				{
                     var sugs = handler.SuggestionNeeded(CurrentEditor.Value);
-                    var prefix = Helper.CommonPrefix(sugs);
+                    var prefix = Helper.CommonPrefix(sugs, CurrentEditor.Value);
 
                     if(string.IsNullOrEmpty(prefix))
                     {
