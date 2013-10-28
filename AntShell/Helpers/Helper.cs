@@ -27,6 +27,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Globalization;
 
 namespace AntShell.Helpers
 {
@@ -39,7 +40,7 @@ namespace AntShell.Helpers
                 return items.First();
             }
 
-            var commonPrefix = new StringBuilder(items.FirstOrDefault(x => x.StartsWith(baseString ?? string.Empty)) ?? string.Empty);
+            var commonPrefix = new StringBuilder(items.FirstOrDefault(x => x.StartsWith(baseString ?? string.Empty, true, CultureInfo.CurrentCulture)) ?? string.Empty);
 			foreach(var item in items)
 			{
 				if (item == null)
