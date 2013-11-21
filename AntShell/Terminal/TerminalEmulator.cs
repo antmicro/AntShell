@@ -124,6 +124,7 @@ namespace AntShell.Terminal
 			validator.Add(ControlSequenceType.Backspace, 	(char)127);
             validator.Add(ControlSequenceType.Backspace,    (char)8);
 			validator.Add(ControlSequenceType.Enter,		'\r');
+            validator.Add(ControlSequenceType.Enter,        '\n');
 
 			validator.Add(ControlSequenceType.Ignore,		(char)12);
 
