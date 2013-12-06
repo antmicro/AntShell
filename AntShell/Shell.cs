@@ -123,7 +123,11 @@ namespace AntShell
 		{
 			RegisterCommand(new CommandFromHistoryCommand(history));
 			RegisterCommand(new HistoryCommand(history));
-			RegisterCommand(new SaveCommand(history));
+
+            if(settings.UseBuiltinSave)
+            {
+                RegisterCommand(new SaveCommand(history));
+            }
 
 			if (settings.UseBuiltinQuit)
 			{

@@ -33,6 +33,7 @@ namespace AntShell
 		public string Banner;
 		public bool UseBuiltinQuit { get; set; }
 		public bool UseBuiltinHelp { get; set; }
+        public bool UseBuiltinSave { get; set; }
         public bool ForceVirtualCursor { get; set; }
         public bool ClearScreen { get; set; }
 
@@ -40,6 +41,7 @@ namespace AntShell
 		{
 			UseBuiltinQuit = true;
 			UseBuiltinHelp = true;
+            UseBuiltinSave = true;
 		}
 	}
 }
