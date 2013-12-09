@@ -37,6 +37,8 @@ namespace AntShell
         public bool ForceVirtualCursor { get; set; }
         public bool ClearScreen { get; set; }
 
+        public string HistorySavePath { get; set; }
+
 		public ShellSettings()
 		{
 			UseBuiltinQuit = true;

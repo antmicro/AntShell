@@ -42,31 +42,13 @@ namespace AntShell.Commands.BuiltIn
 		{
 			history.RemoveLast();
 
-			if (args.Length < 2)
+            if (args.Length != 2)
 			{
 				writer.WriteError("History file name is required.");
 				return 1;
 			}
 
-			int? from = null, length = null;
-			if (args.Length > 2)
-			{
-				int _from;
-				if (int.TryParse(args[2], out _from))
-				{
-					from = _from - 1;
-				}
-			}
-			if (args.Length > 3)
-			{
-				int _length;
-				if (int.TryParse(args[3], out _length))
-				{
-					length = _length;
-				}
-			}
-
-			System.IO.File.WriteAllLines(args[1], history.Items.Skip(from ?? 0).Take(length ?? int.MaxValue));
+            history.Save(args[1]);
 
 			return 0;
 		}

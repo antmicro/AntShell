@@ -24,6 +24,9 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 using System.Collections.Generic;
+using System.Linq;
+using System.IO;
+using System;
 
 namespace AntShell
 {
@@ -135,6 +138,28 @@ namespace AntShell
 		public bool HasMoved { get {return (position != -1) &&  (position != items.Count); } }
 
 		#endregion
+
+        #region Save/Load
+
+        public void Save(string path)
+        {
+            if (items.Count > 0 && items[items.Count - 1] == "q" || items[items.Count - 1] == "quit")
+            {
+                items.RemoveAt(items.Count - 1);
+            }
+
+            File.WriteAllLines(path, Items);
+        }
+
+        public void Load(string path)
+        {
+            if (File.Exists(path))
+            {
+                items.AddRange(File.ReadAllLines(path));
+                position = items.Count;
+            }
+        }
+        #endregion
 	}
 }
 

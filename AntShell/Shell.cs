@@ -81,6 +81,11 @@ namespace AntShell
 
 		public void Start(bool stopOnError = false)
 		{
+            if (settings.HistorySavePath != null)
+            {
+                history.Load(settings.HistorySavePath);
+            }
+
 			term.Start(settings.ClearScreen);
 
 			if (settings.Banner != null)
@@ -101,6 +106,11 @@ namespace AntShell
 
 			term.Run(stopOnError);
 
+            if (settings.HistorySavePath != null)
+            {
+                history.Save(settings.HistorySavePath);
+            }
+
             var q = Quitted;
             if (q != null)
             {
@@ -110,7 +120,12 @@ namespace AntShell
 
 		public void Stop()
 		{
-			term.Stop();
+            if (settings.HistorySavePath != null)
+            {
+                history.Save(settings.HistorySavePath);
+            }
+
+            term.Stop();
 		}
 
 		public void Reset()
