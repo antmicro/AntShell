@@ -143,7 +143,7 @@ namespace AntShell
 
         public void Save(string path)
         {
-            if (items.Count > 0 && items[items.Count - 1] == "q" || items[items.Count - 1] == "quit")
+            if (items.Count > 0 && (items[items.Count - 1] == "q" || items[items.Count - 1] == "quit"))
             {
                 items.RemoveAt(items.Count - 1);
             }
