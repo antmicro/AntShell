@@ -740,6 +740,10 @@ namespace AntShell.Terminal
 				while (true)
 				{
 					var b = EncodingHelper.ReadChar(inputStream, encoding);
+                    if (!b.HasValue)
+                    {
+                        return new Position(-1, -1);
+                    }
                     localBuffer.Add(b.Value);
 
 					var validationResult = validator.Check(localBuffer.ToArray(), out cs);

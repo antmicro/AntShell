@@ -209,6 +209,7 @@ namespace AntShell
 			if (cmd != null)
 			{
 				history.Add(cmd);
+                history.Save(settings.HistorySavePath);
 			}
 
             var param = Regex.Matches(cmd, string.Format(@"(?<match>[{0}]+)|\""(?<match>[{0}]*)""", @"\w\.\-\?\!\~\/"))
