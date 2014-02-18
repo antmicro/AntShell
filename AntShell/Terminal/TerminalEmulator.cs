@@ -729,49 +729,54 @@ namespace AntShell.Terminal
 
 		public Position GetCursorPosition(bool useExactValue = false)
 		{
-			if (useExactValue && !forceVirtualCursor)
-			{
-				ControlSequence cs;
-				var localBuffer = new List<char>();
-				
-				SendCSI();
-				SendControlSequence("6n");
+            while (true)
+            {
+    			if (useExactValue && !forceVirtualCursor)
+    			{
+    				ControlSequence cs;
+    				var localBuffer = new List<char>();
+    				
+    				SendCSI();
+    				SendControlSequence("6n");
 
-				while (true)
-				{
-					var b = EncodingHelper.ReadChar(inputStream, encoding);
-                    if (!b.HasValue)
-                    {
-                        return new Position(-1, -1);
-                    }
-                    localBuffer.Add(b.Value);
+    				while (true)
+    				{
+                        var b = EncodingHelper.ReadChar(inputStream, encoding, true);
+                        if (!b.HasValue)
+                        {
+                            inputStream.Flush();
+                            break;
+                            //return new Position(-1, -1);
+                        }
+                        localBuffer.Add(b.Value);
 
-					var validationResult = validator.Check(localBuffer.ToArray(), out cs);
-					switch(validationResult)
-					{
-						case SequenceValidationResult.PrefixFound:
-						continue;
+    					var validationResult = validator.Check(localBuffer.ToArray(), out cs);
+    					switch(validationResult)
+    					{
+    						case SequenceValidationResult.PrefixFound:
+    						continue;
 
-						case SequenceValidationResult.SequenceFound:
-						if (cs.Type == ControlSequenceType.CursorPosition)
-						{
-							return cs.Argument as Position;
-						}
-						Buffer.AddRange(localBuffer);
-						localBuffer.Clear();
-						continue;
+    						case SequenceValidationResult.SequenceFound:
+    						if (cs.Type == ControlSequenceType.CursorPosition)
+    						{
+    							return cs.Argument as Position;
+    						}
+    						Buffer.AddRange(localBuffer);
+    						localBuffer.Clear();
+    						continue;
 
-						case SequenceValidationResult.SequenceNotFound:
-						Buffer.AddRange(localBuffer);
-						localBuffer.Clear();
-						continue;
-					}
-				}
-			}
-			else
-			{
-				return vcursor.Position.Clone();
-			}
+    						case SequenceValidationResult.SequenceNotFound:
+    						Buffer.AddRange(localBuffer);
+    						localBuffer.Clear();
+    						continue;
+    					}
+    				}
+    			}
+    			else
+    			{
+    				return vcursor.Position.Clone();
+    			}
+            }
 		}
 
 		#endregion

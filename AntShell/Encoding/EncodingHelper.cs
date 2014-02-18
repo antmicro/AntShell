@@ -26,21 +26,26 @@ namespace AntShell.Encoding
 {
     public static class EncodingHelper
     {
-        public static char? ReadChar(Stream s, System.Text.Encoding e)
+        public static char? ReadChar(Stream s, System.Text.Encoding e, bool withTimeout = false)
         {
             byte[] bytes = new byte[2];
-            int res = 0;
+            int res;
 
             for (int i = 0; i < 2; i++) {
+                if (withTimeout)
+                {
+                    s.ReadTimeout = 500;
+                }
                 res = s.ReadByte();
-                if (res == -1)
+
+                if (res < 0)
                 {
                     return null;
                 }
 
                 bytes[i] = (byte)res;
                 var chars = e.GetChars(bytes, 0, i + 1)[0];
-                if (!(e.DecoderFallback as CustomDecoderFallback).IsError) {
+                if (!((CustomDecoderFallback)e.DecoderFallback).IsError) {
                     return chars;
                 }
             }
