@@ -20,7 +20,6 @@
 //  */
 using System;
 using System.IO;
-using System.Text;
 
 namespace AntShell.Encoding
 {
@@ -32,7 +31,7 @@ namespace AntShell.Encoding
             int res;
 
             for (int i = 0; i < 2; i++) {
-                if (withTimeout)
+                if (withTimeout && s.CanTimeout)
                 {
                     s.ReadTimeout = 500;
                 }
