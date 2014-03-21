@@ -106,11 +106,6 @@ namespace AntShell
 
 			term.Run(stopOnError);
 
-            if (settings.HistorySavePath != null)
-            {
-                history.Save(settings.HistorySavePath);
-            }
-
             var q = Quitted;
             if (q != null)
             {
@@ -120,11 +115,6 @@ namespace AntShell
 
 		public void Stop()
 		{
-            if (settings.HistorySavePath != null)
-            {
-                history.Save(settings.HistorySavePath);
-            }
-
             term.Stop();
 		}
 
