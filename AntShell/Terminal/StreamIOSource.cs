@@ -65,6 +65,10 @@ namespace AntShell.Terminal
 
         #endregion
 
+        public StreamIOSource(Stream stream) : this(stream, stream)
+        {
+        }
+
         public StreamIOSource(Stream input, Stream output)
         {
             inputStream = input;
