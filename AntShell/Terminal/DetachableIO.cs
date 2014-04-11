@@ -38,7 +38,7 @@ namespace AntShell.Terminal
             encoding = System.Text.Encoding.GetEncoding("UTF-8", System.Text.EncoderFallback.ReplacementFallback, new CustomDecoderFallback());
         }
 
-        public DetachableIO(IIOSource source)
+        public DetachableIO(IIOSource source) : this()
         {
             Attach(source);
         }
