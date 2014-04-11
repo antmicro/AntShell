@@ -62,7 +62,6 @@
     <Compile Include="Commands\ISuggestionProvider.cs" />
     <Compile Include="Terminal\TerminalBuffer.cs" />
     <Compile Include="Terminal\TerminalMultiplexer.cs" />
-    <Compile Include="Terminal\StreamTerminalIOSource.cs" />
     <Compile Include="Terminal\BasicTerminalEmulator.cs" />
     <Compile Include="Terminal\IPassiveIOSource.cs" />
     <Compile Include="Terminal\IActiveIOSource.cs" />
@@ -71,6 +70,7 @@
     <Compile Include="Terminal\PAIOSourceConverter.cs" />
     <Compile Include="Terminal\APIOSourceConverter.cs" />
     <Compile Include="Terminal\NavigableTerminalEmulator.cs" />
+    <Compile Include="Terminal\StreamIOSource.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
