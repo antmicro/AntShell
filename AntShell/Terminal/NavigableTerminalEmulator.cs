@@ -26,50 +26,39 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.IO;
 using AntShell.Helpers;
-using AntShell.Encoding;
 
 namespace AntShell.Terminal
 {
-	public class TerminalEmulator
+    public class NavigableTerminalEmulator : BasicTerminalEmulator<DetachableIO>
 	{
 		private const int MAX_HEIGHT = 9999;
 		private const int MAX_WIDTH = 9999;
 
 		private SequenceValidator validator;
-		private Queue<char> queue;
+		private Queue<char> sequenceQueue;
 
 		public ITerminalHandler Handler { get; set; }
 
 		private VirtualCursor vcursor;
 
-		private List<char> Buffer;
 		private List<int> WrappedLines;
 		private int CurrentLine;
 		private int LinesScrolled;
 
-		private Stream inputStream;
-        private Stream outputStream;
         private bool onceAgain;
-        private System.Text.Encoding encoding;
 
         private bool clearScreen = false;
         private bool forceVirtualCursor = false;
 
-		public TerminalEmulator(Stream input, Stream output, bool forceVCursor = false)
+        public NavigableTerminalEmulator(DetachableIO io, bool forceVCursor = false) : base(io)
 		{
 			validator = new SequenceValidator();
-			queue = new Queue<char>();
+            sequenceQueue = new Queue<char>();
 
-            this.forceVirtualCursor = forceVCursor;
-			this.inputStream = input;
-            this.outputStream = output;
+            forceVirtualCursor = forceVCursor;
 			WrappedLines = new List<int>();
-			Buffer = new List<char>();
 			vcursor = new VirtualCursor();
-
-            encoding = System.Text.Encoding.GetEncoding("UTF-8", System.Text.EncoderFallback.ReplacementFallback, new CustomDecoderFallback());
 
 			ControlSequences();
 		}
@@ -81,8 +70,7 @@ namespace AntShell.Terminal
             {
     			ClearScreen();
     			ResetColors();
-    			CursorUp(MAX_HEIGHT, false);
-    			CursorToColumn(0, false);
+                ResetCursor();
             }
 
 			Calibrate();
@@ -158,14 +146,14 @@ namespace AntShell.Terminal
       		onceAgain = true;
 			while(onceAgain)
 			{
-				var input = GetNextInput();
+                var input = GetNextInput();
 
 				if (input == null)
 				{
-					if (stopOnError)
+                    if (stopOnError)
 					{
 						break;
-					}
+                    }
 
 					continue;
 				}
@@ -174,38 +162,21 @@ namespace AntShell.Terminal
 			}
 		}
 
-		private char? GetNextChar()
-		{
-			char? character;
-
-			if (Buffer.Count > 0)
-			{
-				character = Buffer.ElementAt(0);
-				Buffer.RemoveAt(0);
-			}
-			else
-			{
-				character = EncodingHelper.ReadChar(inputStream, encoding);
-			}
-
-			return character;
-		}
-
-		public object GetNextInput()
+        public object GetNextInput(int timeout = -1)
 		{
 			while (true)
 			{
-				var b = GetNextChar();
+                var b = InputOutput.GetNextChar(timeout);
 				if (b == null)
 				{
 					return null;
 				}
 
-				if (queue.Count == 0)
+				if (sequenceQueue.Count == 0)
 				{
 					if (b == (char)SequenceElement.ESC)
 					{
-						queue.Enqueue(b.Value);
+						sequenceQueue.Enqueue(b.Value);
 						continue;
 					}
 
@@ -222,19 +193,19 @@ namespace AntShell.Terminal
 				}
 				else
 				{
-					queue.Enqueue(b.Value);
+					sequenceQueue.Enqueue(b.Value);
 					ControlSequence cs;
-					var validationResult = validator.Check(queue.ToArray(), out cs);
+					var validationResult = validator.Check(sequenceQueue.ToArray(), out cs);
 					if (cs == null)
 					{
 						if (validationResult == SequenceValidationResult.SequenceNotFound)
 						{
-							queue.Clear();
+							sequenceQueue.Clear();
 						}
 					}
 					else
 					{
-						queue.Clear();
+						sequenceQueue.Clear();
 						return cs;
 					}
 				}
@@ -247,13 +218,15 @@ namespace AntShell.Terminal
 			{
 				return;
 			}
-			else if (input is char)
+
+            var inputAsControlSequence = input as ControlSequence;
+			if (input is char)
 			{
 				Handler.HandleCharacter((char)input);
 			}
-			else if (input is ControlSequence)
+            else if (inputAsControlSequence != null)
 			{
-				Handler.HandleControlSequence((ControlSequence)input);
+                Handler.HandleControlSequence((ControlSequence)input);
 			}
 		}
 
@@ -278,20 +251,13 @@ namespace AntShell.Terminal
 
 			if (text != null)
 			{
-				if (color.HasValue)
-				{
-					SetColor(color.Value);
-				}
-
-				foreach(var c in text.ToCharArray())
-				{
-					result += WriteChar(c, checkWrap) ? 1 : 0;
-				}
-
-				if (color.HasValue)
-				{
-					ResetColors();
-				}
+                ColorChangerWrapper(color, () => 
+                {
+                    foreach(var c in text)
+                    {
+                        result += WriteChar(c, checkWrap) ? 1 : 0;
+                    }
+                });
 			}
 
 			return result;
@@ -299,17 +265,7 @@ namespace AntShell.Terminal
 
 		public void Write(char c, bool checkWrap = true, ConsoleColor? color = null)
 		{
-			if (color.HasValue)
-			{
-				SetColor(color.Value);
-			}
-			
-			WriteChar(c, checkWrap);
-			
-			if (color.HasValue)
-			{
-				ResetColors();
-			}
+            ColorChangerWrapper(color,() => WriteChar(c, checkWrap));
 		}
 
 		public void WriteNoMove(string text, int skip = 0, ConsoleColor? color = null)
@@ -334,48 +290,58 @@ namespace AntShell.Terminal
 
 		public void WriteRaw(char c, ConsoleColor? color = null)
 		{
-			if (color.HasValue)
-			{
-				SetColor(color.Value);
-			}
-
-			WriteChar(c, false);
-
-			if (color.HasValue)
-			{
-				ResetColors();
-			}
+            ColorChangerWrapper(color, () => WriteChar(c, false));
 		}
+
+        public void WriteRaw(byte[] bs, ConsoleColor? color = null)
+        {
+            ColorChangerWrapper(color, () =>
+                {
+                    foreach (var b in bs)
+                    {
+                        InputOutput.Write(b);
+                    }
+                }
+            );
+        }
 
 		public void WriteRaw(string text, ConsoleColor? color = null)
 		{
 			if (text != null)
 			{
-				if (color.HasValue)
-				{
-					SetColor(color.Value);
-				}
-				
-				foreach(var c in text.ToCharArray())
-				{
-					WriteChar(c, false);
-				}
-				
-				if (color.HasValue)
-				{
-					ResetColors();
-				}
+                ColorChangerWrapper(color, () =>
+                    {
+                        foreach (var b in text)
+                        {
+                            InputOutput.Write(b);
+                        }
+                    }
+                );
 			}
 		}
+
+        private void ColorChangerWrapper(ConsoleColor? color, Action action)
+        {
+            if (color.HasValue)
+            {
+                SetColor(color.Value);
+            }
+
+            action();
+
+            if (color.HasValue)
+            {
+                ResetColors();
+            }
+        }
 
 		private bool InEscapeMode = false;
 		private bool WriteChar(char c, bool checkIfWrapped = true)
 		{
-			WriteCharRaw(c);
+            InputOutput.Write(c);
 
 			if (forceVirtualCursor || checkIfWrapped)
 			{
-
 				if (c == (byte)SequenceElement.ESC) // to eliminate control sequences, mostly color change
 				{
 					InEscapeMode = true;
@@ -414,14 +380,6 @@ namespace AntShell.Terminal
 			}
 
 			return false;
-		}
-
-		private void WriteCharRaw(char c)
-		{
-            foreach (var b in encoding.GetBytes(new [] { c }))
-            {
-			    outputStream.WriteByte(b);
-            }
 		}
 
 		#endregion
@@ -604,11 +562,6 @@ namespace AntShell.Terminal
 			vcursor.MaxReachedPosition.Y = vcursor.RealPosition.Y;
 		}
 
-		public void ClearScreen()
-		{
-			SendCSI((byte)'2', (byte)'J');
-		}
-
 		#endregion
 
 		#region Display
@@ -741,10 +694,10 @@ namespace AntShell.Terminal
 
     				while (true)
     				{
-                        var b = EncodingHelper.ReadChar(inputStream, encoding, true);
+                        var b = InputOutput.PeekNextChar(500);
                         if (!b.HasValue)
                         {
-                            inputStream.Flush();
+                            InputOutput.Flush();
                             break;
                             //return new Position(-1, -1);
                         }
@@ -759,14 +712,13 @@ namespace AntShell.Terminal
     						case SequenceValidationResult.SequenceFound:
     						if (cs.Type == ControlSequenceType.CursorPosition)
     						{
+                                InputOutput.ClearPeeked();
     							return cs.Argument as Position;
     						}
-    						Buffer.AddRange(localBuffer);
     						localBuffer.Clear();
     						continue;
 
     						case SequenceValidationResult.SequenceNotFound:
-    						Buffer.AddRange(localBuffer);
     						localBuffer.Clear();
     						continue;
     					}
@@ -780,43 +732,6 @@ namespace AntShell.Terminal
 		}
 
 		#endregion
-
-		#region Helper methods
-
-		private void SendControlSequence(params string[] seq)
-		{
-			foreach(var s in seq)
-			{
-				foreach(var c in s.ToCharArray())
-				{
-					outputStream.WriteByte((byte)c);
-				}
-			}
-		}
-
-		private void SendControlSequence(params byte[] seq)
-		{
-			foreach(var b in seq)
-			{
-				outputStream.WriteByte(b);
-			}
-		}
-
-		private void SendCSI(params byte[] seq)
-		{
-			SendControlSequence((byte)SequenceElement.ESC, (byte)SequenceElement.CSI);
-			SendControlSequence(seq);
-		}
-
-		#endregion
-
-		private enum SequenceElement : byte
-		{
-			ESC = 0x1B, // <Esc>
- 			CSI = 0x5B, // '['
-			SEM = 0x3B, // ';'
-			INTEGER = 0xFF
-		}
 	}
 }
 

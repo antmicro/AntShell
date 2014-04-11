@@ -38,7 +38,7 @@ namespace AntShell
 		private CommandEditor command;
 		private CommandEditor search;
 		private CommandEditor userInput;
-		private TerminalEmulator terminal;
+		private NavigableTerminalEmulator terminal;
 
 		public Prompt NormalPrompt { get; set; }
 
@@ -56,17 +56,17 @@ namespace AntShell
 
 		#endregion
 
-		public CommandLine(TerminalEmulator term, CommandHistory history, ICommandHandler handler)
-		{
-			this.handler = handler;
-			terminal = term;
-			this.history = history;
-			command = new CommandEditor();
-			search = new CommandEditor();
-			userInput = new CommandEditor();
+        public CommandLine(NavigableTerminalEmulator term, CommandHistory history, ICommandHandler handler)
+        {
+            this.handler = handler;
+            this.history = history;
+            command = new CommandEditor();
+            search = new CommandEditor();
+            userInput = new CommandEditor();
 
-			term.Handler = this;
-		}
+            terminal = term;
+            term.Handler = this;
+        }
 
 		public void Start()
 		{
@@ -505,17 +505,18 @@ namespace AntShell
 			while (true)
 			{
 				var input = terminal.GetNextInput();
+                var inputAsControlSequence = input as ControlSequence;
 				if (input is char) {
 					HandleCharacter((char)input);
 				} 
-				else if (input is ControlSequence)
+                else if (inputAsControlSequence != null)
 				{
-					if (((ControlSequence)input).Type == ControlSequenceType.Enter)
+                    if (inputAsControlSequence.Type == ControlSequenceType.Enter)
 					{
 						result = CurrentEditor.Value;
 						break;
 					}
-					else if (((ControlSequence)input).Type == ControlSequenceType.Ctrl && (char)((ControlSequence)input).Argument == 'c')
+                    else if (inputAsControlSequence.Type == ControlSequenceType.Ctrl && (char)inputAsControlSequence.Argument == 'c')
 					{
 						terminal.CursorForward(CurrentEditor.MoveEnd());
 						terminal.Write("^C");
