@@ -30,7 +30,7 @@ using AntShell.Helpers;
 
 namespace AntShell.Terminal
 {
-    public class NavigableTerminalEmulator : BasicTerminalEmulator<DetachableIO>
+    public class NavigableTerminalEmulator : BasicTerminalEmulator
 	{
 		private const int MAX_HEIGHT = 9999;
 		private const int MAX_WIDTH = 9999;

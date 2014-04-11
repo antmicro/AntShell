@@ -26,11 +26,11 @@ using System;
 
 namespace AntShell.Terminal
 {
-    public abstract class BasicTerminalEmulator
+    public class BasicTerminalEmulator
     {
         public DetachableIO InputOutput { get; protected set; }
 
-        protected BasicTerminalEmulator(DetachableIO io)
+        public BasicTerminalEmulator(DetachableIO io)
         {
             InputOutput = io;
         }
@@ -78,19 +78,6 @@ namespace AntShell.Terminal
             CSI = 0x5B, // '['
             SEM = 0x3B, // ';'
             INTEGER = 0xFF
-        }
-    }
-
-    public class BasicTerminalEmulator<T> : BasicTerminalEmulator where T : DetachableIO
-    {
-        public new T InputOutput 
-        { 
-            get { return (T) base.InputOutput; }
-            private set { base.InputOutput = value; } 
-        }
-
-        public BasicTerminalEmulator(T io) : base(io)
-        {
         }
     }
 }
