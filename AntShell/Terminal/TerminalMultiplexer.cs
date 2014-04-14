@@ -24,6 +24,7 @@
 // *******************************************************************
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AntShell.Terminal
 {
@@ -33,7 +34,7 @@ namespace AntShell.Terminal
 
         public TerminalMultiplexer(IIOSource world)
         {
-            terminals = new List<Tuple<BasicTerminalEmulator, TerminalBuffer>>();
+            terminals = new List<MulitplexerItem>();
 
             if (world is IActiveIOSource)
             {
@@ -45,14 +46,30 @@ namespace AntShell.Terminal
             }
         }
 
-        public void AddTerminal(BasicTerminalEmulator terminal)
+        public List<string> AvailableTerminals()
         {
-            terminals.Add(Tuple.Create(terminal, new TerminalBuffer(terminal)));
+            return terminals.Select(x => x.Name).ToList();
+        }
+
+        public void AddTerminal(string name, BasicTerminalEmulator terminal)
+        {
+            terminals.Add(new MulitplexerItem { Terminal = terminal, Buffer = new TerminalBuffer(terminal), Name = name });
 
             if (terminals.Count == 1)
             {
                 ChangeTerminal(terminal);
             }
+        }
+
+        public void ChangeTerminalTo(string name)
+        {
+            if (terminals.Count == 1)
+            {
+                return;
+            }
+
+            var next = terminals.First(x => x.Name == name);
+            InnerChangeTerminal(next);
         }
 
         private void ChangeTerminal(BasicTerminalEmulator caller)
@@ -62,6 +79,13 @@ namespace AntShell.Terminal
                 return;
             }
 
+            var currentIndex = terminals.FindIndex(x => x.Terminal == Current);
+            var next = terminals[(currentIndex + 1) % terminals.Count];
+            InnerChangeTerminal(next);
+        }
+
+        private void InnerChangeTerminal(MulitplexerItem next)
+        {
             if (Current != null)
             {
                 var prev = Current.InputOutput.Detach() as MITM;
@@ -71,19 +95,24 @@ namespace AntShell.Terminal
                 }
             }
 
-            var currentIndex = terminals.FindIndex(x => x.Item1 == Current);
-            var next = terminals[(currentIndex + 1) % terminals.Count];
-            Current = next.Item1;
+            Current = next.Terminal;
 
-            var mitm = new MITM(world, next.Item2);
+            var mitm = new MITM(world, next.Buffer);
             mitm.SwitchTerminal += () => ChangeTerminal(null);
 
             Current.InputOutput.Attach(mitm);
-            next.Item2.Replay();
+            next.Buffer.Replay();
         }
 
         private readonly IActiveIOSource world;
-        private readonly List<Tuple<BasicTerminalEmulator, TerminalBuffer>> terminals;
+        private readonly List<MulitplexerItem> terminals;
+
+        private struct MulitplexerItem
+        {
+            public BasicTerminalEmulator Terminal;
+            public TerminalBuffer Buffer;
+            public string Name;
+        }
 
         private class MITM : IActiveIOSource, IDisposable
         {
