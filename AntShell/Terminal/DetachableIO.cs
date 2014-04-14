@@ -129,7 +129,7 @@ namespace AntShell.Terminal
 
         private void EnsurePassiveSource()
         {
-            if (!(source is IPassiveIOSource))
+            if (source != null && !(source is IPassiveIOSource))
             {
                 var converter = source as PAIOSourceConverter;
                 source = converter != null ? converter.OriginalSource : new APIOSourceConverter((IActiveIOSource)source);
@@ -296,6 +296,7 @@ namespace AntShell.Terminal
 
         private bool active;
 
+        public IIOSource Source { get { return source; } }
         private IIOSource source;
 
         private readonly object locker = new object();
