@@ -33,34 +33,34 @@ namespace AntShell.Terminal
 
         public void Flush()
         {
-            inputStream.Flush();
+            InputStream.Flush();
         }
 
         public void Write(byte b)
         {
-            outputStream.WriteByte(b);
+            OutputStream.WriteByte(b);
         }
 
         public int Read(int timeout)
         {
             int result;
 
-            if (timeout < 0 || !inputStream.CanTimeout)
+            if (timeout < 0 || !InputStream.CanTimeout)
             {
-                return inputStream.ReadByte();
+                return InputStream.ReadByte();
             }
 
-            var current = inputStream.ReadTimeout;
-            inputStream.ReadTimeout = timeout;
-            result = inputStream.ReadByte();
-            inputStream.ReadTimeout = current;
+            var current = InputStream.ReadTimeout;
+            InputStream.ReadTimeout = timeout;
+            result = InputStream.ReadByte();
+            InputStream.ReadTimeout = current;
             return result;
         }
 
         public void Close()
         {
-            inputStream.Close();
-            outputStream.Close();
+            InputStream.Close();
+            OutputStream.Close();
         }
 
         #endregion
@@ -71,12 +71,12 @@ namespace AntShell.Terminal
 
         public StreamIOSource(Stream input, Stream output)
         {
-            inputStream = input;
-            outputStream = output;
+            InputStream = input;
+            OutputStream = output;
         }
 
-        private readonly Stream inputStream;
-        private readonly Stream outputStream;
+        public Stream InputStream { get; private set; }
+        public Stream OutputStream { get; private set; }
     }
 }
 
