@@ -39,7 +39,9 @@ namespace AntShell
 	{
         public event Action Quitted;
 
-        public readonly NavigableTerminalEmulator term;
+        public NavigableTerminalEmulator Terminal { get { return term; } }
+
+        private readonly NavigableTerminalEmulator term;
 		private readonly CommandHistory history;
 		private readonly CommandLine line;
 
@@ -51,20 +53,6 @@ namespace AntShell
 		private readonly ICommandHandler externalHandler;
 
 		private readonly ShellSettings settings;
-
-        /*
-        public Shell(Stream s, ShellSettings settings) : this(s, s, settings) { }
-
-
-		public Shell(Stream s, ICommandHandler handler, ShellSettings settings) : this(s, s, handler, settings) { }
-
-        /*
-        public Shell(Stream input, Stream output, ICommandHandler handler, ShellSettings settings) : this(input, output, settings)
-        {
-            externalHandler = handler;
-            externalHandler.GetInternalCommands = () => Commands.Cast<ICommandDescription>();
-        }
-        */
 
         public Shell(DetachableIO io, ICommandHandler handler, ShellSettings settings)
         {
