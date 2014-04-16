@@ -88,7 +88,7 @@ namespace AntShell.Terminal
         {
             if (Current != null)
             {
-                var prev = Current.InputOutput.Detach() as MITM;
+                var prev = Current.InputOutput.Detach() as IOInterceptor;
                 if (prev != null)
                 {
                     prev.Dispose();
@@ -97,7 +97,7 @@ namespace AntShell.Terminal
 
             Current = next.Terminal;
 
-            var mitm = new MITM(world, next.Buffer);
+            var mitm = new IOInterceptor(world, next.Buffer);
             mitm.SwitchTerminal += () => ChangeTerminal(null);
 
             Current.InputOutput.Attach(mitm);
@@ -114,7 +114,7 @@ namespace AntShell.Terminal
             public string Name;
         }
 
-        private class MITM : IActiveIOSource, IDisposable
+        private class IOInterceptor : IActiveIOSource, IDisposable
         {
             #region IDisposable implementation
 
@@ -144,7 +144,7 @@ namespace AntShell.Terminal
 
             #endregion
 
-            public MITM(IActiveIOSource world, TerminalBuffer buffer)
+            public IOInterceptor(IActiveIOSource world, TerminalBuffer buffer)
             {
                 this.world = world;
                 this.buffer = buffer;
