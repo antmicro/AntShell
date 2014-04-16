@@ -29,6 +29,8 @@ namespace AntShell.Terminal
     {
         void Flush();
         void Write(byte b);
+
+        string Name { get; }
     }
 }
 

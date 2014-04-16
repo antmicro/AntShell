@@ -62,6 +62,8 @@ namespace AntShell.Terminal
             activeSource.Write(b);
         }
 
+        public string Name { get { return OriginalSource.Name; } }
+
         #endregion
 
         public APIOSourceConverter(IActiveIOSource source)
