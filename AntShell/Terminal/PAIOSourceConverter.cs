@@ -24,6 +24,7 @@
 // *******************************************************************
 using System;
 using System.Threading;
+using Antmicro.Migrant.Hooks;
 
 namespace AntShell.Terminal
 {
@@ -54,11 +55,17 @@ namespace AntShell.Terminal
         public PAIOSourceConverter(IPassiveIOSource source)
         {
             passiveSource = source;
-            var reader = new Reader(this);
-            reader.Run();
+            Init();
         }
 
         public IPassiveIOSource OriginalSource { get { return passiveSource; } }
+
+        [PostDeserialization]
+        private void Init()
+        {
+            var reader = new Reader(this);
+            reader.Run();
+        }
 
         private readonly IPassiveIOSource passiveSource;
 
