@@ -97,7 +97,7 @@ namespace AntShell.Terminal
 
             Current = next.Terminal;
 
-            var mitm = new IOInterceptor(world, next.Buffer);
+            var mitm = new IOInterceptor(world);
             mitm.SwitchTerminal += () => ChangeTerminal(null);
 
             Current.InputOutput.Attach(mitm);
@@ -146,10 +146,9 @@ namespace AntShell.Terminal
 
             #endregion
 
-            public IOInterceptor(IActiveIOSource world, TerminalBuffer buffer)
+            public IOInterceptor(IActiveIOSource world)
             {
                 this.world = world;
-                this.buffer = buffer;
                 world.ByteRead += HandleByteRead;
             }
 
@@ -173,7 +172,6 @@ namespace AntShell.Terminal
             }
 
             private readonly IActiveIOSource world;
-            private readonly TerminalBuffer buffer;
         }
     }
 }
