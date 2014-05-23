@@ -361,7 +361,7 @@ namespace AntShell
                     var sugs = handler.SuggestionNeeded(CurrentEditor.Value);
                     var prefix = Helper.CommonPrefix(sugs, CurrentEditor.Value);
 
-                    if(string.IsNullOrEmpty(prefix))
+                    if(sugs.Length == 0)
                     {
                         break;
                     }
