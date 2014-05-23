@@ -36,7 +36,6 @@
     <Compile Include="Commands\BuiltIn\SaveCommmand.cs" />
     <Compile Include="Commands\ICommand.cs" />
     <Compile Include="Commands\ICommandInteraction.cs" />
-    <Compile Include="Terminal\TerminalEmulator.cs" />
     <Compile Include="Shell.cs" />
     <Compile Include="Prompt.cs" />
     <Compile Include="Helpers\Position.cs" />
@@ -58,10 +57,20 @@
     <Compile Include="Commands\IOperator.cs" />
     <Compile Include="Encoding\CustomDecoderFallback.cs" />
     <Compile Include="Encoding\CustomDecoderFallbackBuffer.cs" />
-    <Compile Include="Encoding\EncodingHelper.cs" />
     <Compile Include="Commands\ICommandDescription.cs" />
     <Compile Include="Commands\CommandBase.cs" />
     <Compile Include="Commands\ISuggestionProvider.cs" />
+    <Compile Include="Terminal\TerminalBuffer.cs" />
+    <Compile Include="Terminal\TerminalMultiplexer.cs" />
+    <Compile Include="Terminal\BasicTerminalEmulator.cs" />
+    <Compile Include="Terminal\IPassiveIOSource.cs" />
+    <Compile Include="Terminal\IActiveIOSource.cs" />
+    <Compile Include="Terminal\DetachableIO.cs" />
+    <Compile Include="Terminal\IIOSource.cs" />
+    <Compile Include="Terminal\PAIOSourceConverter.cs" />
+    <Compile Include="Terminal\APIOSourceConverter.cs" />
+    <Compile Include="Terminal\NavigableTerminalEmulator.cs" />
+    <Compile Include="Terminal\StreamIOSource.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -84,4 +93,10 @@
       </Properties>
     </MonoDevelop>
   </ProjectExtensions>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Migrant\Migrant\Migrant.csproj">
+      <Project>{5F87C357-09FB-4F53-BE37-41FE5BD88957}</Project>
+      <Name>Migrant</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>

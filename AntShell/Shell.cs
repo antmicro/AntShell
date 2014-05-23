@@ -39,7 +39,9 @@ namespace AntShell
 	{
         public event Action Quitted;
 
-		private readonly TerminalEmulator term;
+        public NavigableTerminalEmulator Terminal { get { return term; } }
+
+        private readonly NavigableTerminalEmulator term;
 		private readonly CommandHistory history;
 		private readonly CommandLine line;
 
@@ -52,29 +54,22 @@ namespace AntShell
 
 		private readonly ShellSettings settings;
 
-        public Shell(Stream s, ShellSettings settings) : this(s, s, settings) { }
-
-		public Shell(Stream input, Stream output, ShellSettings settings)
-		{
-			term = new TerminalEmulator(input, output, settings.ForceVirtualCursor);
-			history = new CommandHistory();
+        public Shell(DetachableIO io, ICommandHandler handler, ShellSettings settings)
+        {
+            term = new NavigableTerminalEmulator(io, settings.ForceVirtualCursor);
+            history = new CommandHistory();
             Commands = new List<ICommand>();
 
-			line = new CommandLine(term, history, this);
-			line.NormalPrompt = settings.NormalPrompt;
-			line.SearchPrompt = settings.SearchPrompt ?? new SearchPrompt("search `{0}`> ", ConsoleColor.Yellow);
+            line = new CommandLine(term, history, this);
+            line.NormalPrompt = settings.NormalPrompt;
+            line.SearchPrompt = settings.SearchPrompt ?? new SearchPrompt("search `{0}`> ", ConsoleColor.Yellow);
 
-			Writer = new CommandInteraction(term, line);
+            Writer = new CommandInteraction(term, line);
 
-			this.settings = settings;
+            this.settings = settings;
 
-			PrepareCommands();
-		}
+            PrepareCommands();
 
-		public Shell(Stream s, ICommandHandler handler, ShellSettings settings) : this(s, s, handler, settings) { }
-
-        public Shell(Stream input, Stream output, ICommandHandler handler, ShellSettings settings) : this(input, output, settings)
-        {
             externalHandler = handler;
             externalHandler.GetInternalCommands = () => Commands.Cast<ICommandDescription>();
         }

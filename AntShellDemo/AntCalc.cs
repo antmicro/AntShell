@@ -26,6 +26,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 using System;
 using AntShell;
 using System.IO;
+using AntShell.Terminal;
 
 namespace AntShellDemo
 {
@@ -40,7 +41,7 @@ namespace AntShellDemo
 				Banner = "Welcome to AntCalc - AntShell Demo!"
 			};
 
-			shell = new Shell(stream, sett);
+            shell = new Shell(new DetachableIO(new StreamIOSource(stream)), null, sett);
 			shell.RegisterCommand(new AddCommand());
 			shell.RegisterCommand(new AskCommand());
 			shell.RegisterCommand(new PrintCommand());

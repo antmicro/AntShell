@@ -31,14 +31,14 @@ namespace AntShell
 {
 	public class CommandInteraction : ICommandInteraction
 	{
-		private TerminalEmulator terminal;
+		private NavigableTerminalEmulator terminal;
 		private CommandLine cmdLine;
 
-		public CommandInteraction(TerminalEmulator term)
+		public CommandInteraction(NavigableTerminalEmulator term)
 		{
 			terminal = term;
 		}
-		public CommandInteraction(TerminalEmulator term, CommandLine cmd) : this(term)
+		public CommandInteraction(NavigableTerminalEmulator term, CommandLine cmd) : this(term)
 		{
 			cmdLine = cmd;
 		}
