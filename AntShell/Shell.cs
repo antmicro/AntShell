@@ -88,6 +88,7 @@ namespace AntShell
 				term.Write(settings.Banner, false);
 				term.NewLine();
 				term.NewLine();
+				term.Calibrate();
 			}
 			if (StartupCommand != null)
 			{
