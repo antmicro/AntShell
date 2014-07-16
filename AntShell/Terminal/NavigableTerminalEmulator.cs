@@ -73,7 +73,12 @@ namespace AntShell.Terminal
                 ResetCursor();
             }
 
-			Calibrate();
+            do
+            {
+                Calibrate();
+                // it sometimes happens that first calibrations returns the size of terminal: 1x1
+                // which causes wrapping to behave strangely
+            } while (vcursor.MaxPosition.X == 1 && vcursor.MaxPosition.Y == 1);
 		}
 
 		private void ControlSequences()
