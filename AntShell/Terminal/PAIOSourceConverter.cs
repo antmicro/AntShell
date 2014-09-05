@@ -25,14 +25,25 @@
 using System;
 using System.Threading;
 using Antmicro.Migrant.Hooks;
+using Antmicro.Migrant;
 
 namespace AntShell.Terminal
 {
-    public class PAIOSourceConverter : IActiveIOSource
+    public class PAIOSourceConverter : IActiveIOSource, IDisposable
     {
         #region IActiveIOSource implementation
 
         public event Action<byte> ByteRead;
+
+        #endregion
+
+        #region IDisposable implementation
+
+        public void Dispose()
+        {
+            passiveSource.Dispose();
+            reader.Halt();
+        }
 
         #endregion
 
@@ -63,10 +74,12 @@ namespace AntShell.Terminal
         [PostDeserialization]
         private void Init()
         {
-            var reader = new Reader(this);
+            reader = new Reader(this);
             reader.Run();
         }
 
+        [Transient]
+        private Reader reader;
         private readonly IPassiveIOSource passiveSource;
 
         private class Reader
@@ -87,17 +100,23 @@ namespace AntShell.Terminal
 
             public void Halt()
             {
+                loopAgain = false;
                 thread.Join();
             }
 
             private void Loop()
             {
-                while(true)
+                loopAgain = true;
+                while(loopAgain)
                 {
-                    var read = converter.passiveSource.Read(-1);
-                    if (read == -1)
+                    var read = converter.passiveSource.Read(1000);
+                    if(read == -1)
                     {
                         break;
+                    }
+                    else if(read == -2)
+                    {
+                        continue;
                     }
                  
                     var byteRead = converter.ByteRead;
@@ -111,6 +130,7 @@ namespace AntShell.Terminal
             private readonly PAIOSourceConverter converter;
 
             private Thread thread;
+            private bool loopAgain;
         }
     }
 }

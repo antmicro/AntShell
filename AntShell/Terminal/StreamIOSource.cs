@@ -29,6 +29,11 @@ namespace AntShell.Terminal
 {
     public class StreamIOSource : IPassiveIOSource
     {
+        public void Dispose()
+        {
+            InputStream.Dispose();
+        }
+
         #region ITerminalIOSource implementation
 
         public void Flush()

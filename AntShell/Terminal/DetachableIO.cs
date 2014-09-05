@@ -29,7 +29,7 @@ using System.Collections.Generic;
 
 namespace AntShell.Terminal
 {
-    public class DetachableIO
+    public class DetachableIO : IDisposable
     {
         public DetachableIO()
         {
@@ -42,6 +42,19 @@ namespace AntShell.Terminal
         {
             Attach(source);
         }
+
+        #region IDisposable implementation
+
+        public void Dispose()
+        {
+            var s = source as IDisposable;
+            if(s != null)
+            {
+                s.Dispose();
+            }
+        }
+
+        #endregion
 
         #region Attach/Detach
 

@@ -22,9 +22,12 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 // *******************************************************************
+using System;
+
+
 namespace AntShell.Terminal
 {
-    public interface IPassiveIOSource : IIOSource
+    public interface IPassiveIOSource : IIOSource, IDisposable
     {
         int Read(int timeout);
     }

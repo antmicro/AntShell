@@ -28,6 +28,10 @@ namespace AntShell.Terminal
 {
     public class APIOSourceConverter : IPassiveIOSource
     {
+        public void Dispose()
+        {
+        }
+
         #region IPassiveIOSource implementation
 
         public int Read(int timeout)
