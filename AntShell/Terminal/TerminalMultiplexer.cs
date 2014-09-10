@@ -61,6 +61,15 @@ namespace AntShell.Terminal
             }
         }
 
+        public void RemoveTerminal(string name)
+        {
+            terminals.RemoveAll(x => x.Name == name);
+            if(terminals.Count != 0)
+            {
+                InnerChangeTerminal(terminals[0]);
+            }
+        }
+
         public void ChangeTerminalTo(string name)
         {
             if (terminals.Count == 1)
