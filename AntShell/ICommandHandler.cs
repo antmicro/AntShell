@@ -33,8 +33,6 @@ namespace AntShell
 	{
 		ICommandInteraction HandleCommand(string cmd, ICommandInteraction ci);
 		string[] SuggestionNeeded(string cmd);
-		string BestSuggestionNeeded(string cmd);
-
         Func<IEnumerable<ICommandDescription>> GetInternalCommands { get; set; }
 	}
 }

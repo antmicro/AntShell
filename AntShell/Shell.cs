@@ -176,20 +176,6 @@ namespace AntShell
 			return result.ToArray();
 		}
 
-		public string BestSuggestionNeeded(string str)
-		{
-            var result = Commands.Where(x => x.Name.StartsWith(str)).Select(x => x.Name).ToList();
-			if (externalHandler != null)
-			{
-				var bestsug = externalHandler.BestSuggestionNeeded(str);
-				if (bestsug != null)
-				{
-					result.Add(bestsug);
-				}
-			}
-            return Helper.CommonPrefix(result, str) ?? str;
-		}
-
 		public ICommandInteraction HandleCommand(string cmd, ICommandInteraction ic)
 		{
 			if (cmd != null)
