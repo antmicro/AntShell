@@ -27,6 +27,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AntShell.Helpers;
+using System.Diagnostics;
 
 namespace AntShell.Terminal
 {
@@ -72,13 +73,19 @@ namespace AntShell.Terminal
     			ResetColors();
                 ResetCursor();
             }
-
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
             do
             {
                 Calibrate();
                 // it sometimes happens that first calibrations returns the size of terminal: 1x1
-                // which causes wrapping to behave strangely
+                // which causes wrapping to behave strangely. Also, sometimes it happens indefinitely.
+                if(stopwatch.Elapsed > TimeSpan.FromSeconds(TerminalTimeout))
+                {
+                    throw new InvalidOperationException("Could not retrieve the size of a terminal.");
+                }
             } while (vcursor.MaxPosition.X == 1 && vcursor.MaxPosition.Y == 1);
+            stopwatch.Stop();
 		}
 
 		private void ControlSequences()
@@ -737,6 +744,8 @@ namespace AntShell.Terminal
 		}
 
 		#endregion
+
+        private const int TerminalTimeout = 5;
 	}
 }
 
