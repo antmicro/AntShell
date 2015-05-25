@@ -26,9 +26,11 @@ using System;
 using AntShell.Encoding;
 using System.Threading;
 using System.Collections.Generic;
+using Antmicro.Migrant;
 
 namespace AntShell.Terminal
 {
+    [Transient]
     public class DetachableIO : IDisposable
     {
         public DetachableIO()
