@@ -38,6 +38,7 @@ namespace AntShell
 	public class Shell : ICommandHandler
 	{
         public event Action Quitted;
+        public event Action Started;
 
         public NavigableTerminalEmulator Terminal { get { return term; } }
 
@@ -99,6 +100,12 @@ namespace AntShell
 			}
 
 			line.Start();
+
+            var s = Started;
+            if(s != null)
+            {
+                s();
+            }
 
 			term.Run(stopOnError);
 
