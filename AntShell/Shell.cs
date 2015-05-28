@@ -91,6 +91,7 @@ namespace AntShell
 				term.NewLine();
 				term.Calibrate();
 			}
+
 			if (StartupCommand != null)
 			{
 				term.Write(string.Format("Executing startup command: {0}", StartupCommand), false);
