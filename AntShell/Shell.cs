@@ -27,11 +27,9 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Linq;
-using System.IO;
 using AntShell.Terminal;
 using AntShell.Commands;
 using AntShell.Commands.BuiltIn;
-using AntShell.Helpers;
 
 namespace AntShell
 {
