@@ -60,11 +60,6 @@ namespace AntShell
 			return cmdLine.ReadLine();
 		}
 
-        public void WritePrompt()
-        {
-            cmdLine.CurrentPrompt.Write(terminal);
-        }
-
 		public void Write(char c, ConsoleColor? color = null)
 		{
 			terminal.WriteRaw(c, color);
