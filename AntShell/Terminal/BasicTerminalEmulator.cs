@@ -23,6 +23,7 @@
 //
 // *******************************************************************
 using System;
+using AntShell.Helpers;
 
 namespace AntShell.Terminal
 {
@@ -58,6 +59,11 @@ namespace AntShell.Terminal
         {
             SendControlSequence((byte)SequenceElement.ESC, (byte)SequenceElement.CSI);
             SendControlSequence(seq);
+        }
+
+        public void Inject(byte b)
+        {
+            InputOutput.Inject(b);
         }
 
         public void ClearScreen()

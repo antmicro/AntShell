@@ -119,6 +119,11 @@ namespace AntShell.Terminal
             return InternalReadCharHandler(PeekNextByte, timeout);
         }
 
+        public void Inject(byte b)
+        {
+            localBuffer.Add(b);
+        }
+
         public int GetNextByte(int timeout = -1)
         {
             int result;

@@ -73,6 +73,14 @@ namespace AntShell
             externalHandler.GetInternalCommands = () => Commands.Cast<ICommandDescription>();
         }
 
+        public void InjectInput(string str)
+        {
+            foreach (var c in str)
+            {
+                term.Inject((byte)c);
+            }
+        }
+
 		public void Start(bool stopOnError = false)
 		{
             if (settings.HistorySavePath != null)
