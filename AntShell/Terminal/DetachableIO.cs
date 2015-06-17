@@ -242,12 +242,19 @@ namespace AntShell.Terminal
         public void Write(byte b)
         {
             var lsource = source;
+            var bp = BytePrinted;
+            var bw = BeforeWrite;
+
+            if(bw != null)
+            {
+                bw(b);
+            }
+       
             if (lsource != null)
             {
                 lsource.Write(b);
             }
 
-            var bp = BytePrinted;
             if (bp != null)
             {
                 bp(b);
@@ -257,6 +264,7 @@ namespace AntShell.Terminal
         #endregion
 
         public Action<byte> BytePrinted;
+        public Action<byte> BeforeWrite;
 
         private event Action<byte> _ByteRead;
         public event Action<byte> ByteRead
