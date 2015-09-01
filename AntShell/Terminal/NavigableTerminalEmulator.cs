@@ -27,7 +27,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AntShell.Helpers;
-using System.Diagnostics;
 
 namespace AntShell.Terminal
 {
@@ -271,7 +270,7 @@ namespace AntShell.Terminal
 		{
 			if (text != null)
 			{
-				var ep = vcursor.Position;
+				var ep = vcursor.RealPosition;
 				var currline = CurrentLine;
 
 				HideCursor();
@@ -282,7 +281,7 @@ namespace AntShell.Terminal
 
 				ShowCursor();
 
-				vcursor.Position = ep;
+				vcursor.RealPosition = ep;
 				CurrentLine = currline;
 			}
 		}
@@ -725,7 +724,7 @@ namespace AntShell.Terminal
     			}
     			else
     			{
-    				return vcursor.Position.Clone();
+    				return vcursor.RealPosition.Clone();
     			}
             }
 		}

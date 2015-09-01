@@ -30,29 +30,26 @@ namespace AntShell.Terminal
 {
 	internal class VirtualCursor
 	{
-		public Position RealPosition;
+        public VirtualCursor()
+        {
+            RealPosition = new Position(1, 1);
+            MaxPosition = new Position(1, 1);
+            MaxReachedPosition = new Position(1, 1);
+        }
 
-		public Position Position { get { return RealPosition; } set { RealPosition = value;} }
+        public Position RealPosition { get; set; }
 
 		public Position BackPosition
 		{
 			get
 			{
-				if (Position.X == 1)
-				{
-					return new Position(MaxPosition.X + 1, Position.Y - 1);
-				}
-
-				return Position;
+				return RealPosition.X == 1 ? new Position(MaxPosition.X + 1, RealPosition.Y - 1) : RealPosition;
 			}
 		}
 
-		public Position MaxReachedPosition
-		{
-			get ; private set;
-		}
+        public Position MaxReachedPosition { get ; private set; }
 
-		public Position MaxPosition;
+        public Position MaxPosition { get; private set; }
 
 		public bool IsCursorOutOfLine { get; private set; }
 
@@ -61,19 +58,18 @@ namespace AntShell.Terminal
 		public void Calibrate(Position pos, Position maxPos)
 		{
 			RealPosition = pos.Clone();
-			Position = pos.Clone();
 			MaxReachedPosition = pos.Clone();
 			MaxPosition = maxPos.Clone();
 		}
 
 		public void MoveUp(int n = 1)
 		{
-			Position.Y = Math.Max(1, Position.Y - n);
+			RealPosition.Y = Math.Max(1, RealPosition.Y - n);
 		}
 
 		public void MoveDown(int n = 1)
 		{
-			Position.Y = Math.Min(MaxPosition.Y, Position.Y + n);
+			RealPosition.Y = Math.Min(MaxPosition.Y, RealPosition.Y + n);
 		}
 
 		public VirtualCursorMoveResult MoveForward(int n = 1, bool enableOutOfScreen = true, bool enableWrap = true)
@@ -168,25 +164,25 @@ namespace AntShell.Terminal
 
 		public void MoveBackward(int n = 1)
 		{
-			if (Position.X == 1)
+			if (RealPosition.X == 1)
 			{
-				Position.Y--;
-				Position.X = Math.Max(1, BackPosition.X - n);
+				RealPosition.Y--;
+				RealPosition.X = Math.Max(1, BackPosition.X - n);
 			}
 			else
 			{
-				Position.X = Math.Max(1, Position.X - n);
+				RealPosition.X = Math.Max(1, RealPosition.X - n);
 			}
 		}
 
 		public void SetX(int n)
 		{
-			Position.X = Math.Max(1, Math.Min(MaxPosition.X, n));
+			RealPosition.X = Math.Max(1, Math.Min(MaxPosition.X, n));
 		}
 
 		public void SetY(int n)
 		{
-			Position.Y = Math.Max(1, Math.Min(MaxPosition.Y, n));
+			RealPosition.Y = Math.Max(1, Math.Min(MaxPosition.Y, n));
 		}
 
 		public Position CalculateMoveForward(int n)
