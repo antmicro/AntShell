@@ -192,10 +192,10 @@ namespace AntShell.Terminal
 
         private char? InternalReadCharHandler(Func<int, int> provider, int timeout)
         {
-            var bytes = new byte[2];
+            var bytes = new byte[4];
             int res;
 
-            for (int i = 0; i < 2; i++) 
+            for (int i = 0; i < bytes.Length; i++) 
             {
                 res = provider(timeout);
                 if (res < 0)
