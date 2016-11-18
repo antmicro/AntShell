@@ -28,7 +28,11 @@ namespace AntShell.Terminal
 {
     public interface IActiveIOSource : IIOSource
     {
-        event Action<byte> ByteRead;
+        /// <summary>
+        /// Event called every time a new byte is available on the input.
+        /// Note: when the input is being closed the event is called for the last time with the special value of -1.
+        /// </summary>
+        event Action<int> ByteRead;
         bool IsAnythingAttached { get; }
     }
 }

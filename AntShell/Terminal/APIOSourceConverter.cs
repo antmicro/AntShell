@@ -71,7 +71,7 @@ namespace AntShell.Terminal
         public APIOSourceConverter(IActiveIOSource source)
         {
             activeSource = source;
-            buffer = new BlockingCollection<byte>();
+            buffer = new BlockingCollection<int>();
 
             activeSource.ByteRead += buffer.Add;
         }
@@ -79,7 +79,7 @@ namespace AntShell.Terminal
         public IActiveIOSource OriginalSource { get { return activeSource; } }
 
         private readonly IActiveIOSource activeSource;
-        private readonly BlockingCollection<byte> buffer;
+        private readonly BlockingCollection<int> buffer;
     }
 }
 

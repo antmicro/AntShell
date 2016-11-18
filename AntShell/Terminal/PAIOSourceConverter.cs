@@ -33,7 +33,7 @@ namespace AntShell.Terminal
     {
         #region IActiveIOSource implementation
 
-        public event Action<byte> ByteRead;
+        public event Action<int> ByteRead;
 
         #endregion
 

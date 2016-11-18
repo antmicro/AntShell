@@ -148,7 +148,7 @@ namespace AntShell.Terminal
         public event Action<byte> BeforeWrite;
         public event Action<byte> AfterWrite;
 
-        public event Action<byte> ByteRead
+        public event Action<int> ByteRead
         {
             add
             {
