@@ -160,11 +160,11 @@ namespace AntShell.Terminal
 			}
 		}
 
-        public object GetNextInput(int timeout = -1)
+		public object GetNextInput()
 		{
 			while (true)
 			{
-                var b = InputOutput.GetNextChar(timeout);
+				var b = InputOutput.GetNextChar();
 				if (b == null)
 				{
 					return null;
