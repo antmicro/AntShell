@@ -34,22 +34,19 @@ namespace AntShell.Terminal
 
         #region IPassiveIOSource implementation
 
-        public int Read(int timeout)
+        public int Read()
         {
-            if (timeout == -1)
+            if(isDone)
             {
-                return buffer.Take();
+                return -1;
             }
-            else if (timeout == 0)
+
+            var result = buffer.Take();
+            if(result == -1)
             {
-                byte result;
-                return buffer.TryTake(out result) ? result : -2;
+                isDone = true;
             }
-            else
-            {
-                byte result;
-                return buffer.TryTake(out result, timeout) ? result : -2;
-            }
+            return result;
         }
 
         #endregion
@@ -77,6 +74,8 @@ namespace AntShell.Terminal
         }
 
         public IActiveIOSource OriginalSource { get { return activeSource; } }
+
+        private bool isDone;
 
         private readonly IActiveIOSource activeSource;
         private readonly BlockingCollection<int> buffer;

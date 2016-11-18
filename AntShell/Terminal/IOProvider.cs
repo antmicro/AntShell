@@ -192,7 +192,7 @@ namespace AntShell.Terminal
             {
                 throw new InvalidOperationException("One cannot read actively and passively from the same IIOSource at the same time.");
             }
-            return ((IPassiveIOSource)backend).Read(-1);
+            return ((IPassiveIOSource)backend).Read();
         }
 
         private IIOSource backend;

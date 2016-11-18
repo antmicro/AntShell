@@ -46,20 +46,16 @@ namespace AntShell.Terminal
             OutputStream.WriteByte(b);
         }
 
-        public int Read(int timeout)
+        public int Read()
         {
-            int result;
-
-            if (timeout < 0 || !InputStream.CanTimeout)
+            try
             {
                 return InputStream.ReadByte();
             }
-
-            var current = InputStream.ReadTimeout;
-            InputStream.ReadTimeout = timeout;
-            result = InputStream.ReadByte();
-            InputStream.ReadTimeout = current;
-            return result;
+            catch(ObjectDisposedException)
+            {
+                return -1;
+            }
         }
 
         public void Close()

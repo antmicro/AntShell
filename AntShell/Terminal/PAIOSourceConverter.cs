@@ -109,20 +109,17 @@ namespace AntShell.Terminal
                 loopAgain = true;
                 while(loopAgain)
                 {
-                    var read = converter.passiveSource.Read(1000);
-                    if(read == -1)
-                    {
-                        break;
-                    }
-                    else if(read == -2)
-                    {
-                        continue;
-                    }
-                 
+                    var read = converter.passiveSource.Read();
+
                     var byteRead = converter.ByteRead;
                     if (byteRead != null)
                     {
-                        byteRead((byte)read);
+                        byteRead(read);
+                    }
+
+                    if(read == -1)
+                    {
+                        break;
                     }
                 }
             }
