@@ -29,9 +29,9 @@ namespace AntShell.Terminal
 {
     public class BasicTerminalEmulator
     {
-        public DetachableIO InputOutput { get; protected set; }
+        public IOProvider InputOutput { get; protected set; }
 
-        public BasicTerminalEmulator(DetachableIO io)
+        public BasicTerminalEmulator(IOProvider io)
         {
             InputOutput = io;
         }

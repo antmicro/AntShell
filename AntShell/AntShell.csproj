@@ -65,12 +65,12 @@
     <Compile Include="Terminal\BasicTerminalEmulator.cs" />
     <Compile Include="Terminal\IPassiveIOSource.cs" />
     <Compile Include="Terminal\IActiveIOSource.cs" />
-    <Compile Include="Terminal\DetachableIO.cs" />
     <Compile Include="Terminal\IIOSource.cs" />
     <Compile Include="Terminal\PAIOSourceConverter.cs" />
     <Compile Include="Terminal\APIOSourceConverter.cs" />
     <Compile Include="Terminal\NavigableTerminalEmulator.cs" />
     <Compile Include="Terminal\StreamIOSource.cs" />
+    <Compile Include="Terminal\IOProvider.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

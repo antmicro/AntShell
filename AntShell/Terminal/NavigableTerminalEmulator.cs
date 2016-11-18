@@ -51,7 +51,7 @@ namespace AntShell.Terminal
         private bool clearScreen = false;
         private bool forceVirtualCursor = false;
 
-        public NavigableTerminalEmulator(DetachableIO io, bool forceVCursor = false) : base(io)
+        public NavigableTerminalEmulator(IOProvider io, bool forceVCursor = false) : base(io)
 		{
 			validator = new SequenceValidator();
             sequenceQueue = new Queue<char>();
@@ -692,7 +692,7 @@ namespace AntShell.Terminal
 
     				while (true)
     				{
-                        var b = InputOutput.PeekNextChar(500);
+                        var b = InputOutput.PeekNextChar();
                         if (!b.HasValue)
                         {
                             InputOutput.Flush();

@@ -32,7 +32,7 @@ namespace AntShell.Terminal
         public TerminalBuffer(BasicTerminalEmulator term)
         {
             this.term = term;
-            term.InputOutput.BytePrinted += b =>
+            term.InputOutput.AfterWrite += b =>
             { 
                 buffer.Add(b);
             };

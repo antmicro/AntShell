@@ -53,7 +53,7 @@ namespace AntShell
 
 		private readonly ShellSettings settings;
 
-        public Shell(DetachableIO io, ICommandHandler handler, ShellSettings settings)
+        public Shell(IOProvider io, ICommandHandler handler, ShellSettings settings)
         {
             term = new NavigableTerminalEmulator(io, settings.ForceVirtualCursor);
             history = new CommandHistory();
