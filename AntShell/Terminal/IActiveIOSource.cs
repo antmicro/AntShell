@@ -29,6 +29,7 @@ namespace AntShell.Terminal
     public interface IActiveIOSource : IIOSource
     {
         event Action<byte> ByteRead;
+        bool IsAnythingAttached { get; }
     }
 }
 

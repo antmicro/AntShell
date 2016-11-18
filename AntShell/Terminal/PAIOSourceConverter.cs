@@ -67,6 +67,8 @@ namespace AntShell.Terminal
             Init();
         }
 
+        public bool IsAnythingAttached { get { return ByteRead != null; } }
+
         public IPassiveIOSource OriginalSource { get { return passiveSource; } }
 
         [PostDeserialization]
