@@ -59,26 +59,52 @@ namespace AntShell.Terminal
 
         private char? InternalReadCharHandler(Func<int> provider)
         {
-            var bytes = new byte[4];
-            int res;
-
-            for (int i = 0; i < bytes.Length; i++) 
+            while(true)
             {
-                res = provider();
-                if (res < 0)
+                var firstByte = provider();
+                var numberOfBytesToRead = 0;
+                if(firstByte < 0)
                 {
                     return null;
                 }
+                if(firstByte < 0x80)
+                {
+                    return (char)firstByte;
+                }
+                else if((firstByte & 0xE0)  == 0xC0)
+                {
+                    // two bytes
+                    numberOfBytesToRead = 1;
+                }
+                else if((firstByte & 0xF0) == 0xE0)
+                {
+                    // three bytes
+                    numberOfBytesToRead = 2;
+                }
+                else
+                {
+                    // four bytes
+                    numberOfBytesToRead = 3;
+                }
 
-                bytes[i] = (byte)res;
-                var chars = encoding.GetChars(bytes, 0, i + 1)[0];
+                var bytes = new byte[numberOfBytesToRead + 1];
+                bytes[0] = (byte)firstByte;
+                for(int i = 1; i < bytes.Length; i++)
+                {
+                    var nextByte = provider();
+                    if(nextByte < 0)
+                    {
+                        return null;
+                    }
+                    bytes[i] = (byte)nextByte;
+                }
+
+                var decodedChar = encoding.GetChars(bytes)[0];
                 if (!((CustomDecoderFallback)encoding.DecoderFallback).IsError) 
                 {
-                    return chars;
+                    return decodedChar;
                 }
             }
-
-            return null;
         }
 
         public int GetNextByte()
