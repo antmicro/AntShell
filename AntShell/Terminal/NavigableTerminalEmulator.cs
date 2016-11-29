@@ -577,7 +577,7 @@ namespace AntShell.Terminal
             }
             else
             {
-			    vcursor.Calibrate(GetCursorPosition(true), GetSize());
+				vcursor.Calibrate(GetCursorPosition(), GetSize());
             }
 		}
 
@@ -671,18 +671,18 @@ namespace AntShell.Terminal
 			CursorToColumn(MAX_WIDTH, false);
 			CursorDown(MAX_HEIGHT, false);
 
-			var result = GetCursorPosition(true);
+			var result = GetCursorPosition();
 
 			RestoreCursor();
 			ShowCursor();
 			return result;
 		}
 
-		public Position GetCursorPosition(bool useExactValue = false)
+		public Position GetCursorPosition()
 		{
             while (true)
             {
-    			if (useExactValue && !forceVirtualCursor)
+			if(!forceVirtualCursor)
     			{
     				ControlSequence cs;
     				var localBuffer = new List<char>();
