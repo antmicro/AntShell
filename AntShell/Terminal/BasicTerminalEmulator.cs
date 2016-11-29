@@ -61,11 +61,6 @@ namespace AntShell.Terminal
             SendControlSequence(seq);
         }
 
-        public void Inject(byte b)
-        {
-            InputOutput.Inject(b);
-        }
-
         public void ClearScreen()
         {
             SendCSI((byte)'2', (byte)'J');

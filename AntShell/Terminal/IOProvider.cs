@@ -101,10 +101,6 @@ namespace AntShell.Terminal
             return result;
         }
 
-        public void Inject(byte b)
-        {
-            localBuffer.Enqueue(b);
-        }
 
         public void Write(char c)
         {
@@ -163,6 +159,14 @@ namespace AntShell.Terminal
                 {
                     SwitchToPassive();
                 }
+            }
+        }
+
+        internal void Inject(char c)
+        {
+            foreach(var b in encoding.GetBytes(new [] { c }))
+            {
+                localBuffer.Enqueue(b);
             }
         }
 

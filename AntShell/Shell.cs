@@ -77,7 +77,7 @@ namespace AntShell
         {
             foreach (var c in str)
             {
-                term.Inject((byte)c);
+                term.InputOutput.Inject(c);
             }
         }
 
