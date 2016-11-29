@@ -32,7 +32,7 @@ namespace AntShell.Helpers
 	{
 		private Dictionary<char, Tuple<SequenceValidator, ControlSequenceGenerator>> seqs = new Dictionary<char, Tuple<SequenceValidator, ControlSequenceGenerator>>();
 
-		public SequenceValidationResult Check(char[] input, out ControlSequence seq)
+		public SequenceValidationResult Check(IReadOnlyList<char> input, out ControlSequence seq)
 		{
 			Tuple<ControlSequenceGenerator, int> result;
 			var seqFound = TryCheck(input, 0, out result);
@@ -58,9 +58,9 @@ namespace AntShell.Helpers
 
 		}
 
-		private bool TryCheck(char[] input, int offset, out Tuple<ControlSequenceGenerator, int> seq)
+		private bool TryCheck(IReadOnlyList<char> input, int offset, out Tuple<ControlSequenceGenerator, int> seq)
 		{
-			if (offset == input.Length)
+			if (offset == input.Count)
 			{
 				seq = null;
 				return true;
@@ -72,9 +72,9 @@ namespace AntShell.Helpers
 
 				if (char.IsDigit((char)input[loffset]))
 				{
-					while (loffset < input.Length && char.IsDigit((char)input[loffset]))
+					while (loffset < input.Count && char.IsDigit((char)input[loffset]))
 					{
-						if (loffset < input.Length)
+						if (loffset < input.Count)
 						{
 							loffset++;
 						}
@@ -94,7 +94,7 @@ namespace AntShell.Helpers
 
 			if (seqs.ContainsKey(input[offset]))
 			{
-				if (input.Length - offset == 1)
+				if (input.Count - offset == 1)
 				{
 					if(seqs[input[offset]].Item2 != null)
 					{
@@ -162,6 +162,6 @@ namespace AntShell.Helpers
 		PrefixFound
 	}
 
-	public delegate ControlSequence ControlSequenceGenerator(char[] seq, int length);
+	public delegate ControlSequence ControlSequenceGenerator(IReadOnlyList<char> seq, int length);
 }
 
