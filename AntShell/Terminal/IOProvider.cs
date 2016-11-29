@@ -52,11 +52,6 @@ namespace AntShell.Terminal
             return InternalReadCharHandler(GetNextByte);
         }
 
-        public char? PeekNextChar()
-        {
-            return InternalReadCharHandler(PeekNextByte);
-        }
-
         private char? InternalReadCharHandler(Func<int> provider)
         {
             while(true)
@@ -115,16 +110,6 @@ namespace AntShell.Terminal
             }
 
             return PassiveReadByte();
-        }
-
-        public int PeekNextByte()
-        {
-            int result = PassiveReadByte();
-            if (result >= 0)
-            {
-                Inject((byte)result);
-            }   
-            return result;
         }
 
 
