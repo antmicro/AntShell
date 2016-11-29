@@ -151,8 +151,6 @@ namespace AntShell.Terminal
                 world.Write(b);
             }
 
-            public string Name { get { return "IOInterceptor"; } }
-
             #endregion
 
             public IOInterceptor(IActiveIOSource world)

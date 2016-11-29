@@ -59,8 +59,6 @@ namespace AntShell.Terminal
             passiveSource.Write(b);
         }
 
-        public string Name { get { return OriginalSource.Name; } }
-
         #endregion
 
         public PAIOSourceConverter(IPassiveIOSource source)

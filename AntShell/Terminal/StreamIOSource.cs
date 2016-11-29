@@ -70,18 +70,14 @@ namespace AntShell.Terminal
 
         #endregion
 
-        public string Name { get; private set; }
-
-        public StreamIOSource(Stream stream, string name = null) : this(stream, stream, name)
+        public StreamIOSource(Stream stream) : this(stream, stream)
         {
         }
 
-        public StreamIOSource(Stream input, Stream output, string name = null)
+        public StreamIOSource(Stream input, Stream output)
         {
             InputStream = input;
             OutputStream = output;
-
-            Name = name;
         }
 
         public Stream InputStream { get; private set; }
