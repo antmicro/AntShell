@@ -165,6 +165,11 @@ namespace AntShell.Terminal
             add
             {
                 SwitchToActive();
+                foreach(var b in localBuffer)
+                {
+                    value(b);
+                }
+                localBuffer.Clear();
                 ((IActiveIOSource)backend).ByteRead += value;
             }
 
