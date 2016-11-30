@@ -180,6 +180,11 @@ namespace AntShell.Terminal
 
         internal void Inject(char c)
         {
+            if(isInActiveMode)
+            {
+                throw new InvalidOperationException("Cannot use 'Inject' method when a callback is attached to 'ByteRead' event.");
+            }
+
             foreach(var b in encoding.GetBytes(new [] { c }))
             {
                 localBuffer.Enqueue(b);
