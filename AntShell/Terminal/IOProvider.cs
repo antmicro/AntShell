@@ -104,12 +104,17 @@ namespace AntShell.Terminal
 
         public int GetNextByte()
         {
+            if(isInActiveMode)
+            {
+                throw new InvalidOperationException("Cannot use 'GetNextByte' method when a callback is attached to 'ByteRead' event.");
+            }
+
             if(localBuffer.Count > 0)
             {
                 return localBuffer.Dequeue();
             }
 
-            return PassiveReadByte();
+            return ((IPassiveIOSource)backend).Read();
         }
 
 
@@ -199,15 +204,6 @@ namespace AntShell.Terminal
                 backend = new APIOSourceConverter(activeBackend);
                 isInActiveMode = false;
             }
-        }
-
-        private int PassiveReadByte()
-        {
-            if(isInActiveMode)
-            {
-                throw new InvalidOperationException("One cannot read actively and passively from the same IIOSource at the same time.");
-            }
-            return ((IPassiveIOSource)backend).Read();
         }
 
         private IIOSource backend;
