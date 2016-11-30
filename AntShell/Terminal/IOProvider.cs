@@ -49,14 +49,9 @@ namespace AntShell.Terminal
 
         public char? GetNextChar()
         {
-            return InternalReadCharHandler(GetNextByte);
-        }
-
-        private char? InternalReadCharHandler(Func<int> provider)
-        {
             while(true)
             {
-                var firstByte = provider();
+                var firstByte = GetNextByte();
                 var numberOfBytesToRead = 0;
                 if(firstByte < 0)
                 {
@@ -86,7 +81,7 @@ namespace AntShell.Terminal
                 bytes[0] = (byte)firstByte;
                 for(int i = 1; i < bytes.Length; i++)
                 {
-                    var nextByte = provider();
+                    var nextByte = GetNextByte();
                     if(nextByte < 0)
                     {
                         return null;
