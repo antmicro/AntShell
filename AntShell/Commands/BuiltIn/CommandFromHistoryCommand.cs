@@ -29,68 +29,68 @@ using System.Linq;
 namespace AntShell.Commands.BuiltIn
 {
     public class CommandFromHistoryCommand : CommandBase, IOperator
-	{
-		private readonly CommandHistory history;
+    {
+        private readonly CommandHistory history;
 
         public CommandFromHistoryCommand(CommandHistory h) : base("commandFromHistory", "executes command from history.", "!")
-		{
-			history = h;
-		}
+        {
+            history = h;
+        }
 
-		#region ICommand implementation
+        #region ICommand implementation
 
         public override int Execute(string[] args, ICommandInteraction writer)
-		{
-			if (args.Length != 2 || args[1] == string.Empty)
-			{
-				writer.WriteError(string.Format("Usage: {0} <number>", args[0]));
-				return 1;
-			}
+        {
+            if(args.Length != 2 || args[1] == string.Empty)
+            {
+                writer.WriteError(string.Format("Usage: {0} <number>", args[0]));
+                return 1;
+            }
 
-			int num = 0;
-			if (!int.TryParse(args[1], out num))
-			{
-				if (args[1] == "!")
-				{
-					num = -1;
-				}
-				else
-				{
-					writer.WriteError(string.Format("{0} is not a proper index", args[1]));
-					return 2;
-				}
-			}
+            int num = 0;
+            if(!int.TryParse(args[1], out num))
+            {
+                if(args[1] == "!")
+                {
+                    num = -1;
+                }
+                else
+                {
+                    writer.WriteError(string.Format("{0} is not a proper index", args[1]));
+                    return 2;
+                }
+            }
 
-			history.RemoveLast();
-			var count = history.Items.Count();
-			if ((num > 0 && num > count) || (num < 0 && -num > count))
-			{
-				writer.WriteError(string.Format("Command #{0} not found in history", num));
-				return 3;
-			}
+            history.RemoveLast();
+            var count = history.Items.Count();
+            if((num > 0 && num > count) || (num < 0 && -num > count))
+            {
+                writer.WriteError(string.Format("Command #{0} not found in history", num));
+                return 3;
+            }
 
-			if (num != 0)
-			{
-				writer.CommandToExecute = history.Items.ElementAt(num + (num < 0 ? count : -1));
-			}
-			else
-			{
-				writer.WriteError(string.Format("Positive or negative command index must be provided"));
-				return 4;
-			}
+            if(num != 0)
+            {
+                writer.CommandToExecute = history.Items.ElementAt(num + (num < 0 ? count : -1));
+            }
+            else
+            {
+                writer.WriteError(string.Format("Positive or negative command index must be provided"));
+                return 4;
+            }
 
-			return 0;
-		}
+            return 0;
+        }
 
 		
 
-		#endregion
+        #endregion
 
-		#region IOperator implementation
+        #region IOperator implementation
 
-		public char Operator { get { return '!'; } }
+        public char Operator { get { return '!'; } }
 
-		#endregion
-	}
+        #endregion
+    }
 }
 

@@ -66,7 +66,7 @@ namespace AntShell.Terminal
                 {
                     return (char)firstByte;
                 }
-                else if((firstByte & 0xE0)  == 0xC0)
+                else if((firstByte & 0xE0) == 0xC0)
                 {
                     // two bytes
                     numberOfBytesToRead = 1;
@@ -95,7 +95,7 @@ namespace AntShell.Terminal
                 }
 
                 var decodedChar = encoding.GetChars(bytes)[0];
-                if (!((CustomDecoderFallback)encoding.DecoderFallback).IsError) 
+                if(!((CustomDecoderFallback)encoding.DecoderFallback).IsError)
                 {
                     return decodedChar;
                 }
@@ -104,7 +104,7 @@ namespace AntShell.Terminal
 
         public int GetNextByte()
         {
-            if (localBuffer.Count > 0)
+            if(localBuffer.Count > 0)
             {
                 return localBuffer.Dequeue();
             }
@@ -115,7 +115,7 @@ namespace AntShell.Terminal
 
         public void Write(char c)
         {
-            foreach (var b in encoding.GetBytes(new [] { c }))
+            foreach(var b in encoding.GetBytes(new [] { c }))
             {
                 Write(b);
             }
@@ -133,7 +133,7 @@ namespace AntShell.Terminal
 
             backend.Write(b);
 
-            if (afterWrite != null)
+            if(afterWrite != null)
             {
                 afterWrite(b);
             }

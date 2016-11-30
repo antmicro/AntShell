@@ -75,9 +75,12 @@ namespace AntShell.Terminal
 
         protected enum SequenceElement : byte
         {
-            ESC = 0x1B, // <Esc>
-            CSI = 0x5B, // '['
-            SEM = 0x3B, // ';'
+            ESC = 0x1B,
+            // <Esc>
+            CSI = 0x5B,
+            // '['
+            SEM = 0x3B,
+            // ';'
             INTEGER = 0xFF
         }
     }

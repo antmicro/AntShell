@@ -25,42 +25,43 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 namespace AntShell.Helpers
 {
-	public class Position
-	{
-		public int X { get; set; }
-		public int Y { get; set; }
-			
-		public Position(int x, int y)
-		{
-			X = x;
-			Y = y;
-		}
-			
-		public Position Diff(Position p)
-		{
-			return new Position(X - p.X, Y - p.Y);
-		}
+    public class Position
+    {
+        public int X { get; set; }
 
-		public void Move(Position move)
-		{
-			X += move.X;
-			Y += move.Y;
-		}
+        public int Y { get; set; }
 
-		public void IncrementX()
-		{
-			X++;
-		}
+        public Position(int x, int y)
+        {
+            X = x;
+            Y = y;
+        }
 
-		public void IncrementY()
-		{
-			Y++;
-		}
+        public Position Diff(Position p)
+        {
+            return new Position(X - p.X, Y - p.Y);
+        }
 
-		public Position Clone()
-		{
-			return new Position(X, Y);
-		}
-	}
+        public void Move(Position move)
+        {
+            X += move.X;
+            Y += move.Y;
+        }
+
+        public void IncrementX()
+        {
+            X++;
+        }
+
+        public void IncrementY()
+        {
+            Y++;
+        }
+
+        public Position Clone()
+        {
+            return new Position(X, Y);
+        }
+    }
 }
 

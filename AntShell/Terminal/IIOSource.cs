@@ -28,6 +28,7 @@ namespace AntShell.Terminal
     public interface IIOSource
     {
         void Flush();
+
         void Write(byte b);
     }
 }

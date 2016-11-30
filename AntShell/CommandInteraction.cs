@@ -29,55 +29,56 @@ using AntShell.Terminal;
 
 namespace AntShell
 {
-	public class CommandInteraction : ICommandInteraction
-	{
-		private NavigableTerminalEmulator terminal;
-		private CommandLine cmdLine;
+    public class CommandInteraction : ICommandInteraction
+    {
+        private NavigableTerminalEmulator terminal;
+        private CommandLine cmdLine;
 
-		public CommandInteraction(NavigableTerminalEmulator term)
-		{
-			terminal = term;
-		}
-		public CommandInteraction(NavigableTerminalEmulator term, CommandLine cmd) : this(term)
-		{
-			cmdLine = cmd;
-		}
+        public CommandInteraction(NavigableTerminalEmulator term)
+        {
+            terminal = term;
+        }
 
-		public void Clear()
-		{
-			QuitEnvironment = false;
-			CommandToExecute = null;
-		}
+        public CommandInteraction(NavigableTerminalEmulator term, CommandLine cmd) : this(term)
+        {
+            cmdLine = cmd;
+        }
 
-		#region ICommandInteraction implementation
+        public void Clear()
+        {
+            QuitEnvironment = false;
+            CommandToExecute = null;
+        }
 
-		public bool QuitEnvironment { get; set; }
+        #region ICommandInteraction implementation
 
-		public string CommandToExecute { get; set; }
+        public bool QuitEnvironment { get; set; }
 
-		public string ReadLine()
-		{
-			return cmdLine.ReadLine();
-		}
+        public string CommandToExecute { get; set; }
 
-		public void Write(char c, ConsoleColor? color = null)
-		{
-			terminal.WriteRaw(c, color);
-		}
+        public string ReadLine()
+        {
+            return cmdLine.ReadLine();
+        }
 
-		public void WriteError(string error)
-		{
-			if (!error.EndsWith("\r\n"))
-			{
-				terminal.WriteRaw(error + "\r\n", ConsoleColor.Red);
-			}
-			else
-			{
-				terminal.WriteRaw(error, ConsoleColor.Red);
-			}
-		}
+        public void Write(char c, ConsoleColor? color = null)
+        {
+            terminal.WriteRaw(c, color);
+        }
 
-		#endregion
-	}
+        public void WriteError(string error)
+        {
+            if(!error.EndsWith("\r\n"))
+            {
+                terminal.WriteRaw(error + "\r\n", ConsoleColor.Red);
+            }
+            else
+            {
+                terminal.WriteRaw(error, ConsoleColor.Red);
+            }
+        }
+
+        #endregion
+    }
 }
 

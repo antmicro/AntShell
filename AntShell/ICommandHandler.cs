@@ -29,11 +29,13 @@ using System;
 
 namespace AntShell
 {
-	public interface ICommandHandler
-	{
-		ICommandInteraction HandleCommand(string cmd, ICommandInteraction ci);
-		string[] SuggestionNeeded(string cmd);
+    public interface ICommandHandler
+    {
+        ICommandInteraction HandleCommand(string cmd, ICommandInteraction ci);
+
+        string[] SuggestionNeeded(string cmd);
+
         Func<IEnumerable<ICommandDescription>> GetInternalCommands { get; set; }
-	}
+    }
 }
 

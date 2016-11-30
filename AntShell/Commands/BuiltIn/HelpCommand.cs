@@ -28,30 +28,30 @@ using System.Collections.Generic;
 namespace AntShell.Commands.BuiltIn
 {
     public class HelpCommand : CommandBase
-	{
-		#region ICommand implementation
+    {
+        #region ICommand implementation
 
         public override int Execute(string[] args, ICommandInteraction writer)
-		{
-			writer.WriteLine("\nCommands:");
-			writer.WriteLine(string.Format("{0,-18}|{1}", "Name", "Description"));
-			writer.WriteLine("=======================================");
-			foreach(var item in commands)
-			{
-				writer.WriteLine(string.Format("{0,-18}: {1}", item.Name, item.Description));    
-			}
+        {
+            writer.WriteLine("\nCommands:");
+            writer.WriteLine(string.Format("{0,-18}|{1}", "Name", "Description"));
+            writer.WriteLine("=======================================");
+            foreach(var item in commands)
+            {
+                writer.WriteLine(string.Format("{0,-18}: {1}", item.Name, item.Description));    
+            }
 
-			return 0;
-		}
+            return 0;
+        }
 
-		#endregion
+        #endregion
 
-        public HelpCommand(IEnumerable<ICommand> commands) : base ("help", "shows this table.", "?")
-		{
-			this.commands = commands;
-		}
+        public HelpCommand(IEnumerable<ICommand> commands) : base("help", "shows this table.", "?")
+        {
+            this.commands = commands;
+        }
 
-		private readonly IEnumerable<ICommand> commands;
-	}
+        private readonly IEnumerable<ICommand> commands;
+    }
 }
 

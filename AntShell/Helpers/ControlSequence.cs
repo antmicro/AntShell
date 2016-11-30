@@ -25,41 +25,41 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 namespace AntShell.Helpers
 {
-	public class ControlSequence
-	{
-		public ControlSequenceType Type;
-		public object Argument;
+    public class ControlSequence
+    {
+        public ControlSequenceType Type;
+        public object Argument;
 
-		public ControlSequence(ControlSequenceType type, object arg = null)
-		{
-			Type = type;
-			Argument = arg;
-		}
-	}
+        public ControlSequence(ControlSequenceType type, object arg = null)
+        {
+            Type = type;
+            Argument = arg;
+        }
+    }
 
-	public enum ControlSequenceType
-	{
-		Ignore,
-		CursorPosition,
+    public enum ControlSequenceType
+    {
+        Ignore,
+        CursorPosition,
 
-		Home,
-		End,
-		Enter,
+        Home,
+        End,
+        Enter,
 
-		LeftArrow,
-		RightArrow,
-		UpArrow,
-		DownArrow,
+        LeftArrow,
+        RightArrow,
+        UpArrow,
+        DownArrow,
 
-		CtrlLeftArrow,
-		CtrlRightArrow,
+        CtrlLeftArrow,
+        CtrlRightArrow,
 
-		Backspace,
-		Delete,
-		Esc,
-		Tab,
+        Backspace,
+        Delete,
+        Esc,
+        Tab,
 
-		Ctrl
-	}
+        Ctrl
+    }
 }
 

@@ -35,7 +35,8 @@ namespace AntShell.Encoding
         }
 
         private bool _IsError;
-        public bool IsError 
+
+        public bool IsError
         { 
             get
             {
@@ -50,9 +51,10 @@ namespace AntShell.Encoding
             }
         }
 
-        private char? Replacement 
+        private char? Replacement
         {
-            get; set;
+            get;
+            set;
         }
 
         #region implemented abstract members of DecoderFallbackBuffer

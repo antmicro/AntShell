@@ -28,251 +28,251 @@ using System.Text;
 
 namespace AntShell
 {
-	public class CommandEditor
-	{
-		#region Constructors
+    public class CommandEditor
+    {
+        #region Constructors
 
-		public CommandEditor()
-		{
-			bldr = new StringBuilder();
-		}
+        public CommandEditor()
+        {
+            bldr = new StringBuilder();
+        }
 
-		#endregion
+        #endregion
 
-		#region Insert
+        #region Insert
 
-		public bool InsertCharacter(char c)
-		{
-			bldr.Insert(Position, c);
-			Position++;
+        public bool InsertCharacter(char c)
+        {
+            bldr.Insert(Position, c);
+            Position++;
 
-			return Position == Length;
-		}
+            return Position == Length;
+        }
 
-		public void SetValue(string v)
-		{
-			var previousValue = bldr.ToString();
-			if (v != previousValue)
-			{
-				Value = v;
-			}
-		}
+        public void SetValue(string v)
+        {
+            var previousValue = bldr.ToString();
+            if(v != previousValue)
+            {
+                Value = v;
+            }
+        }
 
-		#endregion
+        #endregion
 
-		#region Remove
+        #region Remove
 
-		public bool RemovePreviousCharacter()
-		{
-			if (Position > 0)
-			{
-				bldr.Remove(Position - 1, 1);
-				Position--;
+        public bool RemovePreviousCharacter()
+        {
+            if(Position > 0)
+            {
+                bldr.Remove(Position - 1, 1);
+                Position--;
 
-				return true;
-			}
+                return true;
+            }
 
-			return false;
-		}
+            return false;
+        }
 
-		public bool RemoveNextCharacter()
-		{
-			if (Position < Length)
-			{
-				bldr.Remove(Position, 1);
+        public bool RemoveNextCharacter()
+        {
+            if(Position < Length)
+            {
+                bldr.Remove(Position, 1);
 
-				return true;
-			}
+                return true;
+            }
 
-			return false;
-		}
+            return false;
+        }
 
-		public void Clear()
-		{
-			if (Length > 0)
-			{
-				bldr.Clear();
-				Position = 0;
-			}
-		}
+        public void Clear()
+        {
+            if(Length > 0)
+            {
+                bldr.Clear();
+                Position = 0;
+            }
+        }
 
-		public void RemoveToTheEnd()
-		{
-			if (Position < Length)
-			{
-				bldr.Remove(Position, Length - Position);
-			}
-		}
+        public void RemoveToTheEnd()
+        {
+            if(Position < Length)
+            {
+                bldr.Remove(Position, Length - Position);
+            }
+        }
 
-		public int RemoveWord()
-		{
-			var diff = DiffPrevWord();
-			var previousPosition = Position;
-			Position -= diff;
+        public int RemoveWord()
+        {
+            var diff = DiffPrevWord();
+            var previousPosition = Position;
+            Position -= diff;
 		
-			if (diff > 0)
-			{
-				bldr.Remove(Position, previousPosition - Position);
-			}
+            if(diff > 0)
+            {
+                bldr.Remove(Position, previousPosition - Position);
+            }
 
-			return diff;
-		}
+            return diff;
+        }
 
-		#endregion
+        #endregion
 
-		#region Move Cursor
-		
-		public bool MoveCharacterForward()
-		{
-			if (Position < Length)
-			{
-				Position++;
-				return true;
-			}
+        #region Move Cursor
 
-			return false;
-		}
-		
-		public bool MoveCharacterBackward()
-		{
-			if (Position > 0)
-			{
-				Position--;
+        public bool MoveCharacterForward()
+        {
+            if(Position < Length)
+            {
+                Position++;
+                return true;
+            }
 
-				return true;
-			}
+            return false;
+        }
 
-			return false;
-		}
+        public bool MoveCharacterBackward()
+        {
+            if(Position > 0)
+            {
+                Position--;
 
-		public int MoveHome()
-		{
-			var previousPosition = Position;
-			Position = 0;
+                return true;
+            }
 
-			return previousPosition;
-		}
+            return false;
+        }
 
-		public int MoveEnd()
-		{
-			var previousPosition = Position;
-			Position = Length;
+        public int MoveHome()
+        {
+            var previousPosition = Position;
+            Position = 0;
 
-			return Position - previousPosition;
-		}
+            return previousPosition;
+        }
 
-		public int MoveWordForward()
-		{
-			var diff = DiffNextWord();
-			Position += diff;
+        public int MoveEnd()
+        {
+            var previousPosition = Position;
+            Position = Length;
 
-			return diff;
-		}
+            return Position - previousPosition;
+        }
 
-		public int MoveWordBackward()
-		{
-			var diff = DiffPrevWord();
-			Position -= diff;
+        public int MoveWordForward()
+        {
+            var diff = DiffNextWord();
+            Position += diff;
 
-			return diff;
-		}
+            return diff;
+        }
 
-		#endregion
+        public int MoveWordBackward()
+        {
+            var diff = DiffPrevWord();
+            Position -= diff;
 
-		#region ToString
-				
-		public string ToString(int startIndex = 0, int? stopIndex = null)
-		{
-			return bldr.ToString(startIndex, (stopIndex ?? Length) - startIndex);
-		}
-		
-		public string ToCurrentPositionString()
-		{
-			return ToString(0, Position);
-		}
+            return diff;
+        }
 
-		#endregion
+        #endregion
 
-		#region Properties
-		
-		public int Position { get; private set; }
-		
-		public int Length { get { return bldr.Length; } }
+        #region ToString
 
-		public string Value 
-		{ 
-			get 
-			{ 
-				return ToString(); 
-			} 
+        public string ToString(int startIndex = 0, int? stopIndex = null)
+        {
+            return bldr.ToString(startIndex, (stopIndex ?? Length) - startIndex);
+        }
 
-			private set 
-			{
-				bldr.Clear();
-				bldr.Append(value);
-				Position = bldr.Length;
-			}
-		}
+        public string ToCurrentPositionString()
+        {
+            return ToString(0, Position);
+        }
 
-		#endregion
+        #endregion
 
-		#region Private fields
+        #region Properties
 
-		private StringBuilder bldr;
+        public int Position { get; private set; }
 
-		#endregion
+        public int Length { get { return bldr.Length; } }
 
-		#region Helper methods
+        public string Value
+        { 
+            get
+            { 
+                return ToString(); 
+            } 
 
-		private int DiffNextWord()
-		{
-			var pos = Position;
+            private set
+            {
+                bldr.Clear();
+                bldr.Append(value);
+                Position = bldr.Length;
+            }
+        }
+
+        #endregion
+
+        #region Private fields
+
+        private StringBuilder bldr;
+
+        #endregion
+
+        #region Helper methods
+
+        private int DiffNextWord()
+        {
+            var pos = Position;
 			
-			// jump to the beginning of next word
-			while(pos < Length && char.IsWhiteSpace(bldr[pos]))
-			{
-				pos++;
-			}
+            // jump to the beginning of next word
+            while(pos < Length && char.IsWhiteSpace(bldr[pos]))
+            {
+                pos++;
+            }
 			
-			// jump to the end of current word
-			while (pos < Length && !char.IsWhiteSpace(bldr[pos]))
-			{
-				pos++;
-			}
+            // jump to the end of current word
+            while(pos < Length && !char.IsWhiteSpace(bldr[pos]))
+            {
+                pos++;
+            }
 						
-			return pos - Position;
-		}
+            return pos - Position;
+        }
 
-		private int DiffPrevWord()
-		{
-			var pos = Position;
+        private int DiffPrevWord()
+        {
+            var pos = Position;
 			
-			if (pos > 0)
-			{
-				pos--;
-			}
+            if(pos > 0)
+            {
+                pos--;
+            }
 			
-			// jump to the end of previous word
-			while(pos > 0 && char.IsWhiteSpace(bldr[pos]))
-			{
-				pos--;
-			}
+            // jump to the end of previous word
+            while(pos > 0 && char.IsWhiteSpace(bldr[pos]))
+            {
+                pos--;
+            }
 			
-			// jump to the beginning of current word
-			while (pos > 0 && !char.IsWhiteSpace(bldr[pos]))
-			{
-				pos--;
-			}
+            // jump to the beginning of current word
+            while(pos > 0 && !char.IsWhiteSpace(bldr[pos]))
+            {
+                pos--;
+            }
 			
-			if (pos > 0 && Length > 0)
-			{
-				pos++;
-			}
+            if(pos > 0 && Length > 0)
+            {
+                pos++;
+            }
 
-			return Position - pos;
-		}
+            return Position - pos;
+        }
 
-		#endregion
-	}
+        #endregion
+    }
 }
 

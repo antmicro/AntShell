@@ -33,6 +33,7 @@ namespace AntShell.Terminal
         /// Note: when the input is being closed the event is called for the last time with the special value of -1.
         /// </summary>
         event Action<int> ByteRead;
+
         bool IsAnythingAttached { get; }
     }
 }

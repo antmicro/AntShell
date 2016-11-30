@@ -43,7 +43,9 @@ namespace AntShell.Commands
         }
 
         public string Name { get; private set; }
+
         public string[] AlternativeNames { get; private set; }
+
         public string Description { get; private set; }
 
         #endregion

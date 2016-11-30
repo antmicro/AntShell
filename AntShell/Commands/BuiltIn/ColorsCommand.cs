@@ -28,24 +28,24 @@ using System;
 namespace AntShell.Commands.BuiltIn
 {
     public class ColorsCommand : CommandBase
-	{
-		#region ICommand implementation
+    {
+        #region ICommand implementation
 
         public override int Execute(string[] args, ICommandInteraction writer)
-		{
-			foreach (var name in Enum.GetNames(typeof(ConsoleColor)))
-			{
-				writer.WriteLine(name, (ConsoleColor)Enum.Parse(typeof(ConsoleColor), name));
-			}
+        {
+            foreach(var name in Enum.GetNames(typeof(ConsoleColor)))
+            {
+                writer.WriteLine(name, (ConsoleColor)Enum.Parse(typeof(ConsoleColor), name));
+            }
 
-			return 0;
-		}
+            return 0;
+        }
 
-		#endregion
+        #endregion
 
         public ColorsCommand() : base("colors", "shows table with available text colors.")
-		{
-		}
-	}
+        {
+        }
+    }
 }
 

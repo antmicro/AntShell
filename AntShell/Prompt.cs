@@ -28,78 +28,80 @@ using AntShell.Terminal;
 
 namespace AntShell
 {
-	public class Prompt
-	{
-		public string Text { get; private set; }
+    public class Prompt
+    {
+        public string Text { get; private set; }
 
-		public ConsoleColor Color { get; private set;}
+        public ConsoleColor Color { get; private set; }
 
-		public Prompt(string text, ConsoleColor color)
-		{
-			Text = text;
-			Color = color;
-		}
+        public Prompt(string text, ConsoleColor color)
+        {
+            Text = text;
+            Color = color;
+        }
 
-		public virtual void Write(NavigableTerminalEmulator tem)
-		{
-			tem.Calibrate();
-			tem.Write(Text, true, Color);
-		}
-	}
+        public virtual void Write(NavigableTerminalEmulator tem)
+        {
+            tem.Calibrate();
+            tem.Write(Text, true, Color);
+        }
+    }
 
-	public class SearchPrompt : Prompt
-	{
-		public CommandEditor Search { get; private set; }
+    public class SearchPrompt : Prompt
+    {
+        public CommandEditor Search { get; private set; }
 
-		public ConsoleColor? SearchColor { get; private set; }
+        public ConsoleColor? SearchColor { get; private set; }
 
-		public int Skip
-		{
-			get
-			{
-				return Search.Length - Search.Position + Tail.Length + 1;
-			}
-		}
+        public int Skip
+        {
+            get
+            {
+                return Search.Length - Search.Position + Tail.Length + 1;
+            }
+        }
 
-		public void SetCommandEditor(CommandEditor searchPattern)
-		{
-			Search = searchPattern;
-		}
+        public void SetCommandEditor(CommandEditor searchPattern)
+        {
+            Search = searchPattern;
+        }
 
-		public SearchPrompt(string text, ConsoleColor promptColor, ConsoleColor? searchColor = null) : base(text, promptColor)
-		{
-			SearchColor = searchColor;
+        public SearchPrompt(string text, ConsoleColor promptColor, ConsoleColor? searchColor = null) : base(text, promptColor)
+        {
+            SearchColor = searchColor;
 
-			ArgumentStartIndex = Text.IndexOf("{0}", 0); 
-			Tail = Text.Substring(ArgumentStartIndex + 3, Text.Length - ArgumentStartIndex - 4);
-			Head = Text.Substring(0, ArgumentStartIndex);
-		}
+            ArgumentStartIndex = Text.IndexOf("{0}", 0); 
+            Tail = Text.Substring(ArgumentStartIndex + 3, Text.Length - ArgumentStartIndex - 4);
+            Head = Text.Substring(0, ArgumentStartIndex);
+        }
 
-		public override void Write(NavigableTerminalEmulator tem)
-		{
-			tem.Calibrate();
-			tem.Write(Head, true, Color);
-			tem.Write(Search.Value, true, SearchColor);
-			tem.Write(Tail, true, Color);
-			tem.CursorBackward(Tail.Length);
-		}
+        public override void Write(NavigableTerminalEmulator tem)
+        {
+            tem.Calibrate();
+            tem.Write(Head, true, Color);
+            tem.Write(Search.Value, true, SearchColor);
+            tem.Write(Tail, true, Color);
+            tem.CursorBackward(Tail.Length);
+        }
 
-		public void Recreate(NavigableTerminalEmulator tem, int shift = 0)
-		{
-			var st = Search.ToString(Search.Position + shift);
+        public void Recreate(NavigableTerminalEmulator tem, int shift = 0)
+        {
+            var st = Search.ToString(Search.Position + shift);
 
-			tem.HideCursor();
-			tem.ClearToTheEndOfLine();
-			tem.Write(st, true, SearchColor);
-			tem.Write(Tail, true, Color);
-			tem.CursorBackward(Tail.Length + st.Length + shift);
-			tem.ShowCursor();
-		}
+            tem.HideCursor();
+            tem.ClearToTheEndOfLine();
+            tem.Write(st, true, SearchColor);
+            tem.Write(Tail, true, Color);
+            tem.CursorBackward(Tail.Length + st.Length + shift);
+            tem.ShowCursor();
+        }
 
-		private int ArgumentStartIndex { get; set; }
-		private string Tail { get; set; }
-		private string Head { get; set; }
+        private int ArgumentStartIndex { get; set; }
 
-	}
+        private string Tail { get; set; }
+
+        private string Head { get; set; }
+
+    }
 }
 

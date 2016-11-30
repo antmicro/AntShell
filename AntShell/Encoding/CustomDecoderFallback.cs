@@ -42,7 +42,7 @@ namespace AntShell.Encoding
 
         public override DecoderFallbackBuffer CreateFallbackBuffer()
         {
-            if (buffer == null)
+            if(buffer == null)
             {
                 buffer = new CustomDecoderFallbackBuffer();
             }

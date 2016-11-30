@@ -27,36 +27,38 @@ using System;
 
 namespace AntShell.Commands
 {
-	public interface ICommandInteraction
-	{
-		string ReadLine();
+    public interface ICommandInteraction
+    {
+        string ReadLine();
 
-		void Write(char c, ConsoleColor? color = null);
-		void WriteError(string error);
+        void Write(char c, ConsoleColor? color = null);
 
-		string CommandToExecute { get; set; }
-		bool QuitEnvironment { get; set; }
-	}
+        void WriteError(string error);
 
-	public static class ICommandInteractionExtensions
-	{
-		public static void Write(this ICommandInteraction ici, string str, ConsoleColor? color = null)
-		{
-			foreach (var c in str.ToCharArray())
-			{
-				ici.Write(c, color);
-			}
-		}
+        string CommandToExecute { get; set; }
 
-		public static void WriteLine(this ICommandInteraction ici, string str = "", ConsoleColor? color = null)
-		{
-			ici.Write(string.Format("{0}\n\r", str), color);
-		}
+        bool QuitEnvironment { get; set; }
+    }
 
-		public static void WriteRaw(this ICommandInteraction ici, string str)
-		{
-			ici.Write(str);
-		}
-	}
+    public static class ICommandInteractionExtensions
+    {
+        public static void Write(this ICommandInteraction ici, string str, ConsoleColor? color = null)
+        {
+            foreach(var c in str.ToCharArray())
+            {
+                ici.Write(c, color);
+            }
+        }
+
+        public static void WriteLine(this ICommandInteraction ici, string str = "", ConsoleColor? color = null)
+        {
+            ici.Write(string.Format("{0}\n\r", str), color);
+        }
+
+        public static void WriteRaw(this ICommandInteraction ici, string str)
+        {
+            ici.Write(str);
+        }
+    }
 }
 

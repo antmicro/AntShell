@@ -33,7 +33,9 @@ namespace AntShell.Commands
     public interface ICommandDescription
     {
         string Name { get; }
+
         string[] AlternativeNames { get; }
+
         string Description { get; }
 
         void PrintHelp(ICommandInteraction writer);
@@ -46,7 +48,7 @@ namespace AntShell.Commands
             var helper = new StringBuilder(cd.Name);
             if(cd.AlternativeNames.Any())
             {
-                helper.AppendFormat(" [ {0} ]", cd.AlternativeNames.Aggregate((x,y) => x + ", " + y));
+                helper.AppendFormat(" [ {0} ]", cd.AlternativeNames.Aggregate((x, y) => x + ", " + y));
             }
             helper.AppendFormat("\r\n{0}", cd.Description);
             return helper.ToString();

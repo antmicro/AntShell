@@ -28,123 +28,125 @@ using System.IO;
 
 namespace AntShell
 {
-	public class CommandHistory
-	{
-		#region Add
+    public class CommandHistory
+    {
+        #region Add
 
-		public void Add(string command)
-		{
-            if (items.Count == 0 || items[items.Count - 1] != command)
+        public void Add(string command)
+        {
+            if(items.Count == 0 || items[items.Count - 1] != command)
             {
-    			items.Add(command);
-    			position = items.Count;
+                items.Add(command);
+                position = items.Count;
             }
-		}
+        }
 
-		#endregion
+        #endregion
 
-		#region Remove
+        #region Remove
 
-		public void RemoveLast()
-		{
-			items.RemoveAt(items.Count - 1);
-			Reset();
-		}
+        public void RemoveLast()
+        {
+            items.RemoveAt(items.Count - 1);
+            Reset();
+        }
 
-		#endregion
+        #endregion
 
-		#region Search
+        #region Search
 
-		public string ReverseSearch(string command)
-		{
-			if (command != string.Empty)
-			{
-				int lPos = position - 1;
-				while (lPos >= 0)
-				{
-					if (items[lPos].Contains(command))
-					{
-						position = lPos;
-						return items[lPos];
-					}
+        public string ReverseSearch(string command)
+        {
+            if(command != string.Empty)
+            {
+                int lPos = position - 1;
+                while(lPos >= 0)
+                {
+                    if(items[lPos].Contains(command))
+                    {
+                        position = lPos;
+                        return items[lPos];
+                    }
 					
-					lPos--;
-				}
-			}
+                    lPos--;
+                }
+            }
 			
-			return null;
-		}
+            return null;
+        }
 
-		#endregion
+        #endregion
 
-		#region Iterate methods
+        #region Iterate methods
 
-		public string PreviousCommand()
-		{
-			if (position > 0)
-			{
-				position--;
-				return items[position];
-			}
+        public string PreviousCommand()
+        {
+            if(position > 0)
+            {
+                position--;
+                return items[position];
+            }
 			
-			return null;
-		}
+            return null;
+        }
+
+        public string CurrentCommand
+        {
+            get
+            {
+                return HasMoved ? items[position] : null;
+            }
+        }
+
+        public string NextCommand()
+        {
+            if(position != -1 && position < items.Count - 1)
+            {
+                position++;
+                return items[position];
+                ;
+            }
+
+            position = items.Count;
+            return _currentCommand;
+        }
+
+        public void Reset()
+        {
+            position = items.Count;
+            _currentCommand = null;
+        }
+
+        public void SetCurrentCommand(string value)
+        {
+            _currentCommand = value;
+        }
+
+        #endregion
+
+        #region Private fields
+
+        private List<string> items = new List<string>();
 		
-		public string CurrentCommand
-		{
-			get {
-				return HasMoved ? items[position] : null;
-			}
-		}
-		
-		public string NextCommand()
-		{
-			if (position != -1 && position < items.Count - 1)
-			{
-				position++;
-				return items[position];;
-			}
+        private int position = -1;
 
-			position = items.Count;
-			return _currentCommand;
-		}
+        private string _currentCommand;
 
-		public void Reset()
-		{
-			position = items.Count;
-			_currentCommand = null;
-		}
+        #endregion
 
-		public void SetCurrentCommand(string value)
-		{
-			_currentCommand = value;
-		}
+        #region Properties
 
-		#endregion
+        public IEnumerable<string> Items { get { return items; } }
 
-		#region Private fields
+        public bool HasMoved { get { return (position != -1) && (position != items.Count); } }
 
-		private List<string> items = new List<string>();
-		
-		private int position = -1;
-
-		private string _currentCommand;
-
-		#endregion
-
-		#region Properties
-
-		public IEnumerable<string> Items { get { return items; } }
-
-		public bool HasMoved { get {return (position != -1) &&  (position != items.Count); } }
-
-		#endregion
+        #endregion
 
         #region Save/Load
 
         public void Save(string path)
         {
-            if (items.Count > 0 && (items[items.Count - 1] == "q" || items[items.Count - 1] == "quit"))
+            if(items.Count > 0 && (items[items.Count - 1] == "q" || items[items.Count - 1] == "quit"))
             {
                 items.RemoveAt(items.Count - 1);
             }
@@ -154,13 +156,14 @@ namespace AntShell
 
         public void Load(string path)
         {
-            if (File.Exists(path))
+            if(File.Exists(path))
             {
                 items.AddRange(File.ReadAllLines(path));
                 position = items.Count;
             }
         }
+
         #endregion
-	}
+    }
 }
 

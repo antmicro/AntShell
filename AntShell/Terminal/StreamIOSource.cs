@@ -77,6 +77,7 @@ namespace AntShell.Terminal
         }
 
         public Stream InputStream { get; private set; }
+
         public Stream OutputStream { get; private set; }
     }
 }

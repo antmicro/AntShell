@@ -28,32 +28,32 @@ using System.Linq;
 namespace AntShell.Commands.BuiltIn
 {
     public class SaveCommand : CommandBase
-	{
-		private readonly CommandHistory history;
+    {
+        private readonly CommandHistory history;
 
         public SaveCommand(CommandHistory h) : base("save", "saves commands history to the file.")
-		{
-			history = h;
-		}
+        {
+            history = h;
+        }
 
-		#region ICommand implementation
+        #region ICommand implementation
 
         public override int Execute(string[] args, ICommandInteraction writer)
-		{
-			history.RemoveLast();
+        {
+            history.RemoveLast();
 
-            if (args.Length != 2)
-			{
-				writer.WriteError("History file name is required.");
-				return 1;
-			}
+            if(args.Length != 2)
+            {
+                writer.WriteError("History file name is required.");
+                return 1;
+            }
 
             history.Save(args[1]);
 
-			return 0;
-		}
+            return 0;
+        }
 
-		#endregion
-	}
+        #endregion
+    }
 }
 

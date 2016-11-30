@@ -27,10 +27,11 @@ using AntShell.Helpers;
 
 namespace AntShell.Terminal
 {
-	public interface ITerminalHandler
-	{
-		void HandleControlSequence(ControlSequence cs);
-		void HandleCharacter(char c);
-	}
+    public interface ITerminalHandler
+    {
+        void HandleControlSequence(ControlSequence cs);
+
+        void HandleCharacter(char c);
+    }
 }
 

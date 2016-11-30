@@ -28,33 +28,33 @@ using System;
 namespace AntShell.Commands.BuiltIn
 {
     public class HistoryCommand : CommandBase
-	{
-		private readonly CommandHistory history;
+    {
+        private readonly CommandHistory history;
 
         public HistoryCommand(CommandHistory h) : base("history", "prints command history.")
-		{
-			history = h;
-		}
+        {
+            history = h;
+        }
 
-		#region ICommand implementation
+        #region ICommand implementation
 
         public override int Execute(string[] args, ICommandInteraction writer)
-		{
-			writer.WriteLine("Commands history:");
+        {
+            writer.WriteLine("Commands history:");
             
             writer.WriteLine();
-			var counter = 1;
-			foreach (var item in history.Items) 
-			{
-				writer.WriteLine(string.Format(" {0}: {1}", counter++, item));
-			}
+            var counter = 1;
+            foreach(var item in history.Items)
+            {
+                writer.WriteLine(string.Format(" {0}: {1}", counter++, item));
+            }
 
-			writer.WriteLine();
+            writer.WriteLine();
 
-			return 0;
-		}
+            return 0;
+        }
 
-		#endregion
-	}
+        #endregion
+    }
 }
 

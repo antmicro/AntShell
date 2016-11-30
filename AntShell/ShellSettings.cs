@@ -26,25 +26,32 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 namespace AntShell
 {
-	public class ShellSettings
-	{
-		public Prompt NormalPrompt { get; set; }
-		public SearchPrompt SearchPrompt { get; set; }
-		public string Banner;
-		public bool UseBuiltinQuit { get; set; }
-		public bool UseBuiltinHelp { get; set; }
+    public class ShellSettings
+    {
+        public Prompt NormalPrompt { get; set; }
+
+        public SearchPrompt SearchPrompt { get; set; }
+
+        public string Banner;
+
+        public bool UseBuiltinQuit { get; set; }
+
+        public bool UseBuiltinHelp { get; set; }
+
         public bool UseBuiltinSave { get; set; }
+
         public bool ForceVirtualCursor { get; set; }
+
         public bool ClearScreen { get; set; }
 
         public string HistorySavePath { get; set; }
 
-		public ShellSettings()
-		{
-			UseBuiltinQuit = true;
-			UseBuiltinHelp = true;
+        public ShellSettings()
+        {
+            UseBuiltinQuit = true;
+            UseBuiltinHelp = true;
             UseBuiltinSave = true;
-		}
-	}
+        }
+    }
 }
 

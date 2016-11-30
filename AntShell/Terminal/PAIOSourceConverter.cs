@@ -112,7 +112,7 @@ namespace AntShell.Terminal
                     var read = converter.passiveSource.Read();
 
                     var byteRead = converter.ByteRead;
-                    if (byteRead != null)
+                    if(byteRead != null)
                     {
                         byteRead(read);
                     }

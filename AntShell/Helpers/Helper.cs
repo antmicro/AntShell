@@ -31,29 +31,29 @@ using System.Globalization;
 
 namespace AntShell.Helpers
 {
-	public static class Helper
-	{
+    public static class Helper
+    {
         public static string CommonPrefix(IEnumerable<string> items, string baseString = null)
-		{
-            if (items.Count() == 1)
+        {
+            if(items.Count() == 1)
             {
                 return items.First();
             }
 
             var commonPrefix = new StringBuilder(items.FirstOrDefault(x => x.StartsWith(baseString ?? string.Empty, true, CultureInfo.CurrentCulture)) ?? string.Empty);
-			foreach(var item in items)
-			{
-				if (item == null)
-				{
-					continue;
-				}
+            foreach(var item in items)
+            {
+                if(item == null)
+                {
+                    continue;
+                }
 
-				var index = commonPrefix.ToString().Zip(item, (c1, c2) => Char.ToUpper(c1) == Char.ToUpper(c2)).TakeWhile(b => b).Count();
+                var index = commonPrefix.ToString().Zip(item, (c1, c2) => Char.ToUpper(c1) == Char.ToUpper(c2)).TakeWhile(b => b).Count();
                 commonPrefix.Remove(index, commonPrefix.Length - index);
-			}
+            }
 
-			return (commonPrefix != null) ? commonPrefix.ToString() : null;
-		}
-	}
+            return (commonPrefix != null) ? commonPrefix.ToString() : null;
+        }
+    }
 }
 
