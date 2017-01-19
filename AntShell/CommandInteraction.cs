@@ -24,6 +24,7 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 using System;
+using System.IO;
 using AntShell.Commands;
 using AntShell.Terminal;
 
@@ -61,6 +62,11 @@ namespace AntShell
             return cmdLine.ReadLine();
         }
 
+        public Stream GetRawInputStream()
+        {
+            return new IOProviderStreamWrapper(terminal.InputOutput);
+        }
+
         public void Write(char c, ConsoleColor? color = null)
         {
             terminal.WriteRaw(c, color);
@@ -79,6 +85,68 @@ namespace AntShell
         }
 
         #endregion
+
+        private class IOProviderStreamWrapper : Stream
+        {
+            public IOProviderStreamWrapper(IOProvider io)
+            {
+                this.io = io;
+            }
+
+            private readonly IOProvider io;
+
+            public override bool CanRead { get { return true; } }
+
+            public override bool CanSeek { get { return false; } }
+
+            public override bool CanWrite { get { return false; } }
+
+            public override long Length { get { return 1; } }
+
+            public override long Position
+            {
+                get
+                {
+                    return 0;
+                }
+
+                set
+                {
+                    throw new NotImplementedException();
+                }
+            }
+
+            public override void Flush()
+            {
+                // do nothing
+            }
+
+            public override int Read(byte[] buffer, int offset, int count)
+            {
+                var b = io.GetNextByte();
+                if(b == -1)
+                {
+                    return 0;
+                }
+                buffer[offset] = (byte)b;
+                return 1;
+            }
+
+            public override long Seek(long offset, SeekOrigin origin)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override void SetLength(long value)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override void Write(byte[] buffer, int offset, int count)
+            {
+                throw new NotImplementedException();
+            }
+        }
     }
 }
 
