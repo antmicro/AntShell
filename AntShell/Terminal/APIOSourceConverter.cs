@@ -23,6 +23,8 @@
 //
 // *******************************************************************
 using System.Collections.Concurrent;
+using System.Threading;
+using System;
 
 namespace AntShell.Terminal
 {
@@ -41,12 +43,26 @@ namespace AntShell.Terminal
                 return -1;
             }
 
-            var result = buffer.Take();
+            int result;
+            try
+            {
+                result = buffer.Take(readCancelationTokenSource.Token);
+            }
+            catch(OperationCanceledException)
+            {
+                result = -1;
+            }
+
             if(result == -1)
             {
                 isDone = true;
             }
             return result;
+        }
+
+        public void CancelRead()
+        {
+            readCancelationTokenSource.Cancel();
         }
 
         #endregion
@@ -67,6 +83,7 @@ namespace AntShell.Terminal
 
         public APIOSourceConverter(IActiveIOSource source)
         {
+            readCancelationTokenSource = new CancellationTokenSource();
             activeSource = source;
             buffer = new BlockingCollection<int>();
 
@@ -76,6 +93,7 @@ namespace AntShell.Terminal
         public IActiveIOSource OriginalSource { get { return activeSource; } }
 
         private bool isDone;
+        private CancellationTokenSource readCancelationTokenSource;
 
         private readonly IActiveIOSource activeSource;
         private readonly BlockingCollection<int> buffer;

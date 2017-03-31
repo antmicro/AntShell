@@ -24,6 +24,7 @@
 // *******************************************************************
 using System;
 using System.IO;
+using System.Threading;
 
 namespace AntShell.Terminal
 {
@@ -50,12 +51,23 @@ namespace AntShell.Terminal
         {
             try
             {
-                return InputStream.ReadByte();
+                var asyncReadResult = InputStream.ReadAsync(buffer, 0, 1);
+                asyncReadResult.Wait(cancellationToken.Token);
+                return asyncReadResult.Result == 0 ? -1 : buffer[0];
             }
             catch(ObjectDisposedException)
             {
                 return -1;
             }
+            catch(OperationCanceledException)
+            {
+                return -1;
+            }
+        }
+
+        public void CancelRead()
+        {
+            cancellationToken.Cancel();
         }
 
         public void Close()
@@ -74,11 +86,17 @@ namespace AntShell.Terminal
         {
             InputStream = input;
             OutputStream = output;
+
+            cancellationToken = new CancellationTokenSource();
+            buffer = new byte[1];
         }
 
         public Stream InputStream { get; private set; }
 
         public Stream OutputStream { get; private set; }
+
+        private CancellationTokenSource cancellationToken;
+        private byte[] buffer;
     }
 }
 

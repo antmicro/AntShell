@@ -30,6 +30,7 @@ namespace AntShell.Terminal
     public interface IPassiveIOSource : IIOSource, IDisposable
     {
         int Read();
+        void CancelRead();
     }
 }
 

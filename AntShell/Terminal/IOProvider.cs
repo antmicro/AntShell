@@ -47,6 +47,15 @@ namespace AntShell.Terminal
             }
         }
 
+        public void CancelGet()
+        {
+            var b = backend as IPassiveIOSource;
+            if(b != null)
+            {
+                b.CancelRead();
+            }
+        }
+
         public char? GetNextChar()
         {
             while(true)

@@ -138,6 +138,7 @@ namespace AntShell.Terminal
             }
 
             onceAgain = false;
+            InputOutput.CancelGet();
         }
 
         public void Run(bool stopOnError = false)
