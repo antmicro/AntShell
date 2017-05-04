@@ -32,6 +32,7 @@ namespace AntShell.Terminal
     {
         public void Dispose()
         {
+            CancelRead();
             InputStream.Dispose();
         }
 
