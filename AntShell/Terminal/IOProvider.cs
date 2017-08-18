@@ -30,12 +30,10 @@ namespace AntShell.Terminal
 {
     public class IOProvider : IDisposable
     {
-        public IOProvider(IIOSource backend)
+        public IOProvider()
         {
             localBuffer = new Queue<byte>();
             encoding = System.Text.Encoding.GetEncoding("UTF-8", System.Text.EncoderFallback.ReplacementFallback, new CustomDecoderFallback());
-            this.backend = backend;
-            SwitchToPassive();
         }
 
         public void Dispose()
@@ -49,7 +47,7 @@ namespace AntShell.Terminal
 
         public void CancelGet()
         {
-            var b = backend as IPassiveIOSource;
+            var b = Backend as IPassiveIOSource;
             if(b != null)
             {
                 b.CancelRead();
@@ -118,7 +116,7 @@ namespace AntShell.Terminal
                 return localBuffer.Dequeue();
             }
 
-            return ((IPassiveIOSource)backend).Read();
+            return ((IPassiveIOSource)Backend).Read();
         }
 
 
@@ -140,7 +138,7 @@ namespace AntShell.Terminal
                 beforeWrite(b);
             }
 
-            backend.Write(b);
+            Backend.Write(b);
 
             if(afterWrite != null)
             {
@@ -156,10 +154,34 @@ namespace AntShell.Terminal
         public void Flush()
         {
             ClearPeeked();
-            backend.Flush();
+            Backend.Flush();
         }
 
-        public IIOSource Backend { get { return backend; } }
+        public IIOSource Backend
+        {
+            get
+            {
+                if(backend == null)
+                {
+                    throw new NotSupportedException("The IOProvider cannot be used before initialization is finished.");
+                }
+                return backend;
+            }
+
+            set
+            {
+                if(value == null)
+                {
+                    throw new ArgumentNullException();
+                }
+                if(backend != null)
+                {
+                    throw new NotSupportedException("The IOProvider has already been initialized.");
+                }
+                backend = value;
+                SwitchToPassive();
+            }
+        }
 
         public event Action<byte> BeforeWrite;
         public event Action<byte> AfterWrite;
@@ -174,13 +196,13 @@ namespace AntShell.Terminal
                     value(b);
                 }
                 localBuffer.Clear();
-                ((IActiveIOSource)backend).ByteRead += value;
+                ((IActiveIOSource)Backend).ByteRead += value;
             }
 
             remove
             {
-                ((IActiveIOSource)backend).ByteRead -= value;
-                if(((IActiveIOSource)backend).IsAnythingAttached)
+                ((IActiveIOSource)Backend).ByteRead -= value;
+                if(((IActiveIOSource)Backend).IsAnythingAttached)
                 {
                     SwitchToPassive();
                 }
@@ -202,7 +224,7 @@ namespace AntShell.Terminal
 
         private void SwitchToActive()
         {
-            var passiveBackend = backend as IPassiveIOSource;
+            var passiveBackend = Backend as IPassiveIOSource;
             if(passiveBackend != null)
             {
                 backend = new PAIOSourceConverter(passiveBackend);
@@ -212,7 +234,7 @@ namespace AntShell.Terminal
 
         private void SwitchToPassive()
         {
-            var activeBackend = backend as IActiveIOSource;
+            var activeBackend = Backend as IActiveIOSource;
             if(activeBackend != null)
             {
                 backend = new APIOSourceConverter(activeBackend);
