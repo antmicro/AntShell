@@ -397,7 +397,7 @@ namespace AntShell
                         NormalPrompt.Write(terminal);
                     }
 
-                    if(sugs.Length == 1 && sugs[0][sugs[0].Length - 1] != Path.DirectorySeparatorChar)
+                    if(sugs.Length == 1 && sugs[0][sugs[0].Length - 1] != directorySeparatorChar)
                     {
                         CurrentEditor.InsertCharacter(' ');
                     }
@@ -545,6 +545,8 @@ namespace AntShell
             mode = currentMode;
             return result;
         }
+
+        private const char directorySeparatorChar = '/';
 
         private enum Mode
         {
