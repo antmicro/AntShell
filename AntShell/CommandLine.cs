@@ -40,6 +40,8 @@ namespace AntShell
         private CommandEditor userInput;
         private NavigableTerminalEmulator terminal;
 
+        public char DirectorySeparatorChar { get; set; }
+
         public Prompt NormalPrompt { get; set; }
 
         private SearchPrompt _searchPrompt;
@@ -397,7 +399,7 @@ namespace AntShell
                         NormalPrompt.Write(terminal);
                     }
 
-                    if(sugs.Length == 1 && sugs[0][sugs[0].Length - 1] != directorySeparatorChar)
+                    if(sugs.Length == 1 && sugs[0][sugs[0].Length - 1] != DirectorySeparatorChar)
                     {
                         CurrentEditor.InsertCharacter(' ');
                     }
@@ -545,8 +547,6 @@ namespace AntShell
             mode = currentMode;
             return result;
         }
-
-        private const char directorySeparatorChar = '/';
 
         private enum Mode
         {

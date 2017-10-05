@@ -46,6 +46,8 @@ namespace AntShell
 
         public string HistorySavePath { get; set; }
 
+        public char DirectorySeparator { get; set; }
+
         public ShellSettings()
         {
             UseBuiltinQuit = true;
