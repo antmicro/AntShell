@@ -47,7 +47,7 @@ namespace AntShell
         private SearchPrompt _searchPrompt;
 
         public SearchPrompt SearchPrompt
-        { 
+        {
             get { return _searchPrompt; }
             set
             {
@@ -230,7 +230,7 @@ namespace AntShell
                     }
                 }
                 break;
-			
+
             case ControlSequenceType.CtrlLeftArrow:
                 {
                     var diff = CurrentEditor.MoveWordBackward();
@@ -386,10 +386,9 @@ namespace AntShell
                         CurrentEditor.SetValue(prefix);
                     }
                     else if(tabTabMode)
-                    {						
+                    {
                         terminal.NewLine();
-                            
-                        //var splitPoint = Math.Max(prefix.LastIndexOf(" ", StringComparison.Ordinal), prefix.LastIndexOf(";", StringComparison.Ordinal));
+
                         var splitPoint = prefix.LastIndexOf(" ", StringComparison.Ordinal);
                         foreach(var sug in sugs)
                         {
@@ -425,7 +424,7 @@ namespace AntShell
                     terminal.CursorForward(CurrentEditor.MoveEnd());
                     terminal.NewLine();
                 }
-				
+
                 if(CurrentEditor.Value != string.Empty)
                 {
                     if(wasInSearchMode)
@@ -466,11 +465,10 @@ namespace AntShell
                     terminal.Write(CurrentEditor.Value);
                 }
                 history.Reset();
-                
+
                 break;
 
             default:
-				//Console.WriteLine("WARNING: Unknown control sequence!");
                 break;
             }
 
