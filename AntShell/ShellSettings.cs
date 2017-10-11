@@ -24,6 +24,8 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+using System;
+
 namespace AntShell
 {
     public class ShellSettings
@@ -32,7 +34,7 @@ namespace AntShell
 
         public SearchPrompt SearchPrompt { get; set; }
 
-        public string Banner;
+        public Func<string> BannerProvider;
 
         public bool UseBuiltinQuit { get; set; }
 

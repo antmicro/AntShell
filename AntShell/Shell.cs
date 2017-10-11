@@ -91,9 +91,9 @@ namespace AntShell
 
             term.Start(settings.ClearScreen);
 
-            if(settings.Banner != null)
+            if(settings.BannerProvider != null)
             {
-                term.Write(settings.Banner, false);
+                term.Write(settings.BannerProvider(), false);
                 term.NewLine();
                 term.NewLine();
                 term.Calibrate();
