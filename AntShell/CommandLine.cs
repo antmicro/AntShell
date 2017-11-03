@@ -40,12 +40,14 @@ namespace AntShell
         private CommandEditor userInput;
         private NavigableTerminalEmulator terminal;
 
+        public char DirectorySeparatorChar { get; set; }
+
         public Prompt NormalPrompt { get; set; }
 
         private SearchPrompt _searchPrompt;
 
         public SearchPrompt SearchPrompt
-        { 
+        {
             get { return _searchPrompt; }
             set
             {
@@ -228,7 +230,7 @@ namespace AntShell
                     }
                 }
                 break;
-			
+
             case ControlSequenceType.CtrlLeftArrow:
                 {
                     var diff = CurrentEditor.MoveWordBackward();
@@ -384,10 +386,9 @@ namespace AntShell
                         CurrentEditor.SetValue(prefix);
                     }
                     else if(tabTabMode)
-                    {						
+                    {
                         terminal.NewLine();
-                            
-                        //var splitPoint = Math.Max(prefix.LastIndexOf(" ", StringComparison.Ordinal), prefix.LastIndexOf(";", StringComparison.Ordinal));
+
                         var splitPoint = prefix.LastIndexOf(" ", StringComparison.Ordinal);
                         foreach(var sug in sugs)
                         {
@@ -397,7 +398,7 @@ namespace AntShell
                         NormalPrompt.Write(terminal);
                     }
 
-                    if(sugs.Length == 1 && sugs[0][sugs[0].Length - 1] != Path.DirectorySeparatorChar)
+                    if(sugs.Length == 1 && sugs[0][sugs[0].Length - 1] != DirectorySeparatorChar)
                     {
                         CurrentEditor.InsertCharacter(' ');
                     }
@@ -423,7 +424,7 @@ namespace AntShell
                     terminal.CursorForward(CurrentEditor.MoveEnd());
                     terminal.NewLine();
                 }
-				
+
                 if(CurrentEditor.Value != string.Empty)
                 {
                     if(wasInSearchMode)
@@ -464,11 +465,10 @@ namespace AntShell
                     terminal.Write(CurrentEditor.Value);
                 }
                 history.Reset();
-                
+
                 break;
 
             default:
-				//Console.WriteLine("WARNING: Unknown control sequence!");
                 break;
             }
 
