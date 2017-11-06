@@ -1,4 +1,4 @@
-﻿// *******************************************************************
+﻿﻿﻿// *******************************************************************
 //
 //  Copyright (c) 2013-2016, Antmicro Ltd <antmicro.com>
 //
@@ -130,20 +130,7 @@ namespace AntShell.Terminal
 
         public void Write(byte b)
         {
-            var beforeWrite = BeforeWrite;
-            var afterWrite = AfterWrite;
-
-            if(beforeWrite != null)
-            {
-                beforeWrite(b);
-            }
-
             Backend.Write(b);
-
-            if(afterWrite != null)
-            {
-                afterWrite(b);
-            }
         }
 
         public void ClearPeeked()
@@ -182,9 +169,6 @@ namespace AntShell.Terminal
                 SwitchToPassive();
             }
         }
-
-        public event Action<byte> BeforeWrite;
-        public event Action<byte> AfterWrite;
 
         public event Action<int> ByteRead
         {

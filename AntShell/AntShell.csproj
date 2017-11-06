@@ -61,7 +61,6 @@
     <Compile Include="Commands\ICommandDescription.cs" />
     <Compile Include="Commands\CommandBase.cs" />
     <Compile Include="Commands\ISuggestionProvider.cs" />
-    <Compile Include="Terminal\TerminalBuffer.cs" />
     <Compile Include="Terminal\BasicTerminalEmulator.cs" />
     <Compile Include="Terminal\IPassiveIOSource.cs" />
     <Compile Include="Terminal\IActiveIOSource.cs" />
