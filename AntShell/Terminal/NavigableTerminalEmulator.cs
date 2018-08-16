@@ -69,9 +69,9 @@ namespace AntShell.Terminal
             if(clearScreen)
             {
                 ClearScreen();
-                ResetColors();
                 ResetCursor();
             }
+            ResetColors();
         }
 
         private void ControlSequences()
@@ -134,8 +134,8 @@ namespace AntShell.Terminal
                 ClearScreen();
                 CursorToColumn(1);
                 CursorUp(MAX_HEIGHT);
-                ResetColors();
             }
+            ResetColors();
 
             onceAgain = false;
             InputOutput.CancelGet();
