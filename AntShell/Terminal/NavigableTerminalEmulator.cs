@@ -563,6 +563,11 @@ namespace AntShell.Terminal
             vcursor.MaxReachedPosition.Y = vcursor.RealPosition.Y;
         }
 
+        public void ClearDown()
+        {
+            SendCSI((byte)'J');
+        }
+
         #endregion
 
         #region Display
@@ -589,14 +594,23 @@ namespace AntShell.Terminal
             SendControlSequence((byte)SequenceElement.ESC, (byte)'D');
         }
 
+        private Position savedPosition;
+        private int scrollCount;
+
         public void SaveCursor()
         {
+            savedPosition = vcursor.RealPosition.Clone();
+            scrollCount = LinesScrolled;
             SendCSI((byte)'s');
         }
 
         public void RestoreCursor()
         {
             SendCSI((byte)'u');
+            vcursor.RealPosition = savedPosition.Clone();
+
+            var scrolled = LinesScrolled - scrollCount;
+            CursorUp(scrolled);
         }
 
         public void HideCursor()

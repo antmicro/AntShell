@@ -84,6 +84,21 @@ namespace AntShell
             }
         }
 
+        public void SaveCursor()
+        {
+            terminal.SaveCursor();
+        }
+
+        public void RestoreCursor()
+        {
+            terminal.RestoreCursor();
+        }
+
+        public void ClearToEnd()
+        {
+            terminal.ClearDown();
+        }
+
         #endregion
 
         private class IOProviderStreamWrapper : Stream
