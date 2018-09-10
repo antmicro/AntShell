@@ -350,23 +350,38 @@ namespace AntShell.Terminal
 
                 if(!InEscapeMode) // if the char changed cursor position by one; check for color steering codes
                 {
-                    var result = vcursor.MoveForward();
-
-                    if(vcursor.IsCursorOutOfLine && !vcursor.IsCursorOutOfScreen)
+                    if(c == '\r')
                     {
-                        CursorDown();
-                        CursorToColumn(1);
+                        vcursor.RealPosition.X = 1;
                     }
-
-                    if(result == VirtualCursorMoveResult.LineWrapped)
+                    else if(c == '\n')
                     {
-                        OnLineWrapped();
+                        var scrolled = !vcursor.MoveDown();
+                        if(scrolled)
+                        {
+                            OnScreenScroll();
+                        }
                     }
-
-                    if(result == VirtualCursorMoveResult.ScreenScrolled)
+                    else
                     {
-                        OnLineWrapped();
-                        OnScreenScroll();
+                        var result = vcursor.MoveForward();
+
+                        if(vcursor.IsCursorOutOfLine && !vcursor.IsCursorOutOfScreen)
+                        {
+                            CursorDown();
+                            CursorToColumn(1);
+                        }
+
+                        if(result == VirtualCursorMoveResult.LineWrapped)
+                        {
+                            OnLineWrapped();
+                        }
+
+                        if(result == VirtualCursorMoveResult.ScreenScrolled)
+                        {
+                            OnLineWrapped();
+                            OnScreenScroll();
+                        }
                     }
 
                     return true;
@@ -510,12 +525,10 @@ namespace AntShell.Terminal
 
         public void NewLine()
         {
-            Write("\n\r", false);
+            Write("\n\r", true);
             CurrentLine = 0;
             WrappedLines.Clear();
 
-            vcursor.SetX(1);
-            vcursor.MoveDown();
         }
 
         #endregion

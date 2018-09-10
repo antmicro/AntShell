@@ -67,9 +67,16 @@ namespace AntShell.Terminal
             RealPosition.Y = Math.Max(1, RealPosition.Y - n);
         }
 
-        public void MoveDown(int n = 1)
+        public bool MoveDown(int n = 1)
         {
-            RealPosition.Y = Math.Min(MaxPosition.Y, RealPosition.Y + n);
+            if(RealPosition.Y + n <= MaxPosition.Y)
+            {
+                RealPosition.Y += n;
+                return true;
+            }
+
+            RealPosition.Y = MaxPosition.Y;
+            return false;
         }
 
         public VirtualCursorMoveResult MoveForward(int n = 1, bool enableOutOfScreen = true, bool enableWrap = true)
@@ -91,14 +98,7 @@ namespace AntShell.Terminal
         {
             var result = VirtualCursorMoveResult.NotMoved;
 
-            if(RealPosition.X == 1)
-            {
-                RealPosition.X++;
-                IsCursorOutOfLine = false;
-                IsCursorOutOfScreen = false;
-                result = VirtualCursorMoveResult.LineWrapped;
-            }
-            else if(RealPosition.X < MaxPosition.X)
+            if(RealPosition.X < MaxPosition.X)
             {
                 RealPosition.X++;
                 IsCursorOutOfLine = false;
