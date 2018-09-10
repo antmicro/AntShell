@@ -245,7 +245,7 @@ namespace AntShell.Terminal
 
         #region Writers
 
-        internal int Write(string text, bool checkWrap = true, ConsoleColor? color = null)
+        internal int Write(string text, ConsoleColor? color = null)
         {
             var result = 0;
 
@@ -255,7 +255,7 @@ namespace AntShell.Terminal
                 {
                     foreach(var c in text)
                     {
-                        result += WriteChar(c, checkWrap) ? 1 : 0;
+                        result += WriteChar(c) ? 1 : 0;
                     }
                 });
             }
@@ -263,9 +263,9 @@ namespace AntShell.Terminal
             return result;
         }
 
-        public void Write(char c, bool checkWrap = true, ConsoleColor? color = null)
+        public void Write(char c, ConsoleColor? color = null)
         {
-            ColorChangerWrapper(color, () => WriteChar(c, checkWrap));
+            ColorChangerWrapper(color, () => WriteChar(c));
         }
 
         public void WriteNoMove(string text, int skip = 0, ConsoleColor? color = null)
@@ -278,7 +278,7 @@ namespace AntShell.Terminal
                 HideCursor();
 
                 CursorForward(skip);
-                var count = Write(text, true, color);
+                var count = Write(text, color);
                 CursorBackward(count + skip);
 
                 ShowCursor();
@@ -290,7 +290,7 @@ namespace AntShell.Terminal
 
         public void WriteRaw(char c, ConsoleColor? color = null)
         {
-            ColorChangerWrapper(color, () => WriteChar(c, false));
+            ColorChangerWrapper(color, () => WriteChar(c));
         }
 
         public void WriteRaw(byte[] bs, ConsoleColor? color = null)
@@ -337,61 +337,58 @@ namespace AntShell.Terminal
 
         private bool InEscapeMode = false;
 
-        private bool WriteChar(char c, bool checkIfWrapped = true)
+        private bool WriteChar(char c)
         {
             InputOutput.Write(c);
 
-            if(forceVirtualCursor || checkIfWrapped)
+            if(c == (byte)SequenceElement.ESC) // to eliminate control sequences, mostly color change
             {
-                if(c == (byte)SequenceElement.ESC) // to eliminate control sequences, mostly color change
+                InEscapeMode = true;
+            }
+
+            if(!InEscapeMode) // if the char changed cursor position by one; check for color steering codes
+            {
+                if(c == '\r')
                 {
-                    InEscapeMode = true;
+                    vcursor.RealPosition.X = 1;
                 }
-
-                if(!InEscapeMode) // if the char changed cursor position by one; check for color steering codes
+                else if(c == '\n')
                 {
-                    if(c == '\r')
+                    var scrolled = !vcursor.MoveDown();
+                    if(scrolled)
                     {
-                        vcursor.RealPosition.X = 1;
+                        OnScreenScroll();
                     }
-                    else if(c == '\n')
-                    {
-                        var scrolled = !vcursor.MoveDown();
-                        if(scrolled)
-                        {
-                            OnScreenScroll();
-                        }
-                    }
-                    else
-                    {
-                        var result = vcursor.MoveForward();
-
-                        if(vcursor.IsCursorOutOfLine && !vcursor.IsCursorOutOfScreen)
-                        {
-                            CursorDown();
-                            CursorToColumn(1);
-                        }
-
-                        if(result == VirtualCursorMoveResult.LineWrapped)
-                        {
-                            OnLineWrapped();
-                        }
-
-                        if(result == VirtualCursorMoveResult.ScreenScrolled)
-                        {
-                            OnLineWrapped();
-                            OnScreenScroll();
-                        }
-                    }
-
-                    return true;
                 }
                 else
                 {
-                    if(c == 'm')
+                    var result = vcursor.MoveForward();
+
+                    if(vcursor.IsCursorOutOfLine && !vcursor.IsCursorOutOfScreen)
                     {
-                        InEscapeMode = false;
+                        CursorDown();
+                        CursorToColumn(1);
                     }
+
+                    if(result == VirtualCursorMoveResult.LineWrapped)
+                    {
+                        OnLineWrapped();
+                    }
+
+                    if(result == VirtualCursorMoveResult.ScreenScrolled)
+                    {
+                        OnLineWrapped();
+                        OnScreenScroll();
+                    }
+                }
+
+                return true;
+            }
+            else
+            {
+                if(c == 'm')
+                {
+                    InEscapeMode = false;
                 }
             }
 
@@ -525,7 +522,7 @@ namespace AntShell.Terminal
 
         public void NewLine()
         {
-            Write("\n\r", true);
+            Write("\n\r");
             CurrentLine = 0;
             WrappedLines.Clear();
 

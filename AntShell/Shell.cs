@@ -94,7 +94,7 @@ namespace AntShell
 
             if(settings.BannerProvider != null)
             {
-                term.Write(settings.BannerProvider(), false);
+                term.Write(settings.BannerProvider());
                 term.NewLine();
                 term.NewLine();
                 term.Calibrate();
@@ -102,7 +102,7 @@ namespace AntShell
 
             if(StartupCommand != null)
             {
-                term.Write(string.Format("Executing startup command: {0}", StartupCommand), false);
+                term.Write(string.Format("Executing startup command: {0}", StartupCommand));
                 term.NewLine();
                 HandleCommand(StartupCommand, null);
                 term.NewLine();

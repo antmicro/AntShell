@@ -448,7 +448,7 @@ namespace AntShell
                         if(interaction != null && interaction.CommandToExecute != null)
                         {
                             cmd = interaction.CommandToExecute;
-                            terminal.Write(cmd, false);
+                            terminal.Write(cmd);
                             terminal.NewLine();
                             (interaction as CommandInteraction).Clear();
                         }

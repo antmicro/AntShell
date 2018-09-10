@@ -43,7 +43,7 @@ namespace AntShell
         public virtual void Write(NavigableTerminalEmulator tem)
         {
             tem.Calibrate();
-            tem.Write(Text, true, Color);
+            tem.Write(Text, Color);
         }
     }
 
@@ -70,7 +70,7 @@ namespace AntShell
         {
             SearchColor = searchColor;
 
-            ArgumentStartIndex = Text.IndexOf("{0}", 0); 
+            ArgumentStartIndex = Text.IndexOf("{0}", 0);
             Tail = Text.Substring(ArgumentStartIndex + 3, Text.Length - ArgumentStartIndex - 4);
             Head = Text.Substring(0, ArgumentStartIndex);
         }
@@ -78,9 +78,9 @@ namespace AntShell
         public override void Write(NavigableTerminalEmulator tem)
         {
             tem.Calibrate();
-            tem.Write(Head, true, Color);
-            tem.Write(Search.Value, true, SearchColor);
-            tem.Write(Tail, true, Color);
+            tem.Write(Head, Color);
+            tem.Write(Search.Value, SearchColor);
+            tem.Write(Tail, Color);
             tem.CursorBackward(Tail.Length);
         }
 
@@ -90,8 +90,8 @@ namespace AntShell
 
             tem.HideCursor();
             tem.ClearToTheEndOfLine();
-            tem.Write(st, true, SearchColor);
-            tem.Write(Tail, true, Color);
+            tem.Write(st, SearchColor);
+            tem.Write(Tail, Color);
             tem.CursorBackward(Tail.Length + st.Length + shift);
             tem.ShowCursor();
         }
