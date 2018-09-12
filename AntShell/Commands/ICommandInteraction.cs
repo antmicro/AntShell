@@ -49,6 +49,10 @@ namespace AntShell.Commands
         {
             foreach(var c in str.ToCharArray())
             {
+                if(c == '\n')
+                {
+                    ici.Write('\r', color);
+                }
                 ici.Write(c, color);
             }
         }
