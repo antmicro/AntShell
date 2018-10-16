@@ -51,6 +51,14 @@ namespace AntShell
             CommandToExecute = null;
         }
 
+        public bool HasNewInput
+        {
+            get
+            {
+                return terminal.InputOutput.HasNewInput;
+            }
+        }
+
         #region ICommandInteraction implementation
 
         public bool QuitEnvironment { get; set; }

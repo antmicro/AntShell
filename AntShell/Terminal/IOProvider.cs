@@ -24,6 +24,7 @@
 // *******************************************************************
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using AntShell.Encoding;
 
 namespace AntShell.Terminal
@@ -170,6 +171,16 @@ namespace AntShell.Terminal
             }
         }
 
+        public bool HasNewInput
+        {
+            get
+            {
+                return isInActiveMode
+                    ? Interlocked.Exchange(ref inputIsWaiting, 0) == 1
+                    : (Backend as IPassiveIOSource).TryPeek(out var _);
+            }
+        }
+
         public event Action<int> ByteRead
         {
             add
@@ -208,26 +219,37 @@ namespace AntShell.Terminal
 
         private void SwitchToActive()
         {
-            var passiveBackend = Backend as IPassiveIOSource;
+            var passiveBackend = backend as IPassiveIOSource;
             if(passiveBackend != null)
             {
-                backend = new PAIOSourceConverter(passiveBackend);
+                var activeBackend = new PAIOSourceConverter(passiveBackend);
+                Interlocked.Exchange(ref inputIsWaiting, 0);
+                activeBackend.ByteRead += HandleNewData;
+                backend = activeBackend;
                 isInActiveMode = true;
             }
         }
 
         private void SwitchToPassive()
         {
-            var activeBackend = Backend as IActiveIOSource;
+            var activeBackend = backend as IActiveIOSource;
             if(activeBackend != null)
             {
+                activeBackend.ByteRead -= HandleNewData;
                 backend = new APIOSourceConverter(activeBackend);
                 isInActiveMode = false;
             }
         }
 
+        private void HandleNewData(int b)
+        {
+            Interlocked.Exchange(ref inputIsWaiting, 1);
+        }
+
         private IIOSource backend;
         private bool isInActiveMode;
+        // it's an integer, so that we can use Interlocked.Exchange method
+        private int inputIsWaiting;
 
         private readonly Queue<byte> localBuffer;
         private readonly System.Text.Encoding encoding;
