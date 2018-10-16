@@ -40,7 +40,9 @@ namespace AntShell.Terminal
 
         public void Flush()
         {
+            peekedByte = -1;
             InputStream.Flush();
+            OutputStream.Flush();
         }
 
         public void Write(byte b)
@@ -48,8 +50,32 @@ namespace AntShell.Terminal
             OutputStream.WriteByte(b);
         }
 
+        public bool TryPeek(out int value)
+        {
+            if(peekedByte != -1)
+            {
+                value = peekedByte;
+                return true;
+            }
+            if(InputStream.Length > 0)
+            {
+                peekedByte = InputStream.ReadByte();
+                value = peekedByte;
+                return true;
+            }
+            value = -1;
+            return false;
+        }
+
         public int Read()
         {
+            if(peekedByte != -1)
+            {
+                var result = peekedByte;
+                peekedByte = -1;
+                return result;
+            }
+
             try
             {
                 var asyncReadResult = InputStream.ReadAsync(buffer, 0, 1);
@@ -90,6 +116,7 @@ namespace AntShell.Terminal
 
             cancellationToken = new CancellationTokenSource();
             buffer = new byte[1];
+            peekedByte = -1;
         }
 
         public Stream InputStream { get; private set; }
@@ -98,6 +125,7 @@ namespace AntShell.Terminal
 
         private CancellationTokenSource cancellationToken;
         private byte[] buffer;
+        private int peekedByte;
     }
 }
 

@@ -36,6 +36,26 @@ namespace AntShell.Terminal
 
         #region IPassiveIOSource implementation
 
+        // WARNING: this method is not intended to be used in parallel with `Read`
+        public bool TryPeek(out int value)
+        {
+            if(peekedByte != -1)
+            {
+                value = peekedByte;
+                return true;
+            }
+
+            if(buffer.TryTake(out value))
+            {
+                peekedByte = value;
+                return true;
+            }
+
+            value = -1;
+            return false;
+        }
+
+        // WARNING: this method is not intended to be used in parallel with `TryPeek`
         public int Read()
         {
             if(isDone)
@@ -44,19 +64,27 @@ namespace AntShell.Terminal
             }
 
             int result;
-            try
+            if(peekedByte != -1)
             {
-                result = buffer.Take(readCancelationTokenSource.Token);
+                result = peekedByte;
+                peekedByte = -1;
             }
-            catch(OperationCanceledException)
+            else
             {
-                result = -1;
+                try
+                {
+                    result = buffer.Take(readCancelationTokenSource.Token);
+                }
+                catch(OperationCanceledException)
+                {
+                    result = -1;
+                }
+                if(result == -1)
+                {
+                    isDone = true;
+                }
             }
 
-            if(result == -1)
-            {
-                isDone = true;
-            }
             return result;
         }
 
@@ -83,6 +111,7 @@ namespace AntShell.Terminal
 
         public APIOSourceConverter(IActiveIOSource source)
         {
+            peekedByte = -1;
             readCancelationTokenSource = new CancellationTokenSource();
             activeSource = source;
             buffer = new BlockingCollection<int>();
@@ -92,6 +121,7 @@ namespace AntShell.Terminal
 
         public IActiveIOSource OriginalSource { get { return activeSource; } }
 
+        private int peekedByte;
         private bool isDone;
         private CancellationTokenSource readCancelationTokenSource;
 
