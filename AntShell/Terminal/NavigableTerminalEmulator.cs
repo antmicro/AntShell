@@ -543,7 +543,10 @@ namespace AntShell.Terminal
             {
                 SendCSI((byte)'2', (byte)'K'); // clear line
                 CursorUp();
-                WrappedLines.RemoveAt(WrappedLines.Count - i);
+                if(WrappedLines.Count - i >= 0)
+                {
+                    WrappedLines.RemoveAt(WrappedLines.Count - i);
+                }
             }
 
             CurrentLine = 0;
