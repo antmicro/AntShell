@@ -71,8 +71,11 @@ namespace AntShell
 
             PrepareCommands();
 
-            externalHandler = handler;
-            externalHandler.GetInternalCommands = () => Commands.Cast<ICommandDescription>();
+            if(handler != null)
+            {
+                externalHandler = handler;
+                externalHandler.GetInternalCommands = () => Commands.Cast<ICommandDescription>();
+            }
         }
 
         public void InjectInput(string str)
