@@ -38,10 +38,11 @@ namespace AntShellDemo
 		{
 			var sett = new ShellSettings {
 				NormalPrompt = new Prompt("ant-calc ", ConsoleColor.DarkBlue),
-				Banner = "Welcome to AntCalc - AntShell Demo!"
+				BannerProvider = () => "Welcome to AntCalc - AntShell Demo!"
 			};
 
-            shell = new Shell(new DetachableIO(new StreamIOSource(stream)), null, sett);
+			var io = new IOProvider { Backend = new StreamIOSource(stream) };
+			shell = new Shell(io, null, sett);
 			shell.RegisterCommand(new AddCommand());
 			shell.RegisterCommand(new AskCommand());
 			shell.RegisterCommand(new PrintCommand());
