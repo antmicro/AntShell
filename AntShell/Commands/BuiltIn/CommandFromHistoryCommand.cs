@@ -28,7 +28,7 @@ using System.Linq;
 
 namespace AntShell.Commands.BuiltIn
 {
-    public class CommandFromHistoryCommand : CommandBase, IOperator
+    public class CommandFromHistoryCommand : CommandBase
     {
         private readonly CommandHistory history;
 
