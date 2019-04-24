@@ -36,6 +36,8 @@ namespace AntShell
 
         public Func<string> BannerProvider { get; set; }
 
+        public Func<string, string> PreprocessSuggestionsInput { get; set; }
+
         public bool UseBuiltinQuit { get; set; }
 
         public bool UseBuiltinHelp { get; set; }

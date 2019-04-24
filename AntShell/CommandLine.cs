@@ -42,6 +42,8 @@ namespace AntShell
 
         public char DirectorySeparatorChar { get; set; }
 
+        public Func<string, string> PreprocessSuggestionsInput { get; set; }
+
         public Prompt NormalPrompt { get; set; }
 
         private SearchPrompt _searchPrompt;
@@ -370,7 +372,9 @@ namespace AntShell
                 else if(mode == Mode.Command)
                 {
                     var sugs = handler.SuggestionNeeded(CurrentEditor.Value);
-                    var prefix = Helper.CommonPrefix(sugs, CurrentEditor.Value);
+                    var preparedBaseString = PreprocessSuggestionsInput(CurrentEditor.Value);
+                    var commonPrefix = Helper.CommonPrefix(sugs, preparedBaseString);
+                    var prefix = String.IsNullOrEmpty(commonPrefix) ? CurrentEditor.Value : commonPrefix;
 
                     if(sugs.Length == 0)
                     {

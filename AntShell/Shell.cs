@@ -61,6 +61,7 @@ namespace AntShell
             Commands = new List<ICommand>();
 
             line = new CommandLine(term, history, this);
+            line.PreprocessSuggestionsInput = settings.PreprocessSuggestionsInput;
             line.NormalPrompt = settings.NormalPrompt;
             line.DirectorySeparatorChar = settings.DirectorySeparator;
             line.SearchPrompt = settings.SearchPrompt ?? new SearchPrompt("search `{0}`> ", ConsoleColor.Yellow);
