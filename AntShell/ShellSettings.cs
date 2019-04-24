@@ -34,7 +34,7 @@ namespace AntShell
 
         public SearchPrompt SearchPrompt { get; set; }
 
-        public Func<string> BannerProvider;
+        public Func<string> BannerProvider { get; set; }
 
         public bool UseBuiltinQuit { get; set; }
 
