@@ -38,11 +38,27 @@ namespace AntShell
         public event Action Quitted;
         public event Action<Shell> Started;
 
-        public NavigableTerminalEmulator Terminal { get { return term; } }
+        public NavigableTerminalEmulator Terminal 
+        { 
+            get 
+            { 
+                return term; 
+            }
+            set
+            {
+                term = value;
+                line = new CommandLine(term, history, this);
+                line.PreprocessSuggestionsInput = settings.PreprocessSuggestionsInput;
+                line.NormalPrompt = settings.NormalPrompt;
+                line.DirectorySeparatorChar = settings.DirectorySeparator;
+                line.SearchPrompt = settings.SearchPrompt ?? new SearchPrompt("search `{0}`> ", ConsoleColor.Yellow);
+                Writer = new CommandInteraction(term, line);
+            }
+        }
 
-        private readonly NavigableTerminalEmulator term;
+        private NavigableTerminalEmulator term;
         private readonly CommandHistory history;
-        private readonly CommandLine line;
+        private CommandLine line;
 
         public List<ICommand> Commands { get; private set; }
 
@@ -54,19 +70,10 @@ namespace AntShell
 
         private readonly ShellSettings settings;
 
-        public Shell(IOProvider io, ICommandHandler handler, ShellSettings settings)
+        public Shell(ICommandHandler handler, ShellSettings settings)
         {
-            term = new NavigableTerminalEmulator(io, settings.ForceVirtualCursor);
             history = new CommandHistory();
             Commands = new List<ICommand>();
-
-            line = new CommandLine(term, history, this);
-            line.PreprocessSuggestionsInput = settings.PreprocessSuggestionsInput;
-            line.NormalPrompt = settings.NormalPrompt;
-            line.DirectorySeparatorChar = settings.DirectorySeparator;
-            line.SearchPrompt = settings.SearchPrompt ?? new SearchPrompt("search `{0}`> ", ConsoleColor.Yellow);
-
-            Writer = new CommandInteraction(term, line);
 
             this.settings = settings;
 
@@ -83,12 +90,17 @@ namespace AntShell
         {
             foreach(var c in str)
             {
-                term.InputOutput.Inject(c);
+                term?.InputOutput.Inject(c);
             }
         }
 
         public void Start(bool stopOnError = false)
         {
+            if(term == null)
+            {
+                return;
+            }
+
             if(settings.HistorySavePath != null)
             {
                 history.Load(settings.HistorySavePath);
@@ -131,12 +143,12 @@ namespace AntShell
 
         public void Stop()
         {
-            term.Stop();
+            term?.Stop();
         }
 
         public void Reset()
         {
-            term.ClearScreen();
+            term?.ClearScreen();
             line.CurrentPrompt.Write(term);
         }
 
