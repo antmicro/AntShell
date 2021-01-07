@@ -290,7 +290,7 @@ namespace AntShell.Terminal
 
         public void WriteRaw(char c, ConsoleColor? color = null)
         {
-            ColorChangerWrapper(color, () => WriteChar(c));
+            ColorChangerWrapper(color, () => InputOutput.Write(c));
         }
 
         public void WriteRaw(byte[] bs, ConsoleColor? color = null)
