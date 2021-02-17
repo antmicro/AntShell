@@ -40,6 +40,8 @@ namespace AntShell.Terminal
 
         public ITerminalHandler Handler { get; set; }
 
+        public bool DisableColors { get; set; }
+
         private VirtualCursor vcursor;
 
         private List<int> WrappedLines;
@@ -322,14 +324,14 @@ namespace AntShell.Terminal
 
         private void ColorChangerWrapper(ConsoleColor? color, Action action)
         {
-            if(color.HasValue)
+            if(!DisableColors && color.HasValue)
             {
                 SetColor(color.Value);
             }
 
             action();
 
-            if(color.HasValue)
+            if(!DisableColors && color.HasValue)
             {
                 ResetColors();
             }
