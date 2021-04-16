@@ -1,7 +1,8 @@
+========
 AntShell
 ========
 
-Copyright (c) 2013-2021 Antmicro
+Copyright (c) 2013-2021 `Antmicro <https://www.antmicro.com>`_
 
 AntShell is a small C# utility library providing basic shell features: history handling, built-in commands, prompt etc.
 
