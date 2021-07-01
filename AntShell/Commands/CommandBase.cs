@@ -37,7 +37,7 @@ namespace AntShell.Commands
 
         #region ICommandDescription implementation
 
-        public void PrintHelp(ICommandInteraction writer)
+        public virtual void PrintHelp(ICommandInteraction writer)
         {
             writer.WriteLine(this.GetHelp());
         }
