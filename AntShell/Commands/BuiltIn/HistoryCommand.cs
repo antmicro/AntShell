@@ -24,6 +24,7 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 using System;
+using System.Linq;
 
 namespace AntShell.Commands.BuiltIn
 {
@@ -31,20 +32,55 @@ namespace AntShell.Commands.BuiltIn
     {
         private readonly CommandHistory history;
 
+        private const int globalHistoryLimit = 50;
+
         public HistoryCommand(CommandHistory h) : base("history", "prints command history.")
         {
             history = h;
+        }
+
+        public override void PrintHelp(ICommandInteraction writer)
+        {
+            base.PrintHelp(writer);
+
+            writer.WriteLine("\nUsage:");
+            writer.WriteLine($"history [number of elements to display (default: {globalHistoryLimit})] ");
         }
 
         #region ICommand implementation
 
         public override int Execute(string[] args, ICommandInteraction writer)
         {
+            var historyLimit = globalHistoryLimit;
+            if(args.Length > 2)
+            {
+                writer.WriteError("Incorrect number of arguments supplied.");
+                return 1;
+            }
+            if(args.Length == 2)
+            {
+                if(int.TryParse(args[1], out historyLimit))
+                {
+                    if(historyLimit <= 0)
+                    {
+                        writer.WriteError("You have to specify a positive number of elements to show.");
+                        return 1;
+                    }
+                }
+                else
+                {
+                    writer.WriteError("A number is expected.");
+                    return 1;
+                }
+            }
+
             writer.WriteLine("Commands history:");
-            
             writer.WriteLine();
-            var counter = 1;
-            foreach(var item in history.Items)
+
+            var historyLength = history.Items.Count(); 
+            var toSkip = Math.Max(0, historyLength - historyLimit);
+            var counter = toSkip + 1;
+            foreach(var item in history.Items.Skip(toSkip).Take(historyLimit))
             {
                 writer.WriteLine(string.Format(" {0}: {1}", counter++, item));
             }
