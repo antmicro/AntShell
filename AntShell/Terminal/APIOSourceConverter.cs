@@ -32,6 +32,10 @@ namespace AntShell.Terminal
     {
         public void Dispose()
         {
+            if(activeSource is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
         }
 
         #region IPassiveIOSource implementation
