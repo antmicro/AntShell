@@ -31,6 +31,8 @@ namespace AntShell.Terminal
     {
         public IOProvider InputOutput { get; protected set; }
 
+        public bool PlainMode { get; set; }
+
         public BasicTerminalEmulator(IOProvider io)
         {
             InputOutput = io;
@@ -63,14 +65,20 @@ namespace AntShell.Terminal
 
         public void ClearScreen()
         {
-            SendCSI((byte)'2', (byte)'J');
+            if(!PlainMode)
+            {
+                SendCSI((byte)'2', (byte)'J');
+            }
         }
 
         public void ResetCursor()
         {
-            SendCSI();
-            SendControlSequence("1;1");
-            SendControlSequence((byte)'f');
+            if(!PlainMode)
+            {
+                SendCSI();
+                SendControlSequence("1;1");
+                SendControlSequence((byte)'f');
+            }
         }
 
         protected enum SequenceElement : byte
