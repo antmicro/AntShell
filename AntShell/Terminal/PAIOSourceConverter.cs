@@ -1,6 +1,6 @@
 ﻿// *******************************************************************
 //
-//  Copyright (c) 2013-2014, Antmicro Ltd <antmicro.com>
+//  Copyright (c) 2013-2022, Antmicro Ltd <antmicro.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -34,6 +34,16 @@ namespace AntShell.Terminal
         #region IActiveIOSource implementation
 
         public event Action<int> ByteRead;
+
+        public void Pause()
+        {
+            reader.Pause();
+        }
+
+        public void Resume()
+        {
+            reader.Resume();
+        }
 
         #endregion
 
@@ -87,6 +97,7 @@ namespace AntShell.Terminal
             public Reader(PAIOSourceConverter c)
             {
                 converter = c;
+                threadBlocked = new ManualResetEvent(true);
             }
 
             public void Run()
@@ -104,11 +115,22 @@ namespace AntShell.Terminal
                 thread.Join();
             }
 
+            public void Pause()
+            {
+                threadBlocked.Reset();
+            }
+
+            public void Resume()
+            {
+                threadBlocked.Set();
+            }
+
             private void Loop()
             {
                 loopAgain = true;
                 while(loopAgain)
                 {
+                    threadBlocked.WaitOne();
                     var read = converter.passiveSource.Read();
 
                     var byteRead = converter.ByteRead;
@@ -125,6 +147,7 @@ namespace AntShell.Terminal
             }
 
             private readonly PAIOSourceConverter converter;
+            private readonly ManualResetEvent threadBlocked;
 
             private Thread thread;
             private bool loopAgain;

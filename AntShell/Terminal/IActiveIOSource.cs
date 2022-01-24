@@ -1,6 +1,6 @@
 ﻿// *******************************************************************
 //
-//  Copyright (c) 2013-2014, Antmicro Ltd <antmicro.com>
+//  Copyright (c) 2013-2022, Antmicro Ltd <antmicro.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -33,6 +33,10 @@ namespace AntShell.Terminal
         /// Note: when the input is being closed the event is called for the last time with the special value of -1.
         /// </summary>
         event Action<int> ByteRead;
+
+        void Pause();
+
+        void Resume();
 
         bool IsAnythingAttached { get; }
     }

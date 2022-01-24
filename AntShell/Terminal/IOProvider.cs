@@ -1,6 +1,6 @@
 ﻿﻿﻿// *******************************************************************
 //
-//  Copyright (c) 2013-2016, Antmicro Ltd <antmicro.com>
+//  Copyright (c) 2013-2022, Antmicro Ltd <antmicro.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -143,6 +143,24 @@ namespace AntShell.Terminal
         {
             ClearPeeked();
             Backend.Flush();
+        }
+
+        public void Pause()
+        {
+            var activeBackend = backend as IActiveIOSource;
+            if(activeBackend != null)
+            {
+                activeBackend.Pause();
+            }
+        }
+
+        public void Resume()
+        {
+            var activeBackend = backend as IActiveIOSource;
+            if(activeBackend != null)
+            {
+                activeBackend.Resume();
+            }
         }
 
         public IIOSource Backend
