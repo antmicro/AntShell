@@ -338,6 +338,39 @@ namespace AntShell
                     }
                     break;
 
+                case 'd':
+                    // Delete next character
+                    if(CurrentEditor.RemoveNextCharacter())
+                    {
+                        terminal.ClearToTheEndOfLine();
+                        terminal.WriteNoMove(CurrentEditor.ToString(CurrentEditor.Position));
+                        
+                        // For Search also update prompt
+                        if(mode == Mode.Search)
+                        {
+                            HandleSearchPromptChange();
+                        }
+                    }
+                    // Empty line? Then quit current mode, or the terminal
+                    // for UserInput this needs to be handled in `ReadLine`
+                    else if(CurrentEditor.Length == 0 && mode != Mode.UserInput)
+                    {
+                        if(mode == Mode.Command)
+                        {
+                            terminal.Write("^D");
+                            terminal.NewLine();
+                            terminal.Stop();
+                        }
+                        else if(mode == Mode.Search)
+                        {
+                            // Do not close the terminal, just exit the search prompt
+                            mode = Mode.Command;
+                            terminal.ClearLine();
+                            CurrentPrompt.Write(terminal);
+                        }
+                    }
+                    break;
+
                 default:
                     break;
                 }
@@ -530,16 +563,26 @@ namespace AntShell
                         result = CurrentEditor.Value;
                         break;
                     }
-                    else if(inputAsControlSequence.Type == ControlSequenceType.Ctrl && (char)inputAsControlSequence.Argument == 'c')
+                    else if(inputAsControlSequence.Type == ControlSequenceType.Ctrl)
                     {
-                        terminal.CursorForward(CurrentEditor.MoveEnd());
-                        terminal.Write("^C");
-                        break;
+                        // This handles 'UserInput' mode for Ctrl-C and Ctrl-D
+                        if((char)inputAsControlSequence.Argument == 'c')
+                        {
+                            terminal.CursorForward(CurrentEditor.MoveEnd());
+                            terminal.Write("^C");
+                            break;
+                        } 
+                        else if((char)inputAsControlSequence.Argument == 'd')
+                        {
+                            if(String.IsNullOrEmpty(CurrentEditor.Value))
+                            {
+                                terminal.CursorForward(CurrentEditor.MoveEnd());
+                                terminal.Write("^D");
+                                break;
+                            }
+                        }
                     }
-                    else
-                    {
-                        HandleControlSequence((ControlSequence)input);
-                    }
+                    HandleControlSequence((ControlSequence)input);
                 }
             }
 
