@@ -371,6 +371,27 @@ namespace AntShell
                     }
                     break;
 
+                case 'u':
+                    // Delete all characters to the beginning of the line
+                    while(CurrentEditor.RemovePreviousCharacter())
+                    {
+                        terminal.CursorBackward();
+                    }
+                    if(mode == Mode.Command || mode == Mode.UserInput)
+                    {
+                        terminal.ClearToTheEndOfLine();
+                        terminal.WriteNoMove(CurrentEditor.ToString(CurrentEditor.Position));
+                    }
+                    else if(mode == Mode.Search)
+                    {
+                        SearchPrompt.Recreate(terminal);
+
+                        history.Reset();
+                        var result = history.ReverseSearch(search.Value);
+                        terminal.WriteNoMove(result, SearchPrompt.Skip);
+                    }
+                    break;
+
                 default:
                     break;
                 }
