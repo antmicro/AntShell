@@ -118,6 +118,15 @@ namespace AntShell
 
         #region Input handlers
 
+        private void HandleSearchPromptChange()
+        {
+            SearchPrompt.Recreate(terminal);
+
+            history.Reset();
+            var result = history.ReverseSearch(search.Value);
+            terminal.WriteNoMove(result, SearchPrompt.Skip);
+        }
+
         public void HandleControlSequence(ControlSequence seq)
         {
             switch(seq.Type)
@@ -205,11 +214,7 @@ namespace AntShell
                     }
                     else if(mode == Mode.Search)
                     {
-                        SearchPrompt.Recreate(terminal);
-
-                        history.Reset();
-                        var result = history.ReverseSearch(search.Value);
-                        terminal.WriteNoMove(result, SearchPrompt.Skip);
+                        HandleSearchPromptChange();
                     }
                 }
                 break;
@@ -224,11 +229,7 @@ namespace AntShell
                     }
                     else if(mode == Mode.Search)
                     {
-                        SearchPrompt.Recreate(terminal);
-
-                        history.Reset();
-                        var result = history.ReverseSearch(search.Value);
-                        terminal.WriteNoMove(result, SearchPrompt.Skip);
+                        HandleSearchPromptChange();
                     }
                 }
                 break;
@@ -313,10 +314,7 @@ namespace AntShell
                             }
                             else if(mode == Mode.Search)
                             {
-                                SearchPrompt.Recreate(terminal);
-                                history.Reset();
-                                var result = history.ReverseSearch(search.Value);
-                                terminal.WriteNoMove(result);
+                                HandleSearchPromptChange();
                             }
                         }
                     }
@@ -331,10 +329,7 @@ namespace AntShell
                     }
                     else if(mode == Mode.Search)
                     {
-                        SearchPrompt.Recreate(terminal);
-                        history.Reset();
-                        var result = history.ReverseSearch(search.Value);
-                        terminal.WriteNoMove(result);
+                        HandleSearchPromptChange();
                     }
                     break;
 
@@ -384,11 +379,7 @@ namespace AntShell
                     }
                     else if(mode == Mode.Search)
                     {
-                        SearchPrompt.Recreate(terminal);
-
-                        history.Reset();
-                        var result = history.ReverseSearch(search.Value);
-                        terminal.WriteNoMove(result, SearchPrompt.Skip);
+                        HandleSearchPromptChange();
                     }
                     break;
 
