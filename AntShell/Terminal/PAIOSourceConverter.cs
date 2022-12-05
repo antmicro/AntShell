@@ -112,6 +112,7 @@ namespace AntShell.Terminal
             public void Halt()
             {
                 loopAgain = false;
+                Resume();
                 thread.Join();
             }
 
