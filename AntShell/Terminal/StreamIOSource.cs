@@ -90,6 +90,14 @@ namespace AntShell.Terminal
             {
                 return -1;
             }
+            catch(AggregateException ae)
+            {
+                // The `cancellationToken` will not actually cancel the read so it may throw
+                // an `IOException` in case the file descriptor is disposed externally but
+                // if the token is cancelled we can assume that's the expected behavior
+                ae.Handle(x => (x is IOException) && cancellationToken.Token.IsCancellationRequested);
+                return -1;
+            }
         }
 
         public void CancelRead()
