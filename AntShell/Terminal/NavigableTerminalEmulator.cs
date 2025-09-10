@@ -88,6 +88,16 @@ namespace AntShell.Terminal
 
             validator.Add(ControlSequenceType.CtrlLeftArrow, (char)SequenceElement.ESC, (char)SequenceElement.CSI, '1', ';', '5', 'D');
             validator.Add(ControlSequenceType.CtrlRightArrow, (char)SequenceElement.ESC, (char)SequenceElement.CSI, '1', ';', '5', 'C');
+            // Alt is sent as an ESC prefix in terminal emulators, and ESC treats lowercase/uppercase differently,
+            // which is why we handle both cases separately
+            validator.Add(ControlSequenceType.CtrlRightArrow, (char)SequenceElement.ESC, 'f');
+            validator.Add(ControlSequenceType.CtrlRightArrow, (char)SequenceElement.ESC, 'F');
+            validator.Add(ControlSequenceType.CtrlLeftArrow, (char)SequenceElement.ESC, 'b');
+            validator.Add(ControlSequenceType.CtrlLeftArrow, (char)SequenceElement.ESC, 'B');
+
+            validator.Add(ControlSequenceType.AltBackspace, (char)SequenceElement.ESC, (char)0x7f);
+            validator.Add(ControlSequenceType.AltD, (char)SequenceElement.ESC, (char)'d');
+            validator.Add(ControlSequenceType.AltD, (char)SequenceElement.ESC, (char)'D');
 
             validator.Add(ControlSequenceType.Delete, (char)SequenceElement.ESC, (char)SequenceElement.CSI, '3', '~');
 
@@ -107,6 +117,12 @@ namespace AntShell.Terminal
             validator.Add(new ControlSequence(ControlSequenceType.Ctrl, 'c'), (char)3);
             validator.Add(new ControlSequence(ControlSequenceType.Ctrl, 'd'), (char)4);
             validator.Add(new ControlSequence(ControlSequenceType.Ctrl, 'u'), (char)21);
+            validator.Add(new ControlSequence(ControlSequenceType.Ctrl, 'a'), (char)1);
+            validator.Add(new ControlSequence(ControlSequenceType.Ctrl, 'e'), (char)5);
+            validator.Add(new ControlSequence(ControlSequenceType.Ctrl, 'f'), (char)6);
+            validator.Add(new ControlSequence(ControlSequenceType.Ctrl, 'b'), (char)2);
+            validator.Add(new ControlSequence(ControlSequenceType.Ctrl, 'p'), (char)16);
+            validator.Add(new ControlSequence(ControlSequenceType.Ctrl, 'n'), (char)14);
 
             validator.Add(ControlSequenceType.Tab, '\t');
             validator.Add(ControlSequenceType.Backspace, (char)127);

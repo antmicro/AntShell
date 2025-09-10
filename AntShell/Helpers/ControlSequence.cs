@@ -59,6 +59,9 @@ namespace AntShell.Helpers
         Esc,
         Tab,
 
+        AltBackspace,
+        AltD,
+
         Ctrl
     }
 }

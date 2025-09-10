@@ -118,6 +118,19 @@ namespace AntShell
             return diff;
         }
 
+        public int RemoveWordForward()
+        {
+            var diff = DiffNextWord();
+            var previousPosition = Position;
+
+            if(diff > 0)
+            {
+                bldr.Remove(previousPosition, diff);
+            }
+
+            return diff;
+        }
+
         #endregion
 
         #region Move Cursor

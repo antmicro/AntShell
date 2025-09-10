@@ -127,6 +127,38 @@ namespace AntShell
             terminal.WriteNoMove(result, SearchPrompt.Skip);
         }
 
+        private void RedrawCommandLine()
+        {
+            if(mode == Mode.Command || mode == Mode.UserInput)
+            {
+                terminal.ClearToTheEndOfLine();
+                terminal.WriteNoMove(CurrentEditor.ToString(CurrentEditor.Position));
+            }
+            else if(mode == Mode.Search)
+            {
+                HandleSearchPromptChange();
+            }
+        }
+
+        private void RemoveWord()
+        {
+            var diff = CurrentEditor.RemoveWord();
+            if(diff > 0)
+            {
+                terminal.CursorBackward(diff);
+                RedrawCommandLine();
+            }
+        }
+
+        private void RemoveWordForward()
+        {
+            var diff = CurrentEditor.RemoveWordForward();
+            if(diff > 0)
+            {
+                RedrawCommandLine();
+            }
+        }
+
         private void HistoryPrevious()
         {
             if(!history.HasMoved)
@@ -223,6 +255,10 @@ namespace AntShell
                 }
                 break;
 
+            case ControlSequenceType.AltBackspace:
+                RemoveWord();
+                break;
+
             case ControlSequenceType.Delete:
                 if(CurrentEditor.RemoveNextCharacter())
                 {
@@ -236,6 +272,10 @@ namespace AntShell
                         HandleSearchPromptChange();
                     }
                 }
+                break;
+
+            case ControlSequenceType.AltD:
+                RemoveWordForward();
                 break;
 
             case ControlSequenceType.CtrlLeftArrow:
@@ -255,6 +295,50 @@ namespace AntShell
             case ControlSequenceType.Ctrl:
                 switch((char)seq.Argument)
                 {
+                case 'a':
+                    {
+                        var diff = CurrentEditor.MoveHome();
+                        terminal.CursorBackward(diff);
+                    }
+                    break;
+
+                case 'e':
+                    {
+                        var diff = CurrentEditor.MoveEnd();
+                        terminal.CursorForward(diff);
+                    }
+                    break;
+
+                case 'f':
+                    if(CurrentEditor.MoveCharacterForward())
+                    {
+                        terminal.CursorForward();
+                    }
+                    break;
+
+                case 'b':
+                    if(CurrentEditor.MoveCharacterBackward())
+                    {
+                        terminal.CursorBackward();
+                    }
+                    break;
+
+                case 'p':
+                    if(mode == Mode.UserInput)
+                    {
+                        break;
+                    }
+                    HistoryPrevious();
+                    break;
+
+                case 'n':
+                    if(mode == Mode.UserInput)
+                    {
+                        break;
+                    }
+                    HistoryNext();
+                    break;
+
                 case 'c':
                     if(mode == Mode.Command)
                     {
@@ -306,22 +390,7 @@ namespace AntShell
                     break;
 
                 case 'w':
-                    {
-                        var diff = CurrentEditor.RemoveWord();
-                        if(diff > 0)
-                        {
-                            terminal.CursorBackward(diff);
-                            if(mode == Mode.Command || mode == Mode.UserInput)
-                            {
-                                terminal.ClearToTheEndOfLine();
-                                terminal.WriteNoMove(CurrentEditor.ToString(CurrentEditor.Position));
-                            }
-                            else if(mode == Mode.Search)
-                            {
-                                HandleSearchPromptChange();
-                            }
-                        }
-                    }
+                    RemoveWord();
                     break;
 
                 case 'k':
