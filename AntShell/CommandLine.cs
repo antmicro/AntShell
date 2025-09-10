@@ -127,6 +127,37 @@ namespace AntShell
             terminal.WriteNoMove(result, SearchPrompt.Skip);
         }
 
+        private void HistoryPrevious()
+        {
+            if(!history.HasMoved)
+            {
+                history.SetCurrentCommand(CurrentEditor.Value);
+            }
+
+            var prev = history.PreviousCommand();
+            if(prev != null)
+            {
+                var len = CurrentEditor.Position;
+                CurrentEditor.SetValue(prev);
+                terminal.CursorBackward(len);
+                terminal.ClearToTheEndOfLine();
+                terminal.Write(CurrentEditor.Value);
+            }
+        }
+
+        private void HistoryNext()
+        {
+            var cmd = history.NextCommand();
+            if(cmd != null)
+            {
+                var len = CurrentEditor.Position;
+                CurrentEditor.SetValue(cmd);
+                terminal.CursorBackward(len);
+                terminal.ClearToTheEndOfLine();
+                terminal.Write(CurrentEditor.Value);
+            }
+        }
+
         public void HandleControlSequence(ControlSequence seq)
         {
             switch(seq.Type)
@@ -160,46 +191,19 @@ namespace AntShell
                 break;
 
             case ControlSequenceType.UpArrow:
+                if(mode == Mode.UserInput)
                 {
-                    if(mode == Mode.UserInput)
-                    {
-                        break;
-                    }
-
-                    if(!history.HasMoved)
-                    {
-                        history.SetCurrentCommand(CurrentEditor.Value);
-                    }
-
-                    var prev = history.PreviousCommand();
-                    if(prev != null)
-                    {
-                        var len = CurrentEditor.Position;
-                        CurrentEditor.SetValue(prev);
-                        terminal.CursorBackward(len);
-                        terminal.ClearToTheEndOfLine();
-                        terminal.Write(CurrentEditor.Value);
-                    }
+                    break;
                 }
+                HistoryPrevious();
                 break;
 
             case ControlSequenceType.DownArrow:
+                if(mode == Mode.UserInput)
                 {
-                    if(mode == Mode.UserInput)
-                    {
-                        break;
-                    }
-
-                    var cmd = history.NextCommand();
-                    if(cmd != null)
-                    {
-                        var len = CurrentEditor.Position;
-                        CurrentEditor.SetValue(cmd);
-                        terminal.CursorBackward(len);
-                        terminal.ClearToTheEndOfLine();
-                        terminal.Write(CurrentEditor.Value);
-                    }
+                    break;
                 }
+                HistoryNext();
                 break;
 
             case ControlSequenceType.Backspace:
