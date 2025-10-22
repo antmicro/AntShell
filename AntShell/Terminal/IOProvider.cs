@@ -1,4 +1,4 @@
-﻿﻿﻿// *******************************************************************
+﻿// *******************************************************************
 //
 //  Copyright (c) 2013-2022, Antmicro Ltd <antmicro.com>
 //
@@ -25,6 +25,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+
 using AntShell.Encoding;
 
 namespace AntShell.Terminal
@@ -123,7 +124,7 @@ namespace AntShell.Terminal
 
         public void Write(char c)
         {
-            foreach(var b in encoding.GetBytes(new [] { c }))
+            foreach(var b in encoding.GetBytes(new[] { c }))
             {
                 Write(b);
             }
@@ -229,7 +230,7 @@ namespace AntShell.Terminal
                 throw new InvalidOperationException("Cannot use 'Inject' method when a callback is attached to 'ByteRead' event.");
             }
 
-            foreach(var b in encoding.GetBytes(new [] { c }))
+            foreach(var b in encoding.GetBytes(new[] { c }))
             {
                 localBuffer.Enqueue(b);
             }
@@ -273,4 +274,3 @@ namespace AntShell.Terminal
         private readonly System.Text.Encoding encoding;
     }
 }
-
