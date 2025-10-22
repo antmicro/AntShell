@@ -200,6 +200,8 @@ namespace AntShell.Terminal
             }
         }
 
+        public bool IsBackendSet => backend != null;
+
         public event Action<int> ByteRead
         {
             add
