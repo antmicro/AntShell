@@ -113,6 +113,7 @@ namespace AntShell.Terminal
 
             validator.Add(new ControlSequence(ControlSequenceType.Ctrl, 'k'), (char)11);
             validator.Add(new ControlSequence(ControlSequenceType.Ctrl, 'r'), (char)18);
+            validator.Add(new ControlSequence(ControlSequenceType.Ctrl, 's'), (char)19);
             validator.Add(new ControlSequence(ControlSequenceType.Ctrl, 'w'), (char)23);
             validator.Add(new ControlSequence(ControlSequenceType.Ctrl, 'c'), (char)3);
             validator.Add(new ControlSequence(ControlSequenceType.Ctrl, 'd'), (char)4);

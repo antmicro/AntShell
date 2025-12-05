@@ -55,6 +55,11 @@ namespace AntShell
 
         #region Search
 
+        public string Search(string command)
+        {
+            return searchForward ? ForwardSearch(command) : ReverseSearch(command);
+        }
+
         public string ReverseSearch(string command)
         {
             if(command != string.Empty)
@@ -71,7 +76,29 @@ namespace AntShell
                     lPos--;
                 }
             }
-			
+
+            position = 0;
+            return null;
+        }
+
+        public string ForwardSearch(string command)
+        {
+            if(command != string.Empty)
+            {
+                int lPos = position + 1;
+                while(lPos < items.Count)
+                {
+                    if(items[lPos].Contains(command))
+                    {
+                        position = lPos;
+                        return items[lPos];
+                    }
+
+                    lPos++;
+                }
+            }
+
+            position = items.Count;
             return null;
         }
 
@@ -123,6 +150,8 @@ namespace AntShell
         }
 
         #endregion
+
+        public bool searchForward = false;
 
         #region Private fields
 

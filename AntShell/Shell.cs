@@ -51,7 +51,8 @@ namespace AntShell
                 line.PreprocessSuggestionsInput = settings.PreprocessSuggestionsInput;
                 line.NormalPrompt = settings.NormalPrompt;
                 line.DirectorySeparatorChar = settings.DirectorySeparator;
-                line.SearchPrompt = settings.SearchPrompt ?? new SearchPrompt("search `{0}`> ", ConsoleColor.Yellow);
+                line.ReverseSearchPrompt = settings.SearchPrompt ?? new SearchPrompt("search `{0}`> ", ConsoleColor.Yellow);
+                line.ForwardSearchPrompt = settings.ForwardSearchPrompt ?? new SearchPrompt("fwd-search `{0}`> ", ConsoleColor.Yellow);
                 Writer = new CommandInteraction(term, line);
             }
         }
@@ -195,7 +196,7 @@ namespace AntShell
                 history.Reset();
             }
 
-            return history.ReverseSearch(arg);
+            return history.Search(arg);
         }
 
         public string[] SuggestionNeeded(string arg)

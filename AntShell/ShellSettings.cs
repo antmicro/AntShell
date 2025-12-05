@@ -34,6 +34,8 @@ namespace AntShell
 
         public SearchPrompt SearchPrompt { get; set; }
 
+        public SearchPrompt ForwardSearchPrompt { get; set; }
+
         public Func<string> BannerProvider { get; set; }
 
         public Func<string, string> PreprocessSuggestionsInput { get; set; }

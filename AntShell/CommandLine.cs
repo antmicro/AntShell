@@ -46,17 +46,39 @@ namespace AntShell
 
         public Prompt NormalPrompt { get; set; }
 
-        private SearchPrompt _searchPrompt;
+        private SearchPrompt _reverseSearchPrompt;
 
-        public SearchPrompt SearchPrompt
+        private SearchPrompt _forwardSearchPrompt;
+
+        public SearchPrompt ReverseSearchPrompt
         {
-            get { return _searchPrompt; }
+            get
+            {
+                return _reverseSearchPrompt;
+            }
+
             set
             {
-                _searchPrompt = value;
-                _searchPrompt.SetCommandEditor(search);
+                _reverseSearchPrompt = value;
+                _reverseSearchPrompt.SetCommandEditor(search);
             }
         }
+
+        public SearchPrompt ForwardSearchPrompt
+        {
+            get
+            {
+                return _forwardSearchPrompt;
+            }
+
+            set
+            {
+                _forwardSearchPrompt = value;
+                _forwardSearchPrompt.SetCommandEditor(search);
+            }
+        }
+
+        public SearchPrompt SearchPrompt => history.searchForward ? _forwardSearchPrompt : _reverseSearchPrompt;
 
         private CommandHistory history;
         private ICommandHandler handler;
@@ -123,7 +145,7 @@ namespace AntShell
             SearchPrompt.Recreate(terminal);
 
             history.Reset();
-            var result = history.ReverseSearch(search.Value);
+            var result = history.Search(search.Value);
             terminal.WriteNoMove(result, SearchPrompt.Skip);
         }
 
@@ -293,6 +315,7 @@ namespace AntShell
                 break;
 
             case ControlSequenceType.Ctrl:
+                var searchForward = false;
                 switch((char)seq.Argument)
                 {
                 case 'a':
@@ -360,6 +383,9 @@ namespace AntShell
 
                     break;
 
+                case 's':
+                    searchForward = true;
+                    goto case 'r';
                 case 'r':
                     if(mode == Mode.UserInput)
                     {
@@ -367,6 +393,7 @@ namespace AntShell
                     }
                     else if(mode == Mode.Command)
                     {
+                        history.searchForward = searchForward;
                         mode = Mode.Search;
                         terminal.CursorBackward(command.MoveHome());
                         terminal.ClearLine();
@@ -379,7 +406,13 @@ namespace AntShell
                     {
                         if(search.Value != string.Empty)
                         {
-                            var result = history.ReverseSearch(search.Value);
+                            if(history.searchForward != searchForward)
+                            {
+                                history.searchForward = searchForward;
+                                terminal.ClearLine();
+                                CurrentPrompt.Write(terminal);
+                            }
+                            var result = history.Search(search.Value);
                             terminal.CursorForward(SearchPrompt.Skip);
                             terminal.ClearToTheEndOfLine();
                             terminal.WriteNoMove(result);
@@ -617,7 +650,7 @@ namespace AntShell
                     SearchPrompt.Recreate(terminal, -1);
 
                     history.Reset();
-                    var result = history.ReverseSearch(search.Value);
+                    var result = history.Search(search.Value);
                     terminal.WriteNoMove(result, SearchPrompt.Skip);
                 }
             }
