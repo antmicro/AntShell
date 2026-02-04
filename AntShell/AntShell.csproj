@@ -70,6 +70,7 @@
     <Compile Include="Terminal\NavigableTerminalEmulator.cs" />
     <Compile Include="Terminal\StreamIOSource.cs" />
     <Compile Include="Terminal\IOProvider.cs" />
+    <Compile Include="Terminal\ISizeSource.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
