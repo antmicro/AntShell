@@ -121,6 +121,13 @@ namespace AntShell.Terminal
             return ((IPassiveIOSource)Backend).Read();
         }
 
+        public void Write(string str)
+        {
+            foreach(var b in encoding.GetBytes(str))
+            {
+                Write(b);
+            }
+        }
 
         public void Write(char c)
         {

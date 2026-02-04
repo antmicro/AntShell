@@ -22,10 +22,6 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 // *******************************************************************
-using System;
-
-using AntShell.Helpers;
-
 namespace AntShell.Terminal
 {
     public class BasicTerminalEmulator
@@ -58,7 +54,18 @@ namespace AntShell.Terminal
             }
         }
 
+        protected void SendCSI()
+        {
+            SendControlSequence((byte)SequenceElement.ESC, (byte)SequenceElement.CSI);
+        }
+
         protected void SendCSI(params byte[] seq)
+        {
+            SendControlSequence((byte)SequenceElement.ESC, (byte)SequenceElement.CSI);
+            SendControlSequence(seq);
+        }
+
+        protected void SendCSI(params string[] seq)
         {
             SendControlSequence((byte)SequenceElement.ESC, (byte)SequenceElement.CSI);
             SendControlSequence(seq);
