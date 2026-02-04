@@ -24,6 +24,8 @@ namespace AntShell.Helpers
 {
     public struct Position
     {
+        public static Position operator -(Position a, Position b) => new Position(a.X - b.X, a.Y - b.Y);
+
         public int X { get; set; }
 
         public int Y { get; set; }
@@ -32,11 +34,6 @@ namespace AntShell.Helpers
         {
             X = x;
             Y = y;
-        }
-
-        public Position Diff(Position p)
-        {
-            return new Position(X - p.X, Y - p.Y);
         }
 
         public void Move(Position move)
