@@ -22,7 +22,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 namespace AntShell.Helpers
 {
-    public class Position
+    public struct Position
     {
         public int X { get; set; }
 
@@ -53,11 +53,6 @@ namespace AntShell.Helpers
         public void IncrementY()
         {
             Y++;
-        }
-
-        public Position Clone()
-        {
-            return new Position(X, Y);
         }
     }
 }

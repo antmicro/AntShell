@@ -634,7 +634,7 @@ namespace AntShell.Terminal
 
         public void SaveCursor()
         {
-            savedPosition = vcursor.RealPosition.Clone();
+            savedPosition = vcursor.RealPosition;
             scrollCount = LinesScrolled;
             SendCSI((byte)'s');
         }
@@ -642,7 +642,7 @@ namespace AntShell.Terminal
         public void RestoreCursor()
         {
             SendCSI((byte)'u');
-            vcursor.RealPosition = savedPosition.Clone();
+            vcursor.RealPosition = savedPosition;
 
             var scrolled = LinesScrolled - scrollCount;
             CursorUp(scrolled);
@@ -738,7 +738,7 @@ namespace AntShell.Terminal
         {
             if(forceVirtualCursor)
             {
-                return vcursor.RealPosition.Clone();
+                return vcursor.RealPosition;
             }
 
             var unusedCharacters = new List<char>();
@@ -778,7 +778,7 @@ namespace AntShell.Terminal
                             {
                                 InputOutput.Inject(uc);
                             }
-                            return cs.Argument as Position;
+                            return (Position)cs.Argument;
                         }
                         break;
                     }

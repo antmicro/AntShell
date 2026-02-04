@@ -35,7 +35,7 @@ namespace AntShell.Terminal
             MaxReachedPosition = new Position(1, 1);
         }
 
-        public Position RealPosition { get; set; }
+        public Position RealPosition;
 
         public Position BackPosition
         {
@@ -45,9 +45,9 @@ namespace AntShell.Terminal
             }
         }
 
-        public Position MaxReachedPosition { get; private set; }
+        public Position MaxReachedPosition;
 
-        public Position MaxPosition { get; private set; }
+        public Position MaxPosition;
 
         public bool IsCursorOutOfLine { get; private set; }
 
@@ -55,9 +55,9 @@ namespace AntShell.Terminal
 
         public void Calibrate(Position pos, Position maxPos)
         {
-            RealPosition = pos.Clone();
-            MaxReachedPosition = pos.Clone();
-            MaxPosition = maxPos.Clone();
+            RealPosition = pos;
+            MaxReachedPosition = pos;
+            MaxPosition = maxPos;
         }
 
         public void MoveUp(int n = 1)
