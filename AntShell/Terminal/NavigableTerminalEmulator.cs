@@ -30,33 +30,26 @@ namespace AntShell.Terminal
 {
     public class NavigableTerminalEmulator : BasicTerminalEmulator
     {
-        private const int MAX_HEIGHT = 9999;
-        private const int MAX_WIDTH = 9999;
-
         private SequenceValidator validator;
         private Queue<char> sequenceQueue;
 
         public ITerminalHandler Handler { get; set; }
 
-        private VirtualCursor vcursor;
+        public ISizeSource SizeSource;
 
-        private List<int> WrappedLines;
-        private int CurrentLine;
-        private int LinesScrolled;
+        private VirtualCursor vcursor;
 
         private bool onceAgain;
 
         private bool clearScreen = false;
-        private bool forceVirtualCursor = false;
 
-        public NavigableTerminalEmulator(IOProvider io, bool forceVCursor = false) : base(io)
+        public NavigableTerminalEmulator(IOProvider io, ISizeSource size) : base(io)
         {
             validator = new SequenceValidator();
             sequenceQueue = new Queue<char>();
 
-            forceVirtualCursor = forceVCursor;
-            WrappedLines = new List<int>();
             vcursor = new VirtualCursor();
+            SizeSource = size;
 
             ControlSequences();
         }
@@ -70,6 +63,24 @@ namespace AntShell.Terminal
                 ResetCursor();
             }
             ResetColors();
+
+            if(SizeSource != null)
+            {
+                vcursor.TermWidth = SizeSource.Size.X;
+                SizeSource.Resized += OnResize;
+            }
+        }
+
+        private void OnResize()
+        {
+            if(SizeSource == null) return;
+
+            vcursor.TermWidth = SizeSource.Size.X;
+
+            CursorToStart();
+            ClearToEndOfScreen();
+
+            Handler.Redraw();
         }
 
         private void ControlSequences()
@@ -149,12 +160,15 @@ namespace AntShell.Terminal
             if(clearScreen)
             {
                 ClearScreen();
-                CursorToColumn(1);
-                CursorUp(MAX_HEIGHT);
+                ResetCursor();
             }
             ResetColors();
 
             onceAgain = false;
+            if(SizeSource != null)
+            {
+                SizeSource.Resized -= OnResize;
+            }
             InputOutput.CancelGet();
             InputOutput.Dispose();
         }
@@ -250,17 +264,6 @@ namespace AntShell.Terminal
 
         #endregion
 
-        private void OnScreenScroll()
-        {
-            LinesScrolled++;
-        }
-
-        private void OnLineWrapped()
-        {
-            WrappedLines.Add(vcursor.MaxPosition.X + 1);
-            CurrentLine++;
-        }
-
         #region Writers
 
         internal int Write(string text, ConsoleColor? color = null)
@@ -288,22 +291,15 @@ namespace AntShell.Terminal
 
         public void WriteNoMove(string text, int skip = 0, ConsoleColor? color = null)
         {
-            if(text != null)
-            {
-                var ep = vcursor.RealPosition;
-                var currline = CurrentLine;
+            if(text == null) return;
 
-                HideCursor();
+            HideCursor();
 
-                CursorForward(skip);
-                var count = Write(text, color);
-                CursorBackward(count + skip);
+            CursorAdvance(skip);
+            var count = Write(text, color);
+            CursorAdvance(-(count + skip));
 
-                ShowCursor();
-
-                vcursor.RealPosition = ep;
-                CurrentLine = currline;
-            }
+            ShowCursor();
         }
 
         public void WriteRaw(char c, ConsoleColor? color = null)
@@ -368,36 +364,15 @@ namespace AntShell.Terminal
             {
                 if(c == '\r')
                 {
-                    vcursor.RealPosition.X = 1;
+                    vcursor.LineFeed();
                 }
                 else if(c == '\n')
                 {
-                    var scrolled = !vcursor.MoveDown();
-                    if(scrolled)
-                    {
-                        OnScreenScroll();
-                    }
+                    vcursor.NewLine();
                 }
                 else
                 {
-                    var result = vcursor.MoveForward();
-
-                    if(vcursor.IsCursorOutOfLine && !vcursor.IsCursorOutOfScreen)
-                    {
-                        CursorDown();
-                        CursorToColumn(1);
-                    }
-
-                    if(result == VirtualCursorMoveResult.LineWrapped)
-                    {
-                        OnLineWrapped();
-                    }
-
-                    if(result == VirtualCursorMoveResult.ScreenScrolled)
-                    {
-                        OnLineWrapped();
-                        OnScreenScroll();
-                    }
+                    CursorAdvance(1, moveCursor: false);
                 }
 
                 return true;
@@ -417,186 +392,101 @@ namespace AntShell.Terminal
 
         #region Cursor movement
 
-        public void CursorUp(int n = 1, bool recalculateEstimatedPosition = true)
+        public void CursorUp(int n = 1)
         {
-            if(n > 0)
-            {
-                SendCSI();
-                if(n > 1)
-                {
-                    SendControlSequence(n.ToString());
-                }
-
-                SendControlSequence((byte)'A');
-
-                if(recalculateEstimatedPosition)
-                {
-                    vcursor.MoveUp(n);
-                }
-            }
+            if(n == 0) return;
+            SendCSI($"{n}A");
         }
 
-        public void CursorDown(int n = 1, bool recalculateEstimatedPosition = true)
+        public void CursorDown(int n = 1)
         {
-            if(n > 0)
-            {
-                SendCSI();
-                if(n > 1)
-                {
-                    SendControlSequence(n.ToString());
-                }
-
-                SendControlSequence((byte)'B');
-
-                if(recalculateEstimatedPosition)
-                {
-                    vcursor.MoveDown(n);
-                }
-            }
+            if(n == 0) return;
+            SendCSI($"{n}B");
         }
 
-        public void CursorForward(int n = 1)
+        public void CursorLeft(int n = 1)
         {
-            if(n > 0)
-            {
-                var move = vcursor.CalculateMoveForward(n);
+            if(n == 0) return;
+            SendCSI($"{n}D");
+        }
 
+        public void CursorRight(int n = 1)
+        {
+            if(n == 0) return;
+            SendCSI($"{n}C");
+        }
+
+        public void CursorMoveBy(Position move)
+        {
+            if(move.Y > 0)
+            {
                 CursorDown(move.Y);
-
-                n = Math.Abs(move.X);
-
-                if(n != 0)
-                {
-                    SendCSI();
-                }
-                if(n > 1)
-                {
-                    SendControlSequence(n.ToString());
-                }
-                if(move.X > 0)
-                {
-                    SendControlSequence((byte)'C');
-                    vcursor.MoveForward(n, true);
-                }
-                else if(move.X < 0)
-                {
-                    SendControlSequence((byte)'D');
-                    vcursor.MoveBackward(n);
-                }
-
-                CurrentLine = vcursor.RealPosition.X == 1 ? CurrentLine - (move.Y - 1) : CurrentLine - move.Y;
-
-                if(vcursor.IsCursorOutOfScreen)
-                {
-                    ScrollDown();
-                }
             }
-        }
-
-        public void CursorBackward(int n = 1)
-        {
-            if(n > 0)
+            else if(move.Y < 0)
             {
-                var vb = (vcursor.RealPosition.X == 1);
-                var move = vcursor.CalculateMoveBackward(n);
-
-                CurrentLine = Math.Max(0, CurrentLine + (vb ? move.Y + 1 : move.Y));
-
                 CursorUp(-move.Y);
-                n = Math.Abs(move.X);
-
-                if(n != 0)
-                {
-                    SendCSI();
-                }
-                if(n > 1)
-                {
-                    SendControlSequence(n.ToString());
-                }
-                if(move.X < 0)
-                {
-                    SendControlSequence((byte)'D');
-                    vcursor.MoveBackward(n);
-                }
-                else if(move.X > 0)
-                {
-                    SendControlSequence((byte)'C');
-                    vcursor.MoveForward(n, false);
-                }
+            }
+            if(move.X > 0)
+            {
+                CursorRight(move.X);
+            }
+            else if(move.X < 0)
+            {
+                CursorLeft(-move.X);
             }
         }
 
-        public void CursorToColumn(int n, bool recalculateEstimatedPosition = true)
+        public void CursorToColumn(int col)
         {
-            SendCSI();
-            SendControlSequence(n.ToString());
-            SendControlSequence((byte)'G');
+            SendCSI($"{col}G");
+        }
 
-            if(recalculateEstimatedPosition)
+        public void CursorAdvance(int n, bool moveCursor = true)
+        {
+            var move = vcursor.Move(n);
+            if(moveCursor)
             {
-                vcursor.SetX(n);
+                CursorMoveBy(move.Delta);
             }
+            if(move.NeedNewLine)
+            {
+                RevealNewLine();
+            }
+        }
+
+        public void CursorToStart()
+        {
+            var move = vcursor.MoveToStart();
+            CursorMoveBy(move.Delta);
+            CursorToColumn(1);
         }
 
         public void NewLine()
         {
             Write("\n\r");
-            CurrentLine = 0;
-            WrappedLines.Clear();
+        }
 
+        // NOTE: This assumes the cursor is at the right edge of the screen.
+        //
+        // Moves to beginning of the next line without a newline
+        public void RevealNewLine()
+        {
+            SendControlSequence(" \r");
         }
 
         #endregion
 
         #region Erase
 
-        public void ClearLine()
+        public void ClearLineToEndOfScreen()
         {
-            SendCSI((byte)'2', (byte)'K');
-            CursorToColumn(0);
-
-            var count = vcursor.MaxReachedPosition.Y - vcursor.RealPosition.Y;
-            CursorDown(count);
-            for(int i = count; i > 0; i--)
-            {
-                SendCSI((byte)'2', (byte)'K'); // clear line
-                CursorUp();
-                if(WrappedLines.Count - i >= 0)
-                {
-                    WrappedLines.RemoveAt(WrappedLines.Count - i);
-                }
-            }
-
-            CurrentLine = 0;
-
-            vcursor.MaxReachedPosition.X = vcursor.RealPosition.X;
-            vcursor.MaxReachedPosition.Y = vcursor.RealPosition.Y;
+            SendCSI("2K");
+            SendCSI("J");
         }
 
-        public void ClearToTheEndOfLine()
+        public void ClearToEndOfScreen()
         {
-            var count = vcursor.MaxReachedPosition.Y - vcursor.RealPosition.Y;
-            CursorDown(count);
-            for(int i = count; i > 0; i--)
-            {
-                SendCSI((byte)'2', (byte)'K'); // clear line
-                CursorUp();
-
-                if(WrappedLines.Count > 0 && WrappedLines.Count - i > 0)
-                {
-                    WrappedLines.RemoveAt(WrappedLines.Count - i);
-                }
-            }
-
-            SendCSI((byte)'K');
-
-            vcursor.MaxReachedPosition.X = vcursor.RealPosition.X;
-            vcursor.MaxReachedPosition.Y = vcursor.RealPosition.Y;
-        }
-
-        public void ClearDown()
-        {
-            SendCSI((byte)'J');
+            SendCSI("J");
         }
 
         #endregion
@@ -609,55 +499,50 @@ namespace AntShell.Terminal
             {
                 return;
             }
-            SendCSI((byte)'0', (byte)'m'); // reset colors
+            SendCSI("0m"); // reset colors
         }
-
-        public void Calibrate()
-        {
-            if(forceVirtualCursor)
-            {
-                vcursor.Calibrate(new Position(0, 0), new Position(MAX_WIDTH, MAX_HEIGHT));
-            }
-            else
-            {
-                vcursor.Calibrate(GetCursorPosition(), GetSize());
-            }
-        }
-
-        public void ScrollDown()
-        {
-            SendControlSequence((byte)SequenceElement.ESC, (byte)'D');
-        }
-
-        private Position savedPosition;
-        private int scrollCount;
 
         public void SaveCursor()
         {
-            savedPosition = vcursor.RealPosition;
-            scrollCount = LinesScrolled;
-            SendCSI((byte)'s');
+            SendCSI("s");
         }
 
         public void RestoreCursor()
         {
-            SendCSI((byte)'u');
-            vcursor.RealPosition = savedPosition;
-
-            var scrolled = LinesScrolled - scrollCount;
-            CursorUp(scrolled);
+            SendCSI("u");
         }
 
         public void HideCursor()
         {
-            SendCSI();
-            SendControlSequence("?25l");
+            SendCSI("?25l");
         }
 
         public void ShowCursor()
         {
-            SendCSI();
-            SendControlSequence("?25h");
+            SendCSI("?25h");
+        }
+
+        private static int[] colorSGINumbers;
+
+        static NavigableTerminalEmulator()
+        {
+            colorSGINumbers = new int[16];
+            colorSGINumbers[(int)ConsoleColor.Black] = 30;
+            colorSGINumbers[(int)ConsoleColor.DarkRed] = 31;
+            colorSGINumbers[(int)ConsoleColor.DarkGreen] = 32;
+            colorSGINumbers[(int)ConsoleColor.DarkYellow] = 33;
+            colorSGINumbers[(int)ConsoleColor.DarkBlue] = 34;
+            colorSGINumbers[(int)ConsoleColor.DarkMagenta] = 35;
+            colorSGINumbers[(int)ConsoleColor.DarkCyan] = 36;
+            colorSGINumbers[(int)ConsoleColor.Gray] = 37;
+            colorSGINumbers[(int)ConsoleColor.DarkGray] = 90;
+            colorSGINumbers[(int)ConsoleColor.Red] = 91;
+            colorSGINumbers[(int)ConsoleColor.Green] = 92;
+            colorSGINumbers[(int)ConsoleColor.Yellow] = 93;
+            colorSGINumbers[(int)ConsoleColor.Blue] = 94;
+            colorSGINumbers[(int)ConsoleColor.Magenta] = 95;
+            colorSGINumbers[(int)ConsoleColor.Cyan] = 96;
+            colorSGINumbers[(int)ConsoleColor.White] = 97;
         }
 
         public void SetColor(ConsoleColor color)
@@ -666,126 +551,9 @@ namespace AntShell.Terminal
             {
                 return;
             }
-            switch(color)
-            {
-            case ConsoleColor.Black:
-                SendCSI((byte)SequenceElement.SEM, (byte)'0', (byte)'3', (byte)'0', (byte)'m');
-                break;
-            case ConsoleColor.Red:
-                SendCSI((byte)SequenceElement.SEM, (byte)'0', (byte)'3', (byte)'1', (byte)'m');
-                break;
-            case ConsoleColor.Green:
-                SendCSI((byte)SequenceElement.SEM, (byte)'0', (byte)'3', (byte)'2', (byte)'m');
-                break;
-            case ConsoleColor.Yellow:
-                SendCSI((byte)SequenceElement.SEM, (byte)'0', (byte)'3', (byte)'3', (byte)'m');
-                break;
-            case ConsoleColor.Blue:
-                SendCSI((byte)SequenceElement.SEM, (byte)'0', (byte)'3', (byte)'4', (byte)'m');
-                break;
-            case ConsoleColor.Magenta:
-                SendCSI((byte)SequenceElement.SEM, (byte)'0', (byte)'3', (byte)'5', (byte)'m');
-                break;
-            case ConsoleColor.Cyan:
-                SendCSI((byte)SequenceElement.SEM, (byte)'0', (byte)'3', (byte)'6', (byte)'m');
-                break;
-            case ConsoleColor.Gray:
-                SendCSI((byte)SequenceElement.SEM, (byte)'0', (byte)'3', (byte)'7', (byte)'m');
-                break;
 
-            case ConsoleColor.DarkGray:
-                SendCSI((byte)'3', (byte)'0', (byte)SequenceElement.SEM, (byte)'1', (byte)'m');
-                break;
-            case ConsoleColor.DarkRed:
-                SendCSI((byte)'3', (byte)'1', (byte)SequenceElement.SEM, (byte)'1', (byte)'m');
-                break;
-            case ConsoleColor.DarkGreen:
-                SendCSI((byte)'3', (byte)'2', (byte)SequenceElement.SEM, (byte)'1', (byte)'m');
-                break;
-            case ConsoleColor.DarkYellow:
-                SendCSI((byte)'3', (byte)'3', (byte)SequenceElement.SEM, (byte)'1', (byte)'m');
-                break;
-            case ConsoleColor.DarkBlue:
-                SendCSI((byte)'3', (byte)'4', (byte)SequenceElement.SEM, (byte)'1', (byte)'m');
-                break;
-            case ConsoleColor.DarkMagenta:
-                SendCSI((byte)'3', (byte)'5', (byte)SequenceElement.SEM, (byte)'1', (byte)'m');
-                break;
-            case ConsoleColor.DarkCyan:
-                SendCSI((byte)'3', (byte)'6', (byte)SequenceElement.SEM, (byte)'1', (byte)'m');
-                break;
-            case ConsoleColor.White:
-                SendCSI((byte)'3', (byte)'7', (byte)SequenceElement.SEM, (byte)'1', (byte)'m');
-                break;
-            }
-        }
-
-        public Position GetSize()
-        {
-            HideCursor();
-            SaveCursor();
-            CursorToColumn(MAX_WIDTH, false);
-            CursorDown(MAX_HEIGHT, false);
-
-            var result = GetCursorPosition();
-
-            RestoreCursor();
-            ShowCursor();
-            return result;
-        }
-
-        public Position GetCursorPosition()
-        {
-            if(forceVirtualCursor)
-            {
-                return vcursor.RealPosition;
-            }
-
-            var unusedCharacters = new List<char>();
-            ControlSequence cs;
-            while(true)
-            {
-                var localBuffer = new List<char>();
-
-                SendCSI();
-                SendControlSequence("6n");
-
-                while(true)
-                {
-                    var currentChar = InputOutput.GetNextChar();
-                    if(currentChar == null)
-                    {
-                        foreach(var uc in unusedCharacters)
-                        {
-                            InputOutput.Inject(uc);
-                        }
-                        // the output is closed - there will be no more data
-                        return new Position(0, 0);
-                    }
-
-                    localBuffer.Add(currentChar.Value);
-
-                    var validationResult = validator.Check(localBuffer, out cs);
-                    switch(validationResult)
-                    {
-                    case SequenceValidationResult.PrefixFound:
-                        continue;
-
-                    case SequenceValidationResult.SequenceFound:
-                        if(cs.Type == ControlSequenceType.CursorPosition)
-                        {
-                            foreach(var uc in unusedCharacters)
-                            {
-                                InputOutput.Inject(uc);
-                            }
-                            return (Position)cs.Argument;
-                        }
-                        break;
-                    }
-                    unusedCharacters.AddRange(localBuffer);
-                    localBuffer.Clear();
-                }
-            }
+            int SGRNumber = colorSGINumbers[(int)color];
+            SendCSI($"{SGRNumber}m");
         }
 
         #endregion

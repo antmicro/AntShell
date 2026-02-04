@@ -21,7 +21,6 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 using System;
-using System.IO;
 
 using AntShell.Helpers;
 using AntShell.Terminal;
@@ -141,22 +140,34 @@ namespace AntShell
         private void HandleSearchPromptChange()
         {
             SearchPrompt.Recreate(terminal);
-
             history.Reset();
             var result = history.Search(search.Value);
             terminal.WriteNoMove(result, SearchPrompt.Skip);
         }
 
-        private void RedrawCommandLine()
+        private void RedrawFromCursor()
         {
-            if(mode == Mode.Command || mode == Mode.UserInput)
-            {
-                terminal.ClearToTheEndOfLine();
-                terminal.WriteNoMove(CurrentEditor.ToString(CurrentEditor.Position));
-            }
-            else if(mode == Mode.Search)
+            terminal.ClearToEndOfScreen();
+            if(mode == Mode.Search)
             {
                 HandleSearchPromptChange();
+            }
+            else
+            {
+                terminal.WriteNoMove(CurrentEditor.ToString(CurrentEditor.Position));
+            }
+        }
+
+        public void Redraw()
+        {
+            terminal.CursorToStart();
+            terminal.ClearToEndOfScreen();
+
+            CurrentPrompt.Write(terminal);
+            if(mode != Mode.Search)
+            {
+                terminal.Write(CurrentEditor.ToString(0, CurrentEditor.Position));
+                terminal.WriteNoMove(CurrentEditor.ToString(CurrentEditor.Position));
             }
         }
 
@@ -165,8 +176,8 @@ namespace AntShell
             var diff = CurrentEditor.RemoveWord();
             if(diff > 0)
             {
-                terminal.CursorBackward(diff);
-                RedrawCommandLine();
+                terminal.CursorAdvance(-diff);
+                RedrawFromCursor();
             }
         }
 
@@ -175,7 +186,7 @@ namespace AntShell
             var diff = CurrentEditor.RemoveWordForward();
             if(diff > 0)
             {
-                RedrawCommandLine();
+                RedrawFromCursor();
             }
         }
 
@@ -185,29 +196,41 @@ namespace AntShell
             {
                 history.SetCurrentCommand(CurrentEditor.Value);
             }
-
-            var prev = history.PreviousCommand();
-            if(prev != null)
-            {
-                var len = CurrentEditor.Position;
-                CurrentEditor.SetValue(prev);
-                terminal.CursorBackward(len);
-                terminal.ClearToTheEndOfLine();
-                terminal.Write(CurrentEditor.Value);
-            }
+            UpdateHistory(history.PreviousCommand());
         }
 
         private void HistoryNext()
         {
-            var cmd = history.NextCommand();
-            if(cmd != null)
+            if(!history.HasMoved)
             {
-                var len = CurrentEditor.Position;
-                CurrentEditor.SetValue(cmd);
-                terminal.CursorBackward(len);
-                terminal.ClearToTheEndOfLine();
-                terminal.Write(CurrentEditor.Value);
+                history.SetCurrentCommand(CurrentEditor.Value);
             }
+            UpdateHistory(history.NextCommand());
+        }
+
+        private void UpdateHistory(string cmd)
+        {
+            var switchedModes = false;
+            if(mode == Mode.Search)
+            {
+                switchedModes = true;
+                mode = Mode.Command;
+            }
+            if(cmd == null)
+            {
+                Redraw();
+                return;
+            }
+            var len = CurrentEditor.Position;
+            CurrentEditor.SetValue(cmd);
+            if(switchedModes)
+            {
+                Redraw();
+                return;
+            }
+            terminal.CursorAdvance(-len);
+            terminal.ClearToEndOfScreen();
+            terminal.Write(CurrentEditor.Value);
         }
 
         public void HandleControlSequence(ControlSequence seq)
@@ -217,28 +240,28 @@ namespace AntShell
             case ControlSequenceType.Home:
             {
                 var diff = CurrentEditor.MoveHome();
-                terminal.CursorBackward(diff);
+                terminal.CursorAdvance(-diff);
             }
             break;
 
             case ControlSequenceType.End:
             {
                 var diff = CurrentEditor.MoveEnd();
-                terminal.CursorForward(diff);
+                terminal.CursorAdvance(-diff);
             }
             break;
 
             case ControlSequenceType.LeftArrow:
                 if(CurrentEditor.MoveCharacterBackward())
                 {
-                    terminal.CursorBackward();
+                    terminal.CursorAdvance(-1);
                 }
                 break;
 
             case ControlSequenceType.RightArrow:
                 if(CurrentEditor.MoveCharacterForward())
                 {
-                    terminal.CursorForward();
+                    terminal.CursorAdvance(1);
                 }
                 break;
 
@@ -261,11 +284,11 @@ namespace AntShell
             case ControlSequenceType.Backspace:
                 if(CurrentEditor.RemovePreviousCharacter())
                 {
-                    terminal.CursorBackward();
+                    terminal.CursorAdvance(-1);
 
                     if(mode == Mode.Command || mode == Mode.UserInput)
                     {
-                        terminal.ClearToTheEndOfLine();
+                        terminal.ClearToEndOfScreen();
                         terminal.WriteNoMove(CurrentEditor.ToString(CurrentEditor.Position));
                     }
                     else if(mode == Mode.Search)
@@ -284,7 +307,7 @@ namespace AntShell
                 {
                     if(mode == Mode.Command || mode == Mode.UserInput)
                     {
-                        terminal.ClearToTheEndOfLine();
+                        terminal.ClearToEndOfScreen();
                         terminal.WriteNoMove(CurrentEditor.ToString(CurrentEditor.Position));
                     }
                     else if(mode == Mode.Search)
@@ -301,14 +324,14 @@ namespace AntShell
             case ControlSequenceType.CtrlLeftArrow:
             {
                 var diff = CurrentEditor.MoveWordBackward();
-                terminal.CursorBackward(diff);
+                terminal.CursorAdvance(-diff);
             }
             break;
 
             case ControlSequenceType.CtrlRightArrow:
             {
                 var diff = CurrentEditor.MoveWordForward();
-                terminal.CursorForward(diff);
+                terminal.CursorAdvance(diff);
             }
             break;
 
@@ -319,28 +342,28 @@ namespace AntShell
                 case 'a':
                 {
                     var diff = CurrentEditor.MoveHome();
-                    terminal.CursorBackward(diff);
+                    terminal.CursorAdvance(diff);
                 }
                 break;
 
                 case 'e':
                 {
                     var diff = CurrentEditor.MoveEnd();
-                    terminal.CursorForward(diff);
+                    terminal.CursorAdvance(diff);
                 }
                 break;
 
                 case 'f':
                     if(CurrentEditor.MoveCharacterForward())
                     {
-                        terminal.CursorForward();
+                        terminal.CursorAdvance(1);
                     }
                     break;
 
                 case 'b':
                     if(CurrentEditor.MoveCharacterBackward())
                     {
-                        terminal.CursorBackward();
+                        terminal.CursorAdvance(-1);
                     }
                     break;
 
@@ -363,14 +386,14 @@ namespace AntShell
                 case 'c':
                     if(mode == Mode.Command)
                     {
-                        terminal.CursorForward(CurrentEditor.MoveEnd());
+                        terminal.CursorAdvance(CurrentEditor.MoveEnd());
                         terminal.Write("^C");
                         terminal.NewLine();
                     }
                     else
                     {
                         mode = Mode.Command;
-                        terminal.ClearLine();
+                        terminal.ClearLineToEndOfScreen();
                     }
 
                     search.Clear();
@@ -393,12 +416,7 @@ namespace AntShell
                     {
                         history.searchForward = searchForward;
                         mode = Mode.Search;
-                        terminal.CursorBackward(command.MoveHome());
-                        terminal.ClearLine();
-                        search.SetValue(string.Empty);
-                        command.Clear();
-
-                        CurrentPrompt.Write(terminal);
+                        Redraw();
                     }
                     else if(mode == Mode.Search)
                     {
@@ -407,14 +425,14 @@ namespace AntShell
                             if(history.searchForward != searchForward)
                             {
                                 history.searchForward = searchForward;
-                                terminal.ClearLine();
+                                terminal.ClearLineToEndOfScreen();
                                 CurrentPrompt.Write(terminal);
                             }
                             var result = history.Search(search.Value);
-                            terminal.CursorForward(SearchPrompt.Skip);
-                            terminal.ClearToTheEndOfLine();
+                            terminal.CursorAdvance(SearchPrompt.Skip);
+                            terminal.ClearToEndOfScreen();
                             terminal.WriteNoMove(result);
-                            terminal.CursorBackward(SearchPrompt.Skip);
+                            terminal.CursorAdvance(-SearchPrompt.Skip);
                         }
                     }
 
@@ -429,7 +447,7 @@ namespace AntShell
 
                     if(mode == Mode.Command || mode == Mode.UserInput)
                     {
-                        terminal.ClearToTheEndOfLine();
+                        terminal.ClearToEndOfScreen();
                     }
                     else if(mode == Mode.Search)
                     {
@@ -441,7 +459,7 @@ namespace AntShell
                     // Delete next character
                     if(CurrentEditor.RemoveNextCharacter())
                     {
-                        terminal.ClearToTheEndOfLine();
+                        terminal.ClearToEndOfScreen();
                         terminal.WriteNoMove(CurrentEditor.ToString(CurrentEditor.Position));
 
                         // For Search also update prompt
@@ -464,7 +482,7 @@ namespace AntShell
                         {
                             // Do not close the terminal, just exit the search prompt
                             mode = Mode.Command;
-                            terminal.ClearLine();
+                            terminal.ClearLineToEndOfScreen();
                             CurrentPrompt.Write(terminal);
                         }
                     }
@@ -474,11 +492,11 @@ namespace AntShell
                     // Delete all characters to the beginning of the line
                     while(CurrentEditor.RemovePreviousCharacter())
                     {
-                        terminal.CursorBackward();
+                        terminal.CursorAdvance(-1);
                     }
                     if(mode == Mode.Command || mode == Mode.UserInput)
                     {
-                        terminal.ClearToTheEndOfLine();
+                        terminal.ClearToEndOfScreen();
                         terminal.WriteNoMove(CurrentEditor.ToString(CurrentEditor.Position));
                     }
                     else if(mode == Mode.Search)
@@ -499,9 +517,7 @@ namespace AntShell
                     command.SetValue(history.CurrentCommand ?? string.Empty);
                     mode = Mode.Command;
 
-                    terminal.ClearLine();
-                    NormalPrompt.Write(terminal);
-                    terminal.Write(command.Value);
+                    Redraw();
                 }
                 break;
 
@@ -514,7 +530,7 @@ namespace AntShell
                 {
                     mode = Mode.Command;
                     CurrentEditor.SetValue(history.CurrentCommand);
-                    terminal.ClearLine();
+                    terminal.ClearLineToEndOfScreen();
                     CurrentPrompt.Write(terminal);
                     terminal.Write(CurrentEditor.Value);
                 }
@@ -534,8 +550,8 @@ namespace AntShell
                     {
                         tabTabMode = true;
 
-                        terminal.CursorBackward(CurrentEditor.Position);
-                        terminal.ClearToTheEndOfLine();
+                        terminal.CursorAdvance(-CurrentEditor.Position);
+                        terminal.ClearToEndOfScreen();
                         CurrentEditor.SetValue(prefix);
                     }
                     else if(tabTabMode)
@@ -569,12 +585,12 @@ namespace AntShell
                     command.SetValue(history.CurrentCommand ?? string.Empty);
                     search.Clear();
 
-                    terminal.ClearLine();
+                    terminal.ClearLineToEndOfScreen();
                     wasInSearchMode = true;
                 }
                 else
                 {
-                    terminal.CursorForward(CurrentEditor.MoveEnd());
+                    terminal.CursorAdvance(CurrentEditor.MoveEnd());
                     terminal.NewLine();
                 }
 
@@ -582,6 +598,7 @@ namespace AntShell
                 {
                     if(wasInSearchMode)
                     {
+                        terminal.CursorToStart();
                         NormalPrompt.Write(terminal);
                         terminal.Write(command.Value);
                         terminal.NewLine();
@@ -684,7 +701,7 @@ namespace AntShell
                         // This handles 'UserInput' mode for Ctrl-C and Ctrl-D
                         if((char)inputAsControlSequence.Argument == 'c')
                         {
-                            terminal.CursorForward(CurrentEditor.MoveEnd());
+                            terminal.CursorAdvance(CurrentEditor.MoveEnd());
                             terminal.Write("^C");
                             break;
                         }
@@ -692,7 +709,7 @@ namespace AntShell
                         {
                             if(String.IsNullOrEmpty(CurrentEditor.Value))
                             {
-                                terminal.CursorForward(CurrentEditor.MoveEnd());
+                                terminal.CursorAdvance(CurrentEditor.MoveEnd());
                                 terminal.Write("^D");
                                 break;
                             }

@@ -43,8 +43,6 @@ namespace AntShell
 
         public bool UseBuiltinSave { get; set; }
 
-        public bool ForceVirtualCursor { get; set; }
-
         public bool ClearScreen { get; set; }
 
         public string HistorySavePath { get; set; }

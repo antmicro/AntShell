@@ -20,8 +20,6 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-using System;
-
 using AntShell.Helpers;
 
 namespace AntShell.Terminal
@@ -30,198 +28,68 @@ namespace AntShell.Terminal
     {
         public VirtualCursor()
         {
-            RealPosition = new Position(1, 1);
-            MaxPosition = new Position(1, 1);
-            MaxReachedPosition = new Position(1, 1);
+            Position = new Position(1, 1);
+            TermWidth = 0;
         }
 
-        public Position RealPosition;
+        /// 1-based and relative to the beginning of the prompt line.
+        public Position Position;
 
-        public Position BackPosition
+        /// Amount of characters since the beginning of the prompt line.
+        public int CharPosition
         {
-            get
+            get => (Position.X - 1) + (Position.Y - 1) * TermWidth;
+            set => Position = TermWidth == 0 ? new Position(value + 1, 1) : new Position(value % TermWidth + 1, value / TermWidth + 1);
+        }
+
+        private int termWidth;
+        public int TermWidth
+        {
+            get => termWidth;
+            set
             {
-                return RealPosition.X == 1 ? new Position(MaxPosition.X + 1, RealPosition.Y - 1) : RealPosition;
+                var charPos = CharPosition;
+                termWidth = value;
+                CharPosition = charPos;
             }
         }
 
-        public Position MaxReachedPosition;
-
-        public Position MaxPosition;
-
-        public bool IsCursorOutOfLine { get; private set; }
-
-        public bool IsCursorOutOfScreen { get; private set; }
-
-        public void Calibrate(Position pos, Position maxPos)
+        /// Makes a new non-wrapping line
+        public void NewLine()
         {
-            RealPosition = pos;
-            MaxReachedPosition = pos;
-            MaxPosition = maxPos;
+            Position.Y = 1;
         }
 
-        public void MoveUp(int n = 1)
+        public void LineFeed()
         {
-            RealPosition.Y = Math.Max(1, RealPosition.Y - n);
+            Position.X = 1;
         }
 
-        public bool MoveDown(int n = 1)
-        {
-            if(RealPosition.Y + n <= MaxPosition.Y)
-            {
-                RealPosition.Y += n;
-                return true;
-            }
+        public MoveResult MoveToStart() => Move(-CharPosition);
 
-            RealPosition.Y = MaxPosition.Y;
-            return false;
+        public MoveResult Move(int n)
+        {
+            var oldPos = Position;
+            CharPosition += n;
+            var newPos = Position;
+            var needNewline = n > 0 && Position.X == 1;
+            if(needNewline)
+            {
+                newPos.X = TermWidth;
+            }
+            return new MoveResult(newPos - oldPos, needNewline);
         }
 
-        public VirtualCursorMoveResult MoveForward(int n = 1, bool enableOutOfScreen = true, bool enableWrap = true)
+        public struct MoveResult
         {
-            int result = (int)VirtualCursorMoveResult.NotMoved;
-            for(int i = 0; i < n; i++)
+            public MoveResult(Position delta, bool needNewline = false)
             {
-                var tmp = MoveForward(enableOutOfScreen, enableWrap);
-                if((int)tmp > result)
-                {
-                    result = (int)tmp;
-                }
+                Delta = delta;
+                NeedNewLine = needNewline;
             }
-
-            return (VirtualCursorMoveResult)result;
+            public Position Delta;
+            public bool NeedNewLine;
         }
-
-        private VirtualCursorMoveResult MoveForward(bool enableOutOfScreen, bool enableWrap)
-        {
-            var result = VirtualCursorMoveResult.NotMoved;
-
-            if(RealPosition.X < MaxPosition.X)
-            {
-                RealPosition.X++;
-                IsCursorOutOfLine = false;
-                IsCursorOutOfScreen = false;
-                result = VirtualCursorMoveResult.Moved;
-            }
-            else if(RealPosition.X == MaxPosition.X)
-            {
-                if(enableOutOfScreen)
-                {
-                    RealPosition.X++;
-                    IsCursorOutOfLine = true;
-                    IsCursorOutOfScreen = (RealPosition.Y == MaxPosition.Y);
-                    result = VirtualCursorMoveResult.Moved;
-                }
-                else
-                {
-                    RealPosition.X = 1;
-                    IsCursorOutOfLine = false;
-                    IsCursorOutOfScreen = false;
-                    if(RealPosition.Y < MaxPosition.Y)
-                    {
-                        RealPosition.Y++;
-                        result = VirtualCursorMoveResult.LineWrapped;
-                    }
-                    else
-                    {
-                        result = VirtualCursorMoveResult.ScreenScrolled;
-                    }
-                }
-            }
-            else
-            {
-                if(enableWrap)
-                {
-                    RealPosition.X = 2;
-                    IsCursorOutOfLine = false;
-
-                    if(RealPosition.Y < MaxPosition.Y)
-                    {
-                        RealPosition.Y++;
-                        result = VirtualCursorMoveResult.LineWrapped;
-                    }
-                    else
-                    {
-                        result = VirtualCursorMoveResult.ScreenScrolled;
-                    }
-                }
-                else
-                {
-                    result = VirtualCursorMoveResult.NotMoved;
-                }
-            }
-
-            if((RealPosition.Y > MaxReachedPosition.Y) || ((RealPosition.Y == MaxReachedPosition.Y) && (RealPosition.X > MaxReachedPosition.X)))
-            {
-                MaxReachedPosition.X = RealPosition.X;
-                MaxReachedPosition.Y = RealPosition.Y;
-            }
-
-            return result;
-        }
-
-        public void MoveBackward(int n = 1)
-        {
-            if(RealPosition.X == 1)
-            {
-                RealPosition.Y--;
-                RealPosition.X = Math.Max(1, BackPosition.X - n);
-            }
-            else
-            {
-                RealPosition.X = Math.Max(1, RealPosition.X - n);
-            }
-        }
-
-        public void SetX(int n)
-        {
-            RealPosition.X = Math.Max(1, Math.Min(MaxPosition.X, n));
-        }
-
-        public void SetY(int n)
-        {
-            RealPosition.Y = Math.Max(1, Math.Min(MaxPosition.Y, n));
-        }
-
-        public Position CalculateMoveForward(int n)
-        {
-            var linesDown = 0;
-            var countLeft = n;
-            var currentX = RealPosition.X;
-
-            while(currentX + countLeft >= MaxPosition.X + 1)
-            {
-                countLeft -= MaxPosition.X + 1 - currentX;
-                currentX = 1;
-                linesDown++;
-            }
-
-            return new Position(currentX - RealPosition.X + countLeft, linesDown);
-        }
-
-        public Position CalculateMoveBackward(int n)
-        {
-            var linesUp = 0;
-            var countLeft = n;
-            var currentX = RealPosition.X - 1;
-
-            while(countLeft > currentX)
-            {
-                countLeft -= currentX;
-                linesUp++;
-                currentX = MaxPosition.X;
-            }
-
-            return new Position((currentX - countLeft + 1) - RealPosition.X, -linesUp);
-        }
-    }
-
-    internal enum VirtualCursorMoveResult
-    {
-        NotMoved,
-        Moved,
-        LineWrapped,
-        ScreenScrolled
     }
 }
 

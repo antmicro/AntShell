@@ -102,7 +102,7 @@ namespace AntShell
 
         public void ClearToEnd()
         {
-            terminal.ClearDown();
+            terminal.ClearToEndOfScreen();
         }
 
         #endregion

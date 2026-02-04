@@ -29,6 +29,8 @@ namespace AntShell.Terminal
         void HandleControlSequence(ControlSequence cs);
 
         void HandleCharacter(char c);
+
+        void Redraw();
     }
 }
 

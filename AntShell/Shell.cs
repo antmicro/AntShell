@@ -112,7 +112,6 @@ namespace AntShell
                 term.Write(settings.BannerProvider());
                 term.NewLine();
                 term.NewLine();
-                term.Calibrate();
             }
 
             if(StartupCommand != null)
