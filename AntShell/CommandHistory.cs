@@ -25,6 +25,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace AntShell
 {
@@ -57,7 +58,13 @@ namespace AntShell
 
         public string Search(string command)
         {
-            return searchForward ? ForwardSearch(command) : ReverseSearch(command);
+            var current = items.ElementAtOrDefault(position);
+            string found;
+            do
+            {
+                found = searchForward ? ForwardSearch(command) : ReverseSearch(command);
+            } while(found == current && found != null);
+            return found;
         }
 
         public string ReverseSearch(string command)
