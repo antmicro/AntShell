@@ -1,8 +1,5 @@
 /*
-Copyright (c) 2013-2015 Antmicro <www.antmicro.com>
-
-Authors:
-* Mateusz Holenko (mholenko@antmicro.com)
+Copyright (c) 2010-2026 Antmicro Ltd <www.antmicro.com>
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the

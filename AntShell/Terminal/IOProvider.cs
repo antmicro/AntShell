@@ -1,6 +1,6 @@
 ﻿// *******************************************************************
 //
-//  Copyright (c) 2013-2022, Antmicro Ltd <antmicro.com>
+//  Copyright (c) 2013-2026, Antmicro Ltd <antmicro.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
