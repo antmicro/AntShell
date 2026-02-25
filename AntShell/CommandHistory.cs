@@ -76,7 +76,7 @@ namespace AntShell
                         position = lPos;
                         return items[lPos];
                     }
-					
+
                     lPos--;
                 }
             }
@@ -117,7 +117,7 @@ namespace AntShell
                 position--;
                 return items[position];
             }
-			
+
             return null;
         }
 
@@ -160,7 +160,7 @@ namespace AntShell
         #region Private fields
 
         private List<string> items = new List<string>();
-		
+
         private int position = -1;
 
         private string _currentCommand;

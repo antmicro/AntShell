@@ -159,6 +159,6 @@ namespace AntShell.Helpers
         PrefixFound
     }
 
-    public delegate ControlSequence ControlSequenceGenerator(IReadOnlyList<char> seq,int length);
+    public delegate ControlSequence ControlSequenceGenerator(IReadOnlyList<char> seq, int length);
 }
 

@@ -74,7 +74,7 @@ namespace AntShell.Commands.BuiltIn
             writer.WriteLine("Commands history:");
             writer.WriteLine();
 
-            var historyLength = history.Items.Count(); 
+            var historyLength = history.Items.Count();
             var toSkip = Math.Max(0, historyLength - historyLimit);
             var counter = toSkip + 1;
             foreach(var item in history.Items.Skip(toSkip).Take(historyLimit))

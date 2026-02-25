@@ -106,7 +106,7 @@ namespace AntShell
             var diff = DiffPrevWord();
             var previousPosition = Position;
             Position -= diff;
-		
+
             if(diff > 0)
             {
                 bldr.Remove(Position, previousPosition - Position);
@@ -210,11 +210,11 @@ namespace AntShell
         public int Length { get { return bldr.Length; } }
 
         public string Value
-        { 
+        {
             get
-            { 
-                return ToString(); 
-            } 
+            {
+                return ToString();
+            }
 
             private set
             {
@@ -237,43 +237,43 @@ namespace AntShell
         private int DiffNextWord()
         {
             var pos = Position;
-			
+
             // jump to the beginning of next word
             while(pos < Length && char.IsWhiteSpace(bldr[pos]))
             {
                 pos++;
             }
-			
+
             // jump to the end of current word
             while(pos < Length && !char.IsWhiteSpace(bldr[pos]))
             {
                 pos++;
             }
-						
+
             return pos - Position;
         }
 
         private int DiffPrevWord()
         {
             var pos = Position;
-			
+
             if(pos > 0)
             {
                 pos--;
             }
-			
+
             // jump to the end of previous word
             while(pos > 0 && char.IsWhiteSpace(bldr[pos]))
             {
                 pos--;
             }
-			
+
             // jump to the beginning of current word
             while(pos > 0 && !char.IsWhiteSpace(bldr[pos]))
             {
                 pos--;
             }
-			
+
             if(pos > 0 && Length > 0)
             {
                 pos++;

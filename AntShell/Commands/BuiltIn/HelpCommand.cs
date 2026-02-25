@@ -35,7 +35,7 @@ namespace AntShell.Commands.BuiltIn
             writer.WriteLine("=======================================");
             foreach(var item in commands)
             {
-                writer.WriteLine(string.Format("{0,-18}: {1}", item.Name, item.Description));    
+                writer.WriteLine(string.Format("{0,-18}: {1}", item.Name, item.Description));
             }
 
             return 0;

@@ -22,11 +22,12 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using System.Linq;
-using AntShell.Terminal;
+using System.Text.RegularExpressions;
+
 using AntShell.Commands;
 using AntShell.Commands.BuiltIn;
+using AntShell.Terminal;
 
 namespace AntShell
 {
@@ -35,11 +36,11 @@ namespace AntShell
         public event Action Quitted;
         public event Action<Shell> Started;
 
-        public NavigableTerminalEmulator Terminal 
-        { 
-            get 
-            { 
-                return term; 
+        public NavigableTerminalEmulator Terminal
+        {
+            get
+            {
+                return term;
             }
             set
             {
@@ -218,11 +219,11 @@ namespace AntShell
             }
 
             var param = Regex.Matches(cmd, string.Format(@"(?<match>[{0}]+)|\""(?<match>[{0}]*)""", @"\w\.\-\?\!\~\/"))
-					.Cast<Match>()
-					.Select(m => m.Groups["match"].Value)
-					.ToArray();
+                    .Cast<Match>()
+                    .Select(m => m.Groups["match"].Value)
+                    .ToArray();
 
-            var command = param.Length > 0 ? Commands.SingleOrDefault(x => 
+            var command = param.Length > 0 ? Commands.SingleOrDefault(x =>
                 (x.Name == param[0]) || x.AlternativeNames.Contains(param[0]) ||
                           ((x is IOperator) ? (param[0].Length > 0 && ((IOperator)x).Operator == param[0][0]) : false)
                           ) : null;

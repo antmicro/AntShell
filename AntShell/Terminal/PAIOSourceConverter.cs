@@ -24,8 +24,9 @@
 // *******************************************************************
 using System;
 using System.Threading;
-using Antmicro.Migrant.Hooks;
+
 using Antmicro.Migrant;
+using Antmicro.Migrant.Hooks;
 
 namespace AntShell.Terminal
 {
@@ -102,7 +103,8 @@ namespace AntShell.Terminal
 
             public void Run()
             {
-                thread = new Thread(Loop) {
+                thread = new Thread(Loop)
+                {
                     Name = "PAIOSourceConverter runner",
                     IsBackground = true
                 };

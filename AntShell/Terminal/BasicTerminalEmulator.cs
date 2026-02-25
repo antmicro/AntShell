@@ -23,6 +23,7 @@
 //
 // *******************************************************************
 using System;
+
 using AntShell.Helpers;
 
 namespace AntShell.Terminal

@@ -21,6 +21,7 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 using System;
+
 using AntShell.Helpers;
 
 namespace AntShell.Terminal
@@ -44,7 +45,7 @@ namespace AntShell.Terminal
             }
         }
 
-        public Position MaxReachedPosition { get ; private set; }
+        public Position MaxReachedPosition { get; private set; }
 
         public Position MaxPosition { get; private set; }
 

@@ -21,9 +21,10 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 using System;
+using System.IO;
+
 using AntShell.Helpers;
 using AntShell.Terminal;
-using System.IO;
 
 namespace AntShell
 {
@@ -214,18 +215,18 @@ namespace AntShell
             switch(seq.Type)
             {
             case ControlSequenceType.Home:
-                {
-                    var diff = CurrentEditor.MoveHome();
-                    terminal.CursorBackward(diff);
-                }
-                break;
+            {
+                var diff = CurrentEditor.MoveHome();
+                terminal.CursorBackward(diff);
+            }
+            break;
 
             case ControlSequenceType.End:
-                {
-                    var diff = CurrentEditor.MoveEnd();
-                    terminal.CursorForward(diff);
-                }
-                break;
+            {
+                var diff = CurrentEditor.MoveEnd();
+                terminal.CursorForward(diff);
+            }
+            break;
 
             case ControlSequenceType.LeftArrow:
                 if(CurrentEditor.MoveCharacterBackward())
@@ -298,36 +299,36 @@ namespace AntShell
                 break;
 
             case ControlSequenceType.CtrlLeftArrow:
-                {
-                    var diff = CurrentEditor.MoveWordBackward();
-                    terminal.CursorBackward(diff);
-                }
-                break;
+            {
+                var diff = CurrentEditor.MoveWordBackward();
+                terminal.CursorBackward(diff);
+            }
+            break;
 
             case ControlSequenceType.CtrlRightArrow:
-                {
-                    var diff = CurrentEditor.MoveWordForward();
-                    terminal.CursorForward(diff);
-                }
-                break;
+            {
+                var diff = CurrentEditor.MoveWordForward();
+                terminal.CursorForward(diff);
+            }
+            break;
 
             case ControlSequenceType.Ctrl:
                 var searchForward = false;
                 switch((char)seq.Argument)
                 {
                 case 'a':
-                    {
-                        var diff = CurrentEditor.MoveHome();
-                        terminal.CursorBackward(diff);
-                    }
-                    break;
+                {
+                    var diff = CurrentEditor.MoveHome();
+                    terminal.CursorBackward(diff);
+                }
+                break;
 
                 case 'e':
-                    {
-                        var diff = CurrentEditor.MoveEnd();
-                        terminal.CursorForward(diff);
-                    }
-                    break;
+                {
+                    var diff = CurrentEditor.MoveEnd();
+                    terminal.CursorForward(diff);
+                }
+                break;
 
                 case 'f':
                     if(CurrentEditor.MoveCharacterForward())
@@ -442,7 +443,7 @@ namespace AntShell
                     {
                         terminal.ClearToTheEndOfLine();
                         terminal.WriteNoMove(CurrentEditor.ToString(CurrentEditor.Position));
-                        
+
                         // For Search also update prompt
                         if(mode == Mode.Search)
                         {
@@ -686,7 +687,7 @@ namespace AntShell
                             terminal.CursorForward(CurrentEditor.MoveEnd());
                             terminal.Write("^C");
                             break;
-                        } 
+                        }
                         else if((char)inputAsControlSequence.Argument == 'd')
                         {
                             if(String.IsNullOrEmpty(CurrentEditor.Value))

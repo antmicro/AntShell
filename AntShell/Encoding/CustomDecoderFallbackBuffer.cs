@@ -34,7 +34,7 @@ namespace AntShell.Encoding
         private bool _IsError;
 
         public bool IsError
-        { 
+        {
             get
             {
                 var result = _IsError;

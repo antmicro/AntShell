@@ -23,6 +23,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using AntShell.Helpers;
 
 namespace AntShell.Terminal
@@ -175,7 +176,7 @@ namespace AntShell.Terminal
                     continue;
                 }
 
-                HandleInput(input);	
+                HandleInput(input);
             }
         }
 
@@ -579,7 +580,7 @@ namespace AntShell.Terminal
             for(int i = count; i > 0; i--)
             {
                 SendCSI((byte)'2', (byte)'K'); // clear line
-                CursorUp();		
+                CursorUp();
 
                 if(WrappedLines.Count > 0 && WrappedLines.Count - i > 0)
                 {
