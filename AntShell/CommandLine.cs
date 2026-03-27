@@ -530,6 +530,7 @@ namespace AntShell
                 {
                     mode = Mode.Command;
                     CurrentEditor.SetValue(history.CurrentCommand);
+                    terminal.CursorToStart();
                     terminal.ClearLineToEndOfScreen();
                     CurrentPrompt.Write(terminal);
                     terminal.Write(CurrentEditor.Value);
