@@ -342,7 +342,7 @@ namespace AntShell
                 case 'a':
                 {
                     var diff = CurrentEditor.MoveHome();
-                    terminal.CursorAdvance(diff);
+                    terminal.CursorAdvance(-diff);
                 }
                 break;
 
