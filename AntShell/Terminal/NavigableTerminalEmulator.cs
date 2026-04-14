@@ -23,6 +23,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 using AntShell.Helpers;
 
@@ -67,11 +68,13 @@ namespace AntShell.Terminal
             if(SizeSource != null)
             {
                 vcursor.TermWidth = SizeSource.Size.X;
-                SizeSource.Resized += OnResize;
+                SizeSource.Resized += OnResizeRequest;
             }
         }
 
-        private void OnResize()
+#region Resizing
+
+        private void Resize()
         {
             if(SizeSource == null) return;
 
@@ -82,6 +85,56 @@ namespace AntShell.Terminal
 
             Handler.Redraw();
         }
+
+        // This whole setup exists because Unix signals (of which SIGWINCH will call `OnSourceResize`) can happen on any thread,
+        // and we need to protect against all cases where `Resize` might be called during an existing call to `Resize`
+        // We need to keep track whether we're currently in a no-resize section, in which case any resizes (coming from either this thread being interrupted, or from another thread) are queued to trigger when we leave the no-resize section
+        // To be safe, `NoResize` is reentrant, and thus the lock status has to be an int rather than a bool
+
+        private void OnResizeRequest()
+        {
+            using(resizeGuard)
+            {
+                resizeQueued = true;
+            }
+        }
+
+        private volatile uint resizeGuardStack = 0;
+
+        private volatile bool resizeQueued = false;
+
+        private ResizeGuard resizeGuard => new ResizeGuard(this);
+
+        private readonly object resizeLock = new object();
+
+        private struct ResizeGuard : IDisposable
+        {
+            public ResizeGuard(NavigableTerminalEmulator parent)
+            {
+                this.parent = parent;
+                lock(parent.resizeLock)
+                {
+                    parent.resizeGuardStack += 1;
+                }
+            }
+
+            public void Dispose()
+            {
+                lock(parent.resizeLock)
+                {
+                    // NOTE: The check has to happen before the stack number is reduced, otherwise if this thread disposes of a `NoResize` before we set `resizeQueued = false` (which can always happen due to signals), we can have have multiple resizes happening at the same time
+                    if(parent.resizeGuardStack == 1 && parent.resizeQueued)
+                    {
+                        parent.Resize();
+                        parent.resizeQueued = false;
+                    }
+                    parent.resizeGuardStack -= 1;
+                }
+            }
+
+            private readonly NavigableTerminalEmulator parent;
+        }
+#endregion
 
         private void ControlSequences()
         {
@@ -167,7 +220,7 @@ namespace AntShell.Terminal
             onceAgain = false;
             if(SizeSource != null)
             {
-                SizeSource.Resized -= OnResize;
+                SizeSource.Resized -= OnResizeRequest;
             }
             InputOutput.CancelGet();
             InputOutput.Dispose();
@@ -190,7 +243,10 @@ namespace AntShell.Terminal
                     continue;
                 }
 
-                HandleInput(input);
+                using(resizeGuard)
+                {
+                    HandleInput(input);
+                }
             }
         }
 
