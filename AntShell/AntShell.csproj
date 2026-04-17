@@ -6,7 +6,7 @@
     <AssemblyName>AntShell</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Migrant\Migrant\Migrant_NET.csproj" />
+    <ProjectReference Include="..\..\Migrant\Migrant\Migrant.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Terminal\ActiveDetachableIO.cs" />
