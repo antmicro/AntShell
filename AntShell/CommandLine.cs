@@ -169,6 +169,11 @@ namespace AntShell
                 terminal.Write(CurrentEditor.ToString(0, CurrentEditor.Position));
                 terminal.WriteNoMove(CurrentEditor.ToString(CurrentEditor.Position));
             }
+            else
+            {
+                var match = history.CurrentCommand;
+                terminal.WriteNoMove(match, SearchPrompt.Skip);
+            }
         }
 
         private void RemoveWord()
@@ -247,7 +252,7 @@ namespace AntShell
             case ControlSequenceType.End:
             {
                 var diff = CurrentEditor.MoveEnd();
-                terminal.CursorAdvance(-diff);
+                terminal.CursorAdvance(diff);
             }
             break;
 
@@ -530,7 +535,6 @@ namespace AntShell
                 {
                     mode = Mode.Command;
                     CurrentEditor.SetValue(history.CurrentCommand);
-                    terminal.CursorToStart();
                     terminal.ClearLineToEndOfScreen();
                     CurrentPrompt.Write(terminal);
                     terminal.Write(CurrentEditor.Value);

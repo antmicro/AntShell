@@ -77,7 +77,7 @@ namespace AntShell
             tem.Write(Head, Color);
             tem.Write(Search.Value, SearchColor);
             tem.Write(Tail, Color);
-            tem.CursorAdvance(-Tail.Length);
+            tem.CursorAdvance(-(Tail.Length + Search.Length - Search.Position));
         }
 
         public void Recreate(NavigableTerminalEmulator tem, int shift = 0)

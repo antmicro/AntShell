@@ -538,6 +538,7 @@ namespace AntShell.Terminal
         {
             SendCSI("2K");
             SendCSI("J");
+            CursorToStart();
         }
 
         public void ClearToEndOfScreen()
