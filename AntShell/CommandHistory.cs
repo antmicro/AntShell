@@ -81,7 +81,7 @@ namespace AntShell
                 }
             }
 
-            position = 0;
+            position = -1;
             return null;
         }
 
