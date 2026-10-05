@@ -211,7 +211,7 @@ namespace AntShell
             if(cmd != null)
             {
                 history.Add(cmd);
-                if(settings.HistorySavePath != null)
+                if(settings.HistorySavePath != null && !string.IsNullOrWhiteSpace(cmd))
                 {
                     history.Save(settings.HistorySavePath);
                 }
