@@ -599,38 +599,35 @@ namespace AntShell
                     terminal.NewLine();
                 }
 
-                if(CurrentEditor.Value != string.Empty)
+                if(wasInSearchMode)
                 {
-                    if(wasInSearchMode)
+                    terminal.CursorToStart();
+                    NormalPrompt.Write(terminal);
+                    terminal.Write(command.Value);
+                    terminal.NewLine();
+                }
+
+                var cmd = CurrentEditor.Value;
+                while(true)
+                {
+                    var interaction = handler.HandleCommand(cmd, null);
+                    if(interaction != null && interaction.QuitEnvironment)
                     {
-                        terminal.CursorToStart();
-                        NormalPrompt.Write(terminal);
-                        terminal.Write(command.Value);
-                        terminal.NewLine();
+                        terminal.Stop();
+                        return;
                     }
 
-                    var cmd = CurrentEditor.Value;
-                    while(true)
+                    CurrentEditor.Clear();
+                    if(interaction != null && interaction.CommandToExecute != null)
                     {
-                        var interaction = handler.HandleCommand(cmd, null);
-                        if(interaction != null && interaction.QuitEnvironment)
-                        {
-                            terminal.Stop();
-                            return;
-                        }
-
-                        CurrentEditor.Clear();
-                        if(interaction != null && interaction.CommandToExecute != null)
-                        {
-                            cmd = interaction.CommandToExecute;
-                            terminal.Write(cmd);
-                            terminal.NewLine();
-                            (interaction as CommandInteraction).Clear();
-                        }
-                        else
-                        {
-                            break;
-                        }
+                        cmd = interaction.CommandToExecute;
+                        terminal.Write(cmd);
+                        terminal.NewLine();
+                        (interaction as CommandInteraction).Clear();
+                    }
+                    else
+                    {
+                        break;
                     }
                 }
 
